@@ -79,11 +79,16 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 export default function TrustSection() {
   return (
     <section
-      className="px-4 sm:px-6 lg:px-8 py-16 md:py-24 bg-zinc-950"
+      className="px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative overflow-hidden"
       itemScope
       itemType="https://schema.org/Organization"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-amber-500/4 rounded-full blur-3xl" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative">
         {/* Header */}
         <div className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 text-balance" itemProp="name">
@@ -99,7 +104,7 @@ export default function TrustSection() {
           {trustBadges.map((badge, index) => (
             <article
               key={index}
-              className="p-6 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors"
+              className="p-6 rounded-xl bg-zinc-900/30 border border-zinc-800/40 hover:border-zinc-700/60 transition-colors"
             >
               <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center mb-4">
                 <badge.icon className="w-6 h-6 text-amber-500" aria-hidden="true" />
@@ -110,7 +115,7 @@ export default function TrustSection() {
           ))}
         </div>
 
-        <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8 lg:p-10 mb-14">
+        <div className="rounded-2xl bg-zinc-900/30 border border-zinc-800/40 p-6 sm:p-8 lg:p-10 mb-14">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
@@ -130,7 +135,7 @@ export default function TrustSection() {
           {["Verified Seller", "SSL Secured", "Trusted by 1K+ Users", "Nepal Based Support"].map((signal, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-full"
+              className="flex items-center gap-2 px-4 py-2 bg-zinc-900/30 border border-zinc-800/40 rounded-full"
             >
               <CheckCircle className="w-4 h-4 text-amber-500" aria-hidden="true" />
               <span className="text-zinc-300 text-sm">{signal}</span>

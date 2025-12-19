@@ -7,7 +7,7 @@ import Image from "next/image"
 export default function Footer() {
   return (
     <footer
-      className="relative bg-black border-t border-amber-500/[0.08]"
+      className="relative bg-black/50 border-t border-amber-500/[0.08]"
       itemScope
       itemType="https://schema.org/Organization"
       role="contentinfo"

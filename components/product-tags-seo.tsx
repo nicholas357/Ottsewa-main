@@ -111,7 +111,7 @@ export default function ProductTagsSEO() {
 
   if (loading) {
     return (
-      <section className="px-4 sm:px-6 lg:px-8 py-12 md:py-16 bg-zinc-950">
+      <section className="px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <div className="h-10 w-10 bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl animate-pulse" />
@@ -147,11 +147,10 @@ export default function ProductTagsSEO() {
   if (products.length === 0) return null
 
   return (
-    <section className="px-4 sm:px-6 lg:px-8 py-12 md:py-16 bg-gradient-to-b from-zinc-950 via-zinc-950 to-zinc-900 border-t border-zinc-800/50 relative overflow-hidden">
-      {/* Background decorations */}
+    <section className="px-4 sm:px-6 lg:px-8 py-12 md:py-16 border-t border-zinc-800/30 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-64 h-64 bg-amber-500/[0.03] rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-amber-500/[0.03] rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto relative">
@@ -192,7 +191,7 @@ export default function ProductTagsSEO() {
                 key={group.type}
                 className="bg-zinc-900/50 backdrop-blur-sm rounded-xl border border-zinc-800/50 overflow-hidden hover:border-zinc-700/50 transition-colors group"
               >
-                <header className="px-4 py-3 border-b border-zinc-800/50 bg-gradient-to-r from-zinc-900/50 to-transparent">
+                <header className="px-4 py-3 border-b border-zinc-800/50">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:bg-amber-500/20 transition-colors">

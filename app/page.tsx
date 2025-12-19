@@ -42,8 +42,8 @@ export default function Home() {
         <HeroBanner />
         <CategoryIcons />
         <RecommendedSection />
-        <TrustSection />
         <ProductTagsSEO />
+        <TrustSection />
       </main>
     </>
   )

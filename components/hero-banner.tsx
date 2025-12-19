@@ -30,42 +30,42 @@ interface CachedBanners {
 
 function BannerSkeleton() {
   return (
-    <section className="bg-black">
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <section className="relative bg-zinc-950/50">
+      <div className="relative px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
             {/* Main banner skeleton */}
             <div className="relative w-full lg:w-[70%]">
               <div
-                className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900"
+                className="relative rounded-lg sm:rounded-xl overflow-hidden border border-amber-500/20 bg-zinc-900/80"
                 style={{ aspectRatio: "16/9" }}
               >
                 <div
                   className="absolute inset-0 animate-pulse bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 bg-[length:200%_100%]"
                   style={{ animation: "shimmer 1.5s infinite" }}
                 />
-                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 space-y-3">
-                  <div className="h-5 w-24 bg-zinc-800 rounded-full animate-pulse" />
-                  <div className="h-8 w-48 bg-zinc-800 rounded animate-pulse" />
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 space-y-2">
+                  <div className="h-4 w-20 bg-zinc-800 rounded-full animate-pulse" />
+                  <div className="h-6 w-40 bg-zinc-800 rounded animate-pulse" />
                 </div>
               </div>
               {/* Indicator skeleton */}
-              <div className="flex justify-center gap-2 mt-3">
-                <div className="h-1.5 w-8 bg-zinc-800 rounded-full animate-pulse" />
-                <div className="h-1.5 w-2 bg-zinc-800 rounded-full animate-pulse" />
-                <div className="h-1.5 w-2 bg-zinc-800 rounded-full animate-pulse" />
+              <div className="flex justify-center gap-1.5 mt-2.5">
+                <div className="h-1 w-6 bg-zinc-800 rounded-full animate-pulse" />
+                <div className="h-1 w-1.5 bg-zinc-800 rounded-full animate-pulse" />
+                <div className="h-1 w-1.5 bg-zinc-800 rounded-full animate-pulse" />
               </div>
             </div>
 
             {/* Side banners skeleton */}
             <div className="w-full lg:w-[30%]">
-              <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
                 {[1, 2].map((i) => (
-                  <div key={i} className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
+                  <div key={i} className="relative rounded-lg overflow-hidden border border-zinc-700/40 bg-zinc-900/80">
                     <div className="relative aspect-[16/10] sm:aspect-[16/9]">
                       <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900" />
-                      <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3">
-                        <div className="h-4 w-20 bg-zinc-800 rounded animate-pulse" />
+                      <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-2.5">
+                        <div className="h-3 w-16 bg-zinc-800 rounded animate-pulse" />
                       </div>
                     </div>
                   </div>
@@ -81,15 +81,15 @@ function BannerSkeleton() {
 
 function NoBannersState() {
   return (
-    <section className="bg-black">
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <section className="relative bg-zinc-950/50">
+      <div className="relative px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
         <div className="max-w-7xl mx-auto">
           <div
-            className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/50 flex items-center justify-center"
+            className="relative rounded-lg sm:rounded-xl overflow-hidden border border-zinc-800/60 bg-zinc-900/50 flex items-center justify-center"
             style={{ aspectRatio: "21/9" }}
           >
-            <div className="text-center p-6">
-              <p className="text-zinc-500 text-sm">No banners available</p>
+            <div className="text-center p-4">
+              <p className="text-zinc-500 text-xs sm:text-sm">No banners available</p>
             </div>
           </div>
         </div>
@@ -225,65 +225,83 @@ export default function HeroBanner() {
 
   const MainBannerWrapper = ({ children, banner }: { children: React.ReactNode; banner: Banner }) => {
     const link = getBannerLink(banner)
-    if (link === "#") {
-      return (
+    const content = (
+      <div className="relative group">
+        {/* Outer glow layer */}
+        <div className="absolute -inset-1 rounded-xl sm:rounded-2xl bg-gradient-to-b from-amber-400/20 via-amber-500/5 to-amber-400/20 blur-sm opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Inner border layer */}
+        <div className="absolute -inset-[1px] rounded-lg sm:rounded-xl bg-gradient-to-b from-amber-400/50 via-amber-500/20 to-amber-400/50" />
+        {/* Main content */}
         <div
-          className="relative block rounded-xl overflow-hidden border border-amber-500/[0.1]"
+          className="relative rounded-lg sm:rounded-xl overflow-hidden bg-zinc-900 ring-1 ring-amber-500/10"
           style={{ aspectRatio: "16/9" }}
         >
           {children}
         </div>
-      )
+      </div>
+    )
+
+    if (link === "#") {
+      return content
     }
     return (
       <Link
         href={link}
-        className="relative block rounded-xl overflow-hidden border border-amber-500/[0.1] hover:border-amber-500/20 transition-colors cursor-pointer"
-        style={{ aspectRatio: "16/9" }}
+        className="block transition-transform duration-300 hover:scale-[1.005] cursor-pointer"
         prefetch={true}
       >
-        {children}
+        {content}
       </Link>
     )
   }
 
   const SideBannerWrapper = ({ children, banner }: { children: React.ReactNode; banner: Banner }) => {
     const link = getBannerLink(banner)
-    if (link === "#") {
-      return (
-        <div className="relative rounded-xl overflow-hidden border border-amber-500/[0.1] transition-all duration-300 group">
+    const content = (
+      <div className="relative group">
+        {/* Outer subtle glow */}
+        <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-b from-zinc-500/20 via-zinc-600/10 to-zinc-500/20 blur-[2px] opacity-50 group-hover:from-amber-400/30 group-hover:via-amber-500/15 group-hover:to-amber-400/30 group-hover:opacity-80 transition-all duration-400" />
+        {/* Inner border */}
+        <div className="absolute -inset-[1px] rounded-lg bg-gradient-to-b from-zinc-500/40 via-zinc-600/20 to-zinc-500/40 group-hover:from-amber-400/50 group-hover:via-amber-500/20 group-hover:to-amber-400/50 transition-all duration-400" />
+        {/* Main content */}
+        <div className="relative rounded-lg overflow-hidden bg-zinc-900 ring-1 ring-zinc-700/30 group-hover:ring-amber-500/20 transition-all duration-400">
           {children}
         </div>
-      )
+      </div>
+    )
+
+    if (link === "#") {
+      return content
     }
     return (
       <Link
         href={link}
-        className="relative rounded-xl overflow-hidden border border-amber-500/[0.1] hover:border-amber-500/20 transition-all duration-300 group cursor-pointer"
+        className="block transition-transform duration-300 hover:scale-[1.01] cursor-pointer"
         prefetch={true}
       >
-        {children}
+        {content}
       </Link>
     )
   }
 
   return (
     <section
-      className="bg-black"
+      className="relative bg-zinc-950/50"
       aria-label="Featured promotions and offers"
       itemScope
       itemType="https://schema.org/ItemList"
     >
       <meta itemProp="name" content="Featured Products and Promotions" />
       <meta itemProp="description" content="Browse our featured streaming subscriptions and digital products" />
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="relative px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
         <div className="max-w-7xl mx-auto">
           <h1 className="sr-only">OTTSewa - Buy Streaming Subscriptions in Nepal</h1>
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
             {currentMain && (
               <div className={`relative w-full ${currentSide.length > 0 ? "lg:w-[70%]" : "lg:w-full"}`}>
                 <MainBannerWrapper banner={currentMain}>
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/25 to-transparent z-10" />
+                  {/* Top highlight line */}
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/50 to-transparent z-10" />
 
                   <div className="absolute inset-0" role="img" aria-label={currentMain.title}>
                     {mainBanners.map((slide, idx) => (
@@ -299,16 +317,16 @@ export default function HeroBanner() {
                     ))}
                   </div>
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+                  {/* Lighter gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 z-10">
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 z-10">
                     {currentMain.subtitle && (
-                      <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/[0.1] rounded-full text-[10px] sm:text-xs text-white/90 mb-2">
+                      <span className="inline-block px-2.5 py-0.5 bg-amber-500/90 rounded text-[10px] sm:text-xs font-medium text-black mb-1.5 sm:mb-2">
                         {currentMain.subtitle}
                       </span>
                     )}
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-white tracking-tight drop-shadow-sm">
                       {currentMain.title}
                     </h2>
                   </div>
@@ -321,10 +339,10 @@ export default function HeroBanner() {
                           e.stopPropagation()
                           prevMain()
                         }}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/[0.1] hover:border-white/[0.2] hover:bg-black/80 transition-all cursor-pointer"
+                        className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 p-1.5 sm:p-2 rounded-full bg-black/50 hover:bg-black/70 border border-white/10 hover:border-white/20 transition-all cursor-pointer"
                         aria-label="Previous banner"
                       >
-                        <ChevronLeft className="w-5 h-5 text-white" aria-hidden="true" />
+                        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-white" aria-hidden="true" />
                       </button>
                       <button
                         onClick={(e) => {
@@ -332,23 +350,23 @@ export default function HeroBanner() {
                           e.stopPropagation()
                           nextMain()
                         }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/[0.1] hover:border-white/[0.2] hover:bg-black/80 transition-all cursor-pointer"
+                        className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 p-1.5 sm:p-2 rounded-full bg-black/50 hover:bg-black/70 border border-white/10 hover:border-white/20 transition-all cursor-pointer"
                         aria-label="Next banner"
                       >
-                        <ChevronRight className="w-5 h-5 text-white" aria-hidden="true" />
+                        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white" aria-hidden="true" />
                       </button>
                     </>
                   )}
                 </MainBannerWrapper>
 
                 {mainBanners.length > 1 && (
-                  <div className="flex justify-center gap-2 mt-3" role="tablist" aria-label="Banner navigation">
+                  <div className="flex justify-center gap-1.5 mt-2.5" role="tablist" aria-label="Banner navigation">
                     {mainBanners.map((banner, idx) => (
                       <button
                         key={idx}
                         onClick={() => setMainIndex(idx)}
-                        className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                          idx === mainIndex ? "w-8 bg-amber-500" : "w-2 bg-amber-500/25 hover:bg-amber-500/50"
+                        className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
+                          idx === mainIndex ? "w-6 bg-amber-500" : "w-1.5 bg-zinc-600 hover:bg-zinc-500"
                         }`}
                         role="tab"
                         aria-selected={idx === mainIndex}
@@ -362,12 +380,13 @@ export default function HeroBanner() {
 
             {currentSide.length > 0 && (
               <aside className="w-full lg:w-[30%]" aria-label="Additional offers">
-                <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3 h-full">
                   {currentSide.map((banner, idx) => (
                     <SideBannerWrapper key={`${banner.id}-${idx}`} banner={banner}>
-                      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent z-10" />
+                      {/* Top highlight line */}
+                      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-500/40 to-transparent z-10 group-hover:via-amber-400/50 transition-colors duration-300" />
 
-                      <div className="relative aspect-[16/10] sm:aspect-[16/9]">
+                      <div className="relative aspect-[16/10] sm:aspect-[16/9] lg:aspect-[16/8]">
                         <img
                           src={banner.image_url || "/placeholder.svg"}
                           alt={banner.title}
@@ -375,10 +394,13 @@ export default function HeroBanner() {
                           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
 
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        {/* Lighter gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-                        <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3">
-                          <h3 className="text-xs sm:text-sm font-medium text-white line-clamp-1">{banner.title}</h3>
+                        <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-2.5">
+                          <h3 className="text-xs sm:text-sm font-medium text-white line-clamp-1 drop-shadow-sm">
+                            {banner.title}
+                          </h3>
                         </div>
                       </div>
                     </SideBannerWrapper>

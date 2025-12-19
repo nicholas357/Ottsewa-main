@@ -14,6 +14,7 @@ import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { PageTransition } from "@/components/page-transition"
 import { RouteTransitionBar } from "@/components/route-transition"
 import { ScrollToTopButton } from "@/components/scroll-to-top-button"
+import { BlendBackground } from "@/components/blend-background"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 const poppins = Poppins({
@@ -116,6 +117,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className={`${inter.variable} ${poppins.variable} font-sans antialiased bg-black`}>
+        <BlendBackground />
         <WishlistProvider>
           <CartProvider>
             <RouteTransitionBar />
@@ -126,7 +128,7 @@ export default function RootLayout({
             >
               Skip to main content
             </a>
-            <div className="flex flex-col min-h-screen">
+            <div className="relative flex flex-col min-h-screen">
               <Header />
               <div id="main-content" className="flex-1 pb-20 lg:pb-0">
                 <PageTransition>{children}</PageTransition>

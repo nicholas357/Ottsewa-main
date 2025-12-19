@@ -22,6 +22,8 @@ import {
   ShoppingBag,
   Smartphone,
   Monitor,
+  ChevronRight,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react"
 import { createBrowserClient } from "@/lib/supabase/client"
@@ -57,6 +59,26 @@ const iconMap: Record<string, LucideIcon> = {
   phone: Smartphone,
   monitor: Monitor,
   software: Monitor,
+}
+
+const categoryColors: Record<string, { bg: string; text: string; glow: string }> = {
+  games: { bg: "from-violet-500/20 to-purple-600/10", text: "text-violet-400", glow: "shadow-violet-500/20" },
+  gamepad: { bg: "from-violet-500/20 to-purple-600/10", text: "text-violet-400", glow: "shadow-violet-500/20" },
+  gamepad2: { bg: "from-violet-500/20 to-purple-600/10", text: "text-violet-400", glow: "shadow-violet-500/20" },
+  gift: { bg: "from-pink-500/20 to-rose-600/10", text: "text-pink-400", glow: "shadow-pink-500/20" },
+  wallet: { bg: "from-emerald-500/20 to-green-600/10", text: "text-emerald-400", glow: "shadow-emerald-500/20" },
+  creditcard: { bg: "from-blue-500/20 to-cyan-600/10", text: "text-blue-400", glow: "shadow-blue-500/20" },
+  "credit-card": { bg: "from-blue-500/20 to-cyan-600/10", text: "text-blue-400", glow: "shadow-blue-500/20" },
+  tv: { bg: "from-red-500/20 to-orange-600/10", text: "text-red-400", glow: "shadow-red-500/20" },
+  music: { bg: "from-green-500/20 to-emerald-600/10", text: "text-green-400", glow: "shadow-green-500/20" },
+  film: { bg: "from-amber-500/20 to-yellow-600/10", text: "text-amber-400", glow: "shadow-amber-500/20" },
+  movie: { bg: "from-amber-500/20 to-yellow-600/10", text: "text-amber-400", glow: "shadow-amber-500/20" },
+  zap: { bg: "from-orange-500/20 to-amber-600/10", text: "text-orange-400", glow: "shadow-orange-500/20" },
+  steam: { bg: "from-slate-500/20 to-zinc-600/10", text: "text-slate-300", glow: "shadow-slate-500/20" },
+  playstation: { bg: "from-blue-500/20 to-indigo-600/10", text: "text-blue-400", glow: "shadow-blue-500/20" },
+  psn: { bg: "from-blue-500/20 to-indigo-600/10", text: "text-blue-400", glow: "shadow-blue-500/20" },
+  xbox: { bg: "from-green-500/20 to-emerald-600/10", text: "text-green-400", glow: "shadow-green-500/20" },
+  default: { bg: "from-amber-500/20 to-yellow-600/10", text: "text-amber-400", glow: "shadow-amber-500/20" },
 }
 
 interface Category {
@@ -148,22 +170,27 @@ export default function CategoryIcons() {
 
   if (loading) {
     return (
-      <nav
-        className="relative bg-zinc-950 border-y border-amber-500/[0.08] px-3 sm:px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10"
+      <section
+        className="relative px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 overflow-hidden"
         aria-label="Product categories"
         aria-busy="true"
       >
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
-        <div className="max-w-7xl mx-auto grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2 sm:gap-3 md:gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="flex flex-col items-center gap-2 sm:gap-3">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-zinc-800 rounded-full animate-pulse" />
-              <div className="w-16 h-3 bg-zinc-800 rounded animate-pulse" />
-            </div>
-          ))}
+        <div className="max-w-7xl mx-auto relative">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <div className="h-7 w-40 bg-zinc-800/50 rounded-lg animate-pulse" />
+            <div className="h-5 w-20 bg-zinc-800/50 rounded animate-pulse" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-zinc-900/30 rounded-xl p-4 animate-pulse border border-zinc-800/30">
+                <div className="w-10 h-10 bg-zinc-800/50 rounded-lg mb-3" />
+                <div className="w-20 h-4 bg-zinc-800/50 rounded mb-2" />
+                <div className="w-14 h-3 bg-zinc-800/50 rounded" />
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
-      </nav>
+      </section>
     )
   }
 
@@ -172,56 +199,86 @@ export default function CategoryIcons() {
   }
 
   return (
-    <nav
-      className="relative bg-zinc-950 border-y border-amber-500/[0.08] px-3 sm:px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10"
+    <section
+      className="relative px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 overflow-hidden"
       aria-label="Browse product categories"
       itemScope
       itemType="https://schema.org/SiteNavigationElement"
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
+      <div className="max-w-7xl mx-auto relative">
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-semibold text-white">Browse Categories</h2>
+              <p className="text-xs sm:text-sm text-zinc-500 hidden sm:block">Find what you're looking for</p>
+            </div>
+          </div>
+          <a
+            href="/category"
+            className="flex items-center gap-1 text-xs sm:text-sm text-amber-400 hover:text-amber-300 transition-colors group"
+          >
+            View All
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </a>
+        </div>
 
-      <h2 className="sr-only">Shop by Category</h2>
+        <ul
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 list-none"
+          role="list"
+        >
+          {categories.map((category, index) => {
+            const iconKey = (category.icon || category.slug || "package").toLowerCase()
+            const IconComponent = iconMap[iconKey] || Package
+            const colors = categoryColors[iconKey] || categoryColors.default
 
-      <ul
-        className={`max-w-7xl mx-auto grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 ${categories.length > 6 ? "lg:grid-cols-8" : `lg:grid-cols-${Math.min(categories.length, 6)}`} gap-2 sm:gap-3 md:gap-4 list-none`}
-        role="list"
-      >
-        {categories.map((category) => {
-          const iconKey = (category.icon || category.slug || "package").toLowerCase()
-          const IconComponent = iconMap[iconKey] || Package
-
-          return (
-            <li key={category.id} itemProp="name">
-              <a
-                href={`/category/${category.slug}`}
-                onClick={(e) => handleCategoryClick(e, category.slug)}
-                onMouseEnter={() => handleCategoryHover(category.slug)}
-                className="flex flex-col items-center gap-2 sm:gap-3 transition-all duration-200 group cursor-pointer"
-                itemProp="url"
-                title={`Browse ${category.name} - ${category.productCount} products available`}
-              >
-                <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-zinc-900 rounded-full flex items-center justify-center group-hover:bg-zinc-800 transition-all duration-200 border border-amber-500/[0.1] group-hover:border-amber-500/25 shine-inner group-hover:shadow-[0_0_20px_rgba(245,158,11,0.08)]">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-b from-amber-500/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <IconComponent
-                    className="relative w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-zinc-400 group-hover:text-amber-400 transition-colors"
-                    aria-hidden="true"
+            return (
+              <li key={category.id} itemProp="name">
+                <a
+                  href={`/category/${category.slug}`}
+                  onClick={(e) => handleCategoryClick(e, category.slug)}
+                  onMouseEnter={() => handleCategoryHover(category.slug)}
+                  className="group relative flex flex-col p-3 sm:p-4 rounded-xl bg-zinc-900/30 border border-zinc-800/40 hover:border-zinc-700/60 transition-all duration-300 cursor-pointer overflow-hidden"
+                  itemProp="url"
+                  title={`Browse ${category.name} - ${category.productCount} products available`}
+                >
+                  {/* Hover gradient overlay */}
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${colors.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
                   />
-                </div>
-                <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-zinc-400 group-hover:text-amber-400 text-xs sm:text-xs md:text-sm text-center font-medium leading-tight transition-colors">
+
+                  {/* Icon container */}
+                  <div
+                    className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-zinc-800/60 flex items-center justify-center mb-2.5 sm:mb-3 group-hover:${colors.glow} group-hover:shadow-lg transition-all duration-300`}
+                  >
+                    <IconComponent
+                      className={`w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 group-hover:${colors.text} transition-colors duration-300`}
+                      aria-hidden="true"
+                    />
+                  </div>
+
+                  {/* Category name */}
+                  <span className="relative text-sm sm:text-base font-medium text-zinc-200 group-hover:text-white transition-colors line-clamp-1 mb-0.5">
                     {category.name}
                   </span>
-                  <span className="text-zinc-500 text-[10px] sm:text-xs">
-                    {category.productCount} {category.productCount === 1 ? "product" : "products"}
-                  </span>
-                </div>
-              </a>
-            </li>
-          )
-        })}
-      </ul>
 
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
-    </nav>
+                  {/* Product count */}
+                  <span className="relative text-xs text-zinc-500 group-hover:text-zinc-400 transition-colors">
+                    {category.productCount} {category.productCount === 1 ? "item" : "items"}
+                  </span>
+
+                  {/* Arrow indicator on hover */}
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                    <ChevronRight className={`w-4 h-4 ${colors.text}`} />
+                  </div>
+                </a>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+    </section>
   )
 }

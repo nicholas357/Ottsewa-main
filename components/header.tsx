@@ -330,9 +330,6 @@ export default function Header() {
                   <Menu className="w-5 h-5 text-zinc-400 group-hover:text-white transition-colors" />
                 </button>
                 <Link href="/" className="flex items-center gap-2 group">
-                  <div className="hidden sm:flex w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 items-center justify-center shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/40 transition-all duration-300 group-hover:scale-105">
-                    <Zap className="w-5 h-5 text-black" />
-                  </div>
                   <span className="text-white font-bold text-xl lg:text-2xl tracking-tight">
                     OTT<span className="text-amber-500">Sewa</span>
                   </span>
