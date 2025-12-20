@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/hooks/use-toast"
 import {
   ArrowLeft,
   Save,
@@ -24,8 +25,9 @@ import {
   Settings,
   Globe,
   Gamepad2,
+  Gift,
   CreditCard,
-  Tv,
+  MonitorPlay,
   Monitor,
   Plus,
   Trash2,
@@ -34,7 +36,7 @@ import {
   Upload,
   X,
   HelpCircle,
-  MonitorPlay,
+  Search,
 } from "lucide-react"
 import { RichTextEditor } from "@/components/admin/rich-text-editor"
 
@@ -68,18 +70,19 @@ interface Denomination {
   id?: string
   value: string
   price: string
-  currency: string
+  currency: "NPR" | "USD" | "EUR"
   bonus_value: string
   is_popular: boolean
   is_available: boolean
   stock: string
 }
 
-interface PlanDuration {
+interface Duration {
   id?: string
   months: string
   label: string
   price: string
+  discount_percent: string
   is_popular: boolean
   is_available: boolean
 }
@@ -96,7 +99,7 @@ interface Plan {
   is_popular: boolean
   is_available: boolean
   color: string
-  durations: PlanDuration[]
+  durations: Duration[]
 }
 
 interface LicenseType {
@@ -129,13 +132,6 @@ interface FAQ {
   is_active: boolean
 }
 
-const productTypes = [
-  { value: "game", label: "Game", icon: Gamepad2, color: "blue" },
-  { value: "giftcard", label: "Gift Card", icon: CreditCard, color: "green" },
-  { value: "subscription", label: "Subscription", icon: Tv, color: "purple" },
-  { value: "software", label: "Software", icon: Monitor, color: "orange" },
-]
-
 const suggestedTags = [
   "Action",
   "Adventure",
@@ -161,6 +157,7 @@ export default function EditProductPage() {
   const router = useRouter()
   const params = useParams()
   const productId = params?.id as string
+  const { toast } = useToast()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -181,13 +178,12 @@ export default function EditProductPage() {
     typeSpecific: true,
     tags: true,
     faqs: true,
-    licenseDurations: false, // Added for license durations section
   })
 
   const [form, setForm] = useState({
     title: "",
     slug: "",
-    description: "", // This will now be HTML content
+    description: "",
     short_description: "",
     product_type: "game",
     category_id: "",
@@ -229,6 +225,7 @@ export default function EditProductPage() {
 
   const [tagInput, setTagInput] = useState("")
   const [regionInput, setRegionInput] = useState("")
+  const [galleryInput, setGalleryInput] = useState("")
 
   const [isUploadingMain, setIsUploadingMain] = useState(false)
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false)
@@ -237,22 +234,23 @@ export default function EditProductPage() {
   const thumbnailRef = useRef<HTMLInputElement>(null)
   const galleryRef = useRef<HTMLInputElement>(null)
 
+  const supabase = createClient()
+
   useEffect(() => {
     const checkAdminAndLoadData = async () => {
-      const supabase = createClient()
       const {
         data: { user },
       } = await supabase.auth.getUser()
 
       if (!user) {
-        router.push("/login")
+        router.push("/auth/login")
         return
       }
 
       const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
 
       if (profile?.role !== "admin") {
-        router.push("/")
+        router.push("/dashboard")
         return
       }
 
@@ -279,7 +277,7 @@ export default function EditProductPage() {
         setForm({
           title: product.title || "",
           slug: product.slug || "",
-          description: product.description || "", // HTML content will be loaded here
+          description: product.description || "",
           short_description: product.short_description || "",
           product_type: product.product_type || "game",
           category_id: product.category_id || "",
@@ -374,6 +372,7 @@ export default function EditProductPage() {
                 months: d.months?.toString() || "1",
                 label: d.label || "",
                 price: d.price?.toString() || "",
+                discount_percent: d.discount_percent?.toString() || "0",
                 is_popular: d.is_popular ?? false,
                 is_available: d.is_available ?? true,
               })),
@@ -433,56 +432,25 @@ export default function EditProductPage() {
     if (productId) {
       checkAdminAndLoadData()
     }
-  }, [productId, router])
+  }, [productId, router, supabase])
 
-  const toggleSection = (section: string) => {
-    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }))
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
   }
 
-  const handleTitleChange = (value: string) => {
+  const handleTitleChange = (title: string) => {
     setForm((prev) => ({
       ...prev,
-      title: value,
-      slug: value
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, ""),
+      title,
+      slug: generateSlug(title),
     }))
   }
 
-  // File upload handler
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, type: "main" | "thumbnail" | "gallery") => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    const setUploading =
-      type === "main" ? setIsUploadingMain : type === "thumbnail" ? setIsUploadingThumbnail : setIsUploadingGallery
-
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append("file", file)
-
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      })
-
-      if (res.ok) {
-        const { url } = await res.json()
-        if (type === "main") {
-          setForm((prev) => ({ ...prev, image_url: url }))
-        } else if (type === "thumbnail") {
-          setForm((prev) => ({ ...prev, thumbnail_url: url }))
-        } else {
-          setForm((prev) => ({ ...prev, gallery_images: [...prev.gallery_images, url] }))
-        }
-      }
-    } catch (error) {
-      console.error("Upload failed:", error)
-    } finally {
-      setUploading(false)
-    }
+  const toggleSection = (section: string) => {
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }))
   }
 
   // Tag handlers
@@ -500,19 +468,54 @@ export default function EditProductPage() {
   // Region handlers
   const addRegion = () => {
     if (regionInput.trim() && !form.regions_available.includes(regionInput.trim())) {
-      setForm((prev) => ({ ...prev, regions_available: [...prev.regions_available, regionInput.trim()] }))
+      setForm((prev) => ({
+        ...prev,
+        regions_available: [...prev.regions_available, regionInput.trim()],
+      }))
       setRegionInput("")
     }
   }
 
   const removeRegion = (region: string) => {
-    setForm((prev) => ({ ...prev, regions_available: prev.regions_available.filter((r) => r !== region) }))
+    setForm((prev) => ({
+      ...prev,
+      regions_available: prev.regions_available.filter((r) => r !== region),
+    }))
   }
 
-  // Edition handlers
+  // Gallery handlers
+  const addGalleryImage = () => {
+    if (galleryInput.trim() && !form.gallery_images.includes(galleryInput.trim())) {
+      setForm((prev) => ({
+        ...prev,
+        gallery_images: [...prev.gallery_images, galleryInput.trim()],
+      }))
+      setGalleryInput("")
+    }
+  }
+
+  const removeGalleryImage = (url: string) => {
+    setForm((prev) => ({
+      ...prev,
+      gallery_images: prev.gallery_images.filter((u) => u !== url),
+    }))
+  }
+
+  // Platform management
+  const addPlatform = (platformId: string) => {
+    if (!selectedPlatforms.find((p) => p.platform_id === platformId)) {
+      setSelectedPlatforms((prev) => [...prev, { platform_id: platformId, price_modifier: "0", is_available: true }])
+    }
+  }
+
+  const removePlatform = (platformId: string) => {
+    setSelectedPlatforms((prev) => prev.filter((p) => p.platform_id !== platformId))
+  }
+
+  // Edition management
   const addEdition = () => {
-    setEditions([
-      ...editions,
+    setEditions((prev) => [
+      ...prev,
       {
         name: "",
         slug: "",
@@ -521,26 +524,31 @@ export default function EditProductPage() {
         description: "",
         includes: [],
         image_url: "",
-        is_default: editions.length === 0,
+        is_default: prev.length === 0,
         is_available: true,
       },
     ])
   }
 
   const updateEdition = (index: number, field: keyof Edition, value: any) => {
-    const updated = [...editions]
-    updated[index] = { ...updated[index], [field]: value }
-    setEditions(updated)
+    setEditions((prev) => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      if (field === "name") {
+        updated[index].slug = generateSlug(value)
+      }
+      return updated
+    })
   }
 
   const removeEdition = (index: number) => {
-    setEditions(editions.filter((_, i) => i !== index))
+    setEditions((prev) => prev.filter((_, i) => i !== index))
   }
 
-  // Denomination handlers
+  // Denomination management
   const addDenomination = () => {
-    setDenominations([
-      ...denominations,
+    setDenominations((prev) => [
+      ...prev,
       {
         value: "",
         price: "",
@@ -554,19 +562,21 @@ export default function EditProductPage() {
   }
 
   const updateDenomination = (index: number, field: keyof Denomination, value: any) => {
-    const updated = [...denominations]
-    updated[index] = { ...updated[index], [field]: value }
-    setDenominations(updated)
+    setDenominations((prev) => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
   }
 
   const removeDenomination = (index: number) => {
-    setDenominations(denominations.filter((_, i) => i !== index))
+    setDenominations((prev) => prev.filter((_, i) => i !== index))
   }
 
-  // Plan handlers
+  // Plan management
   const addPlan = () => {
-    setPlans([
-      ...plans,
+    setPlans((prev) => [
+      ...prev,
       {
         name: "",
         slug: "",
@@ -584,43 +594,59 @@ export default function EditProductPage() {
   }
 
   const updatePlan = (index: number, field: keyof Plan, value: any) => {
-    const updated = [...plans]
-    updated[index] = { ...updated[index], [field]: value }
-    setPlans(updated)
+    setPlans((prev) => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      if (field === "name") {
+        updated[index].slug = generateSlug(value)
+      }
+      return updated
+    })
   }
 
   const removePlan = (index: number) => {
-    setPlans(plans.filter((_, i) => i !== index))
+    setPlans((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const addPlanDuration = (planIndex: number) => {
-    const updated = [...plans]
-    updated[planIndex].durations.push({
-      months: "1",
-      label: "",
-      price: "",
-      is_popular: false,
-      is_available: true,
+  // Duration management for plans
+  const addDuration = (planIndex: number) => {
+    setPlans((prev) => {
+      const updated = [...prev]
+      updated[planIndex].durations.push({
+        months: "",
+        label: "",
+        price: "",
+        discount_percent: "0",
+        is_popular: false,
+        is_available: true,
+      })
+      return updated
     })
-    setPlans(updated)
   }
 
-  const updatePlanDuration = (planIndex: number, durIndex: number, field: keyof PlanDuration, value: any) => {
-    const updated = [...plans]
-    updated[planIndex].durations[durIndex] = { ...updated[planIndex].durations[durIndex], [field]: value }
-    setPlans(updated)
+  const updateDuration = (planIndex: number, durationIndex: number, field: keyof Duration, value: any) => {
+    setPlans((prev) => {
+      const updated = [...prev]
+      updated[planIndex].durations[durationIndex] = {
+        ...updated[planIndex].durations[durationIndex],
+        [field]: value,
+      }
+      return updated
+    })
   }
 
-  const removePlanDuration = (planIndex: number, durIndex: number) => {
-    const updated = [...plans]
-    updated[planIndex].durations = updated[planIndex].durations.filter((_, i) => i !== durIndex)
-    setPlans(updated)
+  const removeDuration = (planIndex: number, durationIndex: number) => {
+    setPlans((prev) => {
+      const updated = [...prev]
+      updated[planIndex].durations = updated[planIndex].durations.filter((_, i) => i !== durationIndex)
+      return updated
+    })
   }
 
-  // License type handlers
+  // License Type management
   const addLicenseType = () => {
-    setLicenseTypes([
-      ...licenseTypes,
+    setLicenseTypes((prev) => [
+      ...prev,
       {
         name: "",
         slug: "",
@@ -636,19 +662,24 @@ export default function EditProductPage() {
   }
 
   const updateLicenseType = (index: number, field: keyof LicenseType, value: any) => {
-    const updated = [...licenseTypes]
-    updated[index] = { ...updated[index], [field]: value }
-    setLicenseTypes(updated)
+    setLicenseTypes((prev) => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      if (field === "name") {
+        updated[index].slug = generateSlug(value)
+      }
+      return updated
+    })
   }
 
   const removeLicenseType = (index: number) => {
-    setLicenseTypes(licenseTypes.filter((_, i) => i !== index))
+    setLicenseTypes((prev) => prev.filter((_, i) => i !== index))
   }
 
-  // License duration handlers
+  // License Duration management
   const addLicenseDuration = () => {
-    setLicenseDurations([
-      ...licenseDurations,
+    setLicenseDurations((prev) => [
+      ...prev,
       {
         duration_type: "1year",
         label: "",
@@ -661,13 +692,15 @@ export default function EditProductPage() {
   }
 
   const updateLicenseDuration = (index: number, field: keyof LicenseDuration, value: any) => {
-    const updated = [...licenseDurations]
-    updated[index] = { ...updated[index], [field]: value }
-    setLicenseDurations(updated)
+    setLicenseDurations((prev) => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
   }
 
   const removeLicenseDuration = (index: number) => {
-    setLicenseDurations(licenseDurations.filter((_, i) => i !== index))
+    setLicenseDurations((prev) => prev.filter((_, i) => i !== index))
   }
 
   // FAQ handlers
@@ -685,8 +718,79 @@ export default function EditProductPage() {
     setFaqs(faqs.filter((_, i) => i !== index))
   }
 
+  // File upload
+  const uploadImage = async (file: File, type: "main" | "thumbnail" | "gallery") => {
+    if (type === "main") setIsUploadingMain(true)
+    else if (type === "thumbnail") setIsUploadingThumbnail(true)
+    else setIsUploadingGallery(true)
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        throw new Error("Not authenticated")
+      }
+
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Upload failed")
+      }
+
+      const { url } = await response.json()
+
+      if (type === "main") {
+        setForm((prev) => ({ ...prev, image_url: url }))
+      } else if (type === "thumbnail") {
+        setForm((prev) => ({ ...prev, thumbnail_url: url }))
+      } else {
+        setForm((prev) => ({ ...prev, gallery_images: [...prev.gallery_images, url] }))
+      }
+    } catch (error) {
+      console.error("Upload error:", error)
+      toast({
+        title: "Upload Failed",
+        description: error instanceof Error ? error.message : "Upload failed",
+        variant: "destructive",
+      })
+    } finally {
+      if (type === "main") setIsUploadingMain(false)
+      else if (type === "thumbnail") setIsUploadingThumbnail(false)
+      else setIsUploadingGallery(false)
+    }
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "main" | "thumbnail" | "gallery") => {
+    const file = e.target.files?.[0]
+    if (file) {
+      uploadImage(file, type)
+    }
+    e.target.value = ""
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!form.title || !form.slug || !form.base_price) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      })
+      return
+    }
+
     setSaving(true)
 
     try {
@@ -707,29 +811,82 @@ export default function EditProductPage() {
         body: JSON.stringify(payload),
       })
 
+      const data = await res.json()
+
       if (res.ok) {
+        toast({
+          title: "Success",
+          description: "Product updated successfully",
+        })
         router.push("/admin/products")
       } else {
-        const error = await res.json()
-        alert(error.error || "Failed to update product")
+        toast({
+          title: "Error",
+          description: data.error || "Failed to update product",
+          variant: "destructive",
+        })
       }
     } catch (error) {
-      console.error("Error:", error)
-      alert("Failed to update product")
+      toast({
+        title: "Error",
+        description: "Failed to update product",
+        variant: "destructive",
+      })
     } finally {
       setSaving(false)
     }
   }
 
-  const SectionHeader = ({ title, section, icon: Icon }: { title: string; section: string; icon: any }) => (
+  const getProductTypeConfig = (type: string) => {
+    switch (type) {
+      case "game":
+        return { icon: Gamepad2, color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/30" }
+      case "giftcard":
+        return { icon: Gift, color: "text-green-400", bgColor: "bg-green-500/10", borderColor: "border-green-500/30" }
+      case "subscription":
+        return {
+          icon: MonitorPlay,
+          color: "text-purple-400",
+          bgColor: "bg-purple-500/10",
+          borderColor: "border-purple-500/30",
+        }
+      case "software":
+        return {
+          icon: Settings,
+          color: "text-orange-400",
+          bgColor: "bg-orange-500/10",
+          borderColor: "border-orange-500/30",
+        }
+      default:
+        return { icon: Package, color: "text-zinc-400", bgColor: "bg-zinc-500/10", borderColor: "border-zinc-500/30" }
+    }
+  }
+
+  if (loading || !isAdmin) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+      </div>
+    )
+  }
+
+  const SectionHeader = ({
+    title,
+    section,
+    icon: Icon,
+  }: {
+    title: string
+    section: string
+    icon: any
+  }) => (
     <button
       type="button"
       onClick={() => toggleSection(section)}
-      className="w-full flex items-center justify-between p-4 hover:bg-zinc-800/50 transition cursor-pointer"
+      className="w-full flex items-center justify-between p-4 bg-zinc-800/50 rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
     >
       <div className="flex items-center gap-3">
         <Icon className="w-5 h-5 text-amber-500" />
-        <span className="font-semibold text-white">{title}</span>
+        <span className="text-white font-medium">{title}</span>
       </div>
       {expandedSections[section] ? (
         <ChevronUp className="w-5 h-5 text-zinc-400" />
@@ -739,113 +896,144 @@ export default function EditProductPage() {
     </button>
   )
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
-      </div>
-    )
-  }
-
-  if (!isAdmin) return null
+  const typeConfig = getProductTypeConfig(form.product_type)
 
   return (
     <div className="min-h-screen bg-zinc-950 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4">
-            <Link href="/admin/products">
-              <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white cursor-pointer">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">Edit Product</h1>
-              <p className="text-zinc-400 text-sm mt-1">{form.title || "Untitled Product"}</p>
-            </div>
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <Link href="/admin/products" className="p-2 hover:bg-zinc-900 rounded-lg transition-colors">
+            <ArrowLeft className="w-5 h-5 text-zinc-400 hover:text-white" />
+          </Link>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Edit Product</h1>
+            <p className="text-zinc-400 text-sm">{form.title || "Update product details"}</p>
           </div>
-          <Button
-            type="submit"
-            form="edit-product-form"
-            disabled={saving}
-            className="bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
         </div>
+        <Button
+          type="submit"
+          form="edit-product-form"
+          disabled={saving}
+          className="bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </>
+          )}
+        </Button>
+      </div>
 
-        <form id="edit-product-form" onSubmit={handleSubmit} className="space-y-6">
-          {/* Product Type Selector */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-            <Label className="text-sm font-medium text-zinc-400 mb-4 block">Product Type</Label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {productTypes.map((type) => (
-                <button
-                  key={type.value}
-                  type="button"
-                  onClick={() => setForm((prev) => ({ ...prev, product_type: type.value }))}
-                  className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                    form.product_type === type.value
-                      ? type.color === "blue"
-                        ? "border-blue-500 bg-blue-500/10 text-blue-400"
-                        : type.color === "green"
-                          ? "border-green-500 bg-green-500/10 text-green-400"
-                          : type.color === "purple"
-                            ? "border-purple-500 bg-purple-500/10 text-purple-400"
-                            : "border-orange-500 bg-orange-500/10 text-orange-400"
-                      : "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600 text-zinc-400"
+      <form id="edit-product-form" onSubmit={handleSubmit} className="space-y-6">
+        {/* Product Type */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+          <Label className="text-zinc-300 text-base font-medium mb-4 block">Product Type *</Label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { value: "game", label: "Game", icon: Gamepad2, color: "blue" },
+              { value: "giftcard", label: "Gift Card", icon: Gift, color: "green" },
+              { value: "subscription", label: "Subscription", icon: MonitorPlay, color: "purple" },
+              { value: "software", label: "Software", icon: Settings, color: "orange" },
+            ].map(({ value, label, icon: Icon, color }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, product_type: value }))}
+                className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col items-center gap-2`}
+                style={{
+                  backgroundColor:
+                    form.product_type === value
+                      ? color === "blue"
+                        ? "rgba(59, 130, 246, 0.1)"
+                        : color === "green"
+                          ? "rgba(34, 197, 94, 0.1)"
+                          : color === "purple"
+                            ? "rgba(168, 85, 247, 0.1)"
+                            : "rgba(249, 115, 22, 0.1)"
+                      : undefined,
+                  borderColor:
+                    form.product_type === value
+                      ? color === "blue"
+                        ? "rgba(59, 130, 246, 0.5)"
+                        : color === "green"
+                          ? "rgba(34, 197, 94, 0.5)"
+                          : color === "purple"
+                            ? "rgba(168, 85, 247, 0.5)"
+                            : "rgba(249, 115, 22, 0.5)"
+                      : "rgb(63, 63, 70)",
+                }}
+              >
+                <Icon
+                  className={`w-6 h-6 ${
+                    form.product_type === value
+                      ? color === "blue"
+                        ? "text-blue-400"
+                        : color === "green"
+                          ? "text-green-400"
+                          : color === "purple"
+                            ? "text-purple-400"
+                            : "text-orange-400"
+                      : "text-zinc-400"
+                  }`}
+                />
+                <span
+                  className={`text-sm font-medium ${
+                    form.product_type === value
+                      ? color === "blue"
+                        ? "text-blue-400"
+                        : color === "green"
+                          ? "text-green-400"
+                          : color === "purple"
+                            ? "text-purple-400"
+                            : "text-orange-400"
+                      : "text-zinc-400"
                   }`}
                 >
-                  <type.icon className="w-6 h-6 mx-auto mb-2" />
-                  <span className="text-sm font-medium block">{type.label}</span>
-                </button>
-              ))}
-            </div>
+                  {label}
+                </span>
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* Basic Information */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Basic Information" section="basic" icon={Package} />
-            {expandedSections.basic && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="title" className="text-zinc-300">
-                      Title *
-                    </Label>
-                    <Input
-                      id="title"
-                      value={form.title}
-                      onChange={(e) => handleTitleChange(e.target.value)}
-                      placeholder="Product title"
-                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="slug" className="text-zinc-300">
-                      Slug *
-                    </Label>
-                    <Input
-                      id="slug"
-                      value={form.slug}
-                      onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
-                      placeholder="product-slug"
-                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                      required
-                    />
-                  </div>
+        {/* Basic Information */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <SectionHeader title="Basic Information" section="basic" icon={Package} />
+          {expandedSections.basic && (
+            <div className="p-6 space-y-4 border-t border-zinc-800">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <Label htmlFor="title" className="text-zinc-300">
+                    Product Title *
+                  </Label>
+                  <Input
+                    id="title"
+                    value={form.title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    placeholder="Enter product title"
+                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="slug" className="text-zinc-300">
+                    URL Slug *
+                  </Label>
+                  <Input
+                    id="slug"
+                    value={form.slug}
+                    onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
+                    placeholder="product-url-slug"
+                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                    required
+                  />
                 </div>
                 <div>
                   <Label htmlFor="category" className="text-zinc-300">
@@ -872,7 +1060,7 @@ export default function EditProductPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <Label htmlFor="short_description" className="text-zinc-300">
                     Short Description
                   </Label>
@@ -884,7 +1072,6 @@ export default function EditProductPage() {
                     className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
                   />
                 </div>
-                {/* Use RichTextEditor for description */}
                 <div className="sm:col-span-2">
                   <Label htmlFor="description" className="text-zinc-300">
                     Full Description (Rich Text)
@@ -892,288 +1079,396 @@ export default function EditProductPage() {
                   <div className="mt-1.5">
                     <RichTextEditor
                       value={form.description}
-                      onChange={(content) => setForm((prev) => ({ ...prev, description: content }))}
+                      onChange={(value) => setForm((prev) => ({ ...prev, description: value }))}
                       placeholder="Write your detailed product description here. Use the toolbar to add headings, lists, and price tables."
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="publisher" className="text-zinc-300">
-                      Publisher
-                    </Label>
-                    <Input
-                      id="publisher"
-                      value={form.publisher}
-                      onChange={(e) => setForm((prev) => ({ ...prev, publisher: e.target.value }))}
-                      placeholder="Publisher name"
-                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="developer" className="text-zinc-300">
-                      Developer
-                    </Label>
-                    <Input
-                      id="developer"
-                      value={form.developer}
-                      onChange={(e) => setForm((prev) => ({ ...prev, developer: e.target.value }))}
-                      placeholder="Developer name"
-                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Pricing */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Pricing" section="pricing" icon={DollarSign} />
-            {expandedSections.pricing && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="base_price" className="text-zinc-300">
-                      Base Price *
-                    </Label>
-                    <Input
-                      id="base_price"
-                      type="number"
-                      step="0.01"
-                      value={form.base_price}
-                      onChange={(e) => setForm((prev) => ({ ...prev, base_price: e.target.value }))}
-                      placeholder="Base price"
-                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="original_price" className="text-zinc-300">
-                      Original Price
-                    </Label>
-                    <Input
-                      id="original_price"
-                      type="number"
-                      step="0.01"
-                      value={form.original_price}
-                      onChange={(e) => setForm((prev) => ({ ...prev, original_price: e.target.value }))}
-                      placeholder="Original price"
-                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="currency" className="text-zinc-300">
-                      Currency
-                    </Label>
-                    <Select
-                      value={form.currency}
-                      onValueChange={(value) => setForm((prev) => ({ ...prev, currency: value }))}
-                    >
-                      <SelectTrigger className="mt-1.5 bg-zinc-800 border-zinc-700 text-white cursor-pointer">
-                        <SelectValue placeholder="Select currency" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
-                        <SelectItem value="NPR" className="text-white cursor-pointer">
-                          NPR
-                        </SelectItem>
-                        <SelectItem value="USD" className="text-white cursor-pointer">
-                          USD
-                        </SelectItem>
-                        <SelectItem value="EUR" className="text-white cursor-pointer">
-                          EUR
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="discount_percent" className="text-zinc-300">
-                      Discount Percent
-                    </Label>
-                    <Input
-                      id="discount_percent"
-                      type="number"
-                      step="0.01"
-                      value={form.discount_percent}
-                      onChange={(e) => setForm((prev) => ({ ...prev, discount_percent: e.target.value }))}
-                      placeholder="Discount percent"
-                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="cashback_percent" className="text-zinc-300">
-                      Cashback Percent
-                    </Label>
-                    <Input
-                      id="cashback_percent"
-                      type="number"
-                      step="0.01"
-                      value={form.cashback_percent}
-                      onChange={(e) => setForm((prev) => ({ ...prev, cashback_percent: e.target.value }))}
-                      placeholder="Cashback percent"
-                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Media */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Media" section="media" icon={ImageIcon} />
-            {expandedSections.media && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
                 <div>
-                  <Label htmlFor="image_url" className="text-zinc-300">
-                    Main Image
+                  <Label htmlFor="publisher" className="text-zinc-300">
+                    Publisher
                   </Label>
                   <Input
-                    id="image_url"
-                    value={form.image_url}
-                    onChange={(e) => setForm((prev) => ({ ...prev, image_url: e.target.value }))}
-                    placeholder="Main image URL"
+                    id="publisher"
+                    value={form.publisher}
+                    onChange={(e) => setForm((prev) => ({ ...prev, publisher: e.target.value }))}
+                    placeholder="Publisher name"
                     className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="developer" className="text-zinc-300">
+                    Developer
+                  </Label>
+                  <Input
+                    id="developer"
+                    value={form.developer}
+                    onChange={(e) => setForm((prev) => ({ ...prev, developer: e.target.value }))}
+                    placeholder="Developer name"
+                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Pricing */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <SectionHeader title="Pricing" section="pricing" icon={DollarSign} />
+          {expandedSections.pricing && (
+            <div className="p-6 space-y-4 border-t border-zinc-800">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="base_price" className="text-zinc-300">
+                    Base Price (NPR) *
+                  </Label>
+                  <Input
+                    id="base_price"
+                    type="number"
+                    step="0.01"
+                    value={form.base_price}
+                    onChange={(e) => setForm((prev) => ({ ...prev, base_price: e.target.value }))}
+                    placeholder="0.00"
+                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="original_price" className="text-zinc-300">
+                    Original Price (for discount display)
+                  </Label>
+                  <Input
+                    id="original_price"
+                    type="number"
+                    step="0.01"
+                    value={form.original_price}
+                    onChange={(e) => setForm((prev) => ({ ...prev, original_price: e.target.value }))}
+                    placeholder="0.00"
+                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="currency" className="text-zinc-300">
+                    Currency
+                  </Label>
+                  <Select
+                    value={form.currency}
+                    onValueChange={(value) => setForm((prev) => ({ ...prev, currency: value }))}
+                  >
+                    <SelectTrigger className="mt-1.5 bg-zinc-800 border-zinc-700 text-white cursor-pointer">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectItem value="NPR" className="text-white cursor-pointer">
+                        NPR
+                      </SelectItem>
+                      <SelectItem value="USD" className="text-white cursor-pointer">
+                        USD
+                      </SelectItem>
+                      <SelectItem value="EUR" className="text-white cursor-pointer">
+                        EUR
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="discount_percent" className="text-zinc-300">
+                    Discount %
+                  </Label>
+                  <Input
+                    id="discount_percent"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={form.discount_percent}
+                    onChange={(e) => setForm((prev) => ({ ...prev, discount_percent: e.target.value }))}
+                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="cashback_percent" className="text-zinc-300">
+                    Cashback %
+                  </Label>
+                  <Input
+                    id="cashback_percent"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={form.cashback_percent}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cashback_percent: e.target.value }))}
+                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Media */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <SectionHeader title="Media" section="media" icon={ImageIcon} />
+          {expandedSections.media && (
+            <div className="p-6 space-y-6 border-t border-zinc-800">
+              {/* Main Image */}
+              <div>
+                <Label className="text-zinc-300 mb-2 block">Main Image</Label>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <div className="flex gap-2">
+                      <Input
+                        value={form.image_url}
+                        onChange={(e) => setForm((prev) => ({ ...prev, image_url: e.target.value }))}
+                        placeholder="https://... or upload image"
+                        className="bg-zinc-800 border-zinc-700 text-white"
+                      />
+                      <input
+                        ref={mainImageRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={(e) => handleFileChange(e, "main")}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => mainImageRef.current?.click()}
+                        disabled={isUploadingMain}
+                        variant="outline"
+                        className="border-zinc-700 text-zinc-300 cursor-pointer bg-transparent hover:bg-zinc-800"
+                      >
+                        {isUploadingMain ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Upload className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  {form.image_url && (
+                    <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-zinc-700 group">
+                      <Image
+                        src={form.image_url || "/placeholder.svg"}
+                        alt="Main image preview"
+                        fill
+                        className="object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setForm((prev) => ({ ...prev, image_url: "" }))}
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer"
+                      >
+                        <Trash2 className="w-5 h-5 text-red-400" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Thumbnail */}
+              <div>
+                <Label className="text-zinc-300 mb-2 block">Thumbnail Image</Label>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <div className="flex gap-2">
+                      <Input
+                        value={form.thumbnail_url}
+                        onChange={(e) => setForm((prev) => ({ ...prev, thumbnail_url: e.target.value }))}
+                        placeholder="https://... or upload image"
+                        className="bg-zinc-800 border-zinc-700 text-white"
+                      />
+                      <input
+                        ref={thumbnailRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={(e) => handleFileChange(e, "thumbnail")}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => thumbnailRef.current?.click()}
+                        disabled={isUploadingThumbnail}
+                        variant="outline"
+                        className="border-zinc-700 text-zinc-300 cursor-pointer bg-transparent hover:bg-zinc-800"
+                      >
+                        {isUploadingThumbnail ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Upload className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  {form.thumbnail_url && (
+                    <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-zinc-700 group">
+                      <Image
+                        src={form.thumbnail_url || "/placeholder.svg"}
+                        alt="Thumbnail preview"
+                        fill
+                        className="object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setForm((prev) => ({ ...prev, thumbnail_url: "" }))}
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer"
+                      >
+                        <Trash2 className="w-5 h-5 text-red-400" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Video URL */}
+              <div>
+                <Label htmlFor="video_url" className="text-zinc-300">
+                  Video URL
+                </Label>
+                <Input
+                  id="video_url"
+                  value={form.video_url}
+                  onChange={(e) => setForm((prev) => ({ ...prev, video_url: e.target.value }))}
+                  placeholder="https://youtube.com/..."
+                  className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                />
+              </div>
+
+              {/* Gallery Images */}
+              <div>
+                <Label className="text-zinc-300 mb-2 block">Gallery Images</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={galleryInput}
+                    onChange={(e) => setGalleryInput(e.target.value)}
+                    placeholder="https://... or upload images"
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addGalleryImage())}
                   />
                   <Button
                     type="button"
-                    onClick={() => mainImageRef.current?.click()}
-                    disabled={isUploadingMain}
-                    className="mt-2 bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
+                    onClick={addGalleryImage}
+                    variant="outline"
+                    className="border-zinc-700 text-zinc-300 cursor-pointer bg-transparent hover:bg-zinc-800"
                   >
-                    {isUploadingMain ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Main Image
-                      </>
-                    )}
+                    <Plus className="w-4 h-4" />
                   </Button>
                   <input
+                    ref={galleryRef}
                     type="file"
-                    ref={mainImageRef}
-                    onChange={(e) => handleFileChange(e, "main")}
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={(e) => handleFileChange(e, "gallery")}
                     className="hidden"
                   />
-                </div>
-                <div>
-                  <Label htmlFor="thumbnail_url" className="text-zinc-300">
-                    Thumbnail Image
-                  </Label>
-                  <Input
-                    id="thumbnail_url"
-                    value={form.thumbnail_url}
-                    onChange={(e) => setForm((prev) => ({ ...prev, thumbnail_url: e.target.value }))}
-                    placeholder="Thumbnail image URL"
-                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                  />
-                  <Button
-                    type="button"
-                    onClick={() => thumbnailRef.current?.click()}
-                    disabled={isUploadingThumbnail}
-                    className="mt-2 bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
-                  >
-                    {isUploadingThumbnail ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Thumbnail Image
-                      </>
-                    )}
-                  </Button>
-                  <input
-                    type="file"
-                    ref={thumbnailRef}
-                    onChange={(e) => handleFileChange(e, "thumbnail")}
-                    className="hidden"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="gallery_images" className="text-zinc-300">
-                    Gallery Images
-                  </Label>
-                  <div className="flex flex-wrap gap-4">
-                    {form.gallery_images.map((image, index) => (
-                      <div key={index} className="relative">
-                        <Image
-                          src={image || "/placeholder.svg"}
-                          alt={`Gallery Image ${index + 1}`}
-                          width={100}
-                          height={100}
-                          className="rounded"
-                        />
-                        <Button
-                          type="button"
-                          onClick={() =>
-                            setForm((prev) => ({
-                              ...prev,
-                              gallery_images: prev.gallery_images.filter((_, i) => i !== index),
-                            }))
-                          }
-                          className="absolute top-0 right-0 bg-red-500 hover:bg-red-400 text-white cursor-pointer rounded"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
                   <Button
                     type="button"
                     onClick={() => galleryRef.current?.click()}
                     disabled={isUploadingGallery}
-                    className="mt-2 bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
+                    variant="outline"
+                    className="border-zinc-700 text-zinc-300 cursor-pointer bg-transparent hover:bg-zinc-800"
                   >
-                    {isUploadingGallery ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Gallery Images
-                      </>
-                    )}
+                    {isUploadingGallery ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                   </Button>
-                  <input
-                    type="file"
-                    multiple
-                    ref={galleryRef}
-                    onChange={(e) => handleFileChange(e, "gallery")}
-                    className="hidden"
-                  />
                 </div>
-                <div>
-                  <Label htmlFor="video_url" className="text-zinc-300">
-                    Video URL
-                  </Label>
+                {form.gallery_images.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 mt-4">
+                    {form.gallery_images.map((url, i) => (
+                      <div
+                        key={i}
+                        className="relative aspect-square rounded-lg overflow-hidden border border-zinc-700 group"
+                      >
+                        <Image
+                          src={url || "/placeholder.svg"}
+                          alt={`Gallery image ${i + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(url)}
+                          className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer"
+                        >
+                          <Trash2 className="w-5 h-5 text-red-400" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Tags */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <SectionHeader title="Tags" section="tags" icon={Tag} />
+          {expandedSections.tags && (
+            <div className="p-6 space-y-4 border-t border-zinc-800">
+              <div>
+                <Label className="text-zinc-300 mb-2 block">Product Tags</Label>
+                <div className="flex gap-2">
                   <Input
-                    id="video_url"
-                    value={form.video_url}
-                    onChange={(e) => setForm((prev) => ({ ...prev, video_url: e.target.value }))}
-                    placeholder="Video URL"
-                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    placeholder="Add a tag..."
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
                   />
+                  <Button
+                    type="button"
+                    onClick={addTag}
+                    variant="outline"
+                    className="border-zinc-700 text-zinc-300 cursor-pointer bg-transparent hover:bg-zinc-800"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                {form.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {form.tags.map((tag, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-sm flex items-center gap-2"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="hover:text-red-400 cursor-pointer"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <Label className="text-zinc-400 text-sm mb-2 block">Suggested Tags</Label>
+                <div className="flex flex-wrap gap-2">
+                  {suggestedTags
+                    .filter((t) => !form.tags.includes(t))
+                    .slice(0, 12)
+                    .map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => setForm((prev) => ({ ...prev, tags: [...prev.tags, tag] }))}
+                        className="px-3 py-1 bg-zinc-800 text-zinc-400 rounded-full text-sm hover:bg-zinc-700 hover:text-white transition-colors cursor-pointer"
+                      >
+                        + {tag}
+                      </button>
+                    ))}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          {/* Inventory */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Inventory" section="inventory" icon={MonitorPlay} />
-            {expandedSections.inventory && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
+        {/* Inventory */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <SectionHeader title="Inventory & Status" section="inventory" icon={Package} />
+          {expandedSections.inventory && (
+            <div className="p-6 space-y-4 border-t border-zinc-800">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="stock" className="text-zinc-300">
                     Stock
@@ -1183,30 +1478,7 @@ export default function EditProductPage() {
                     type="number"
                     value={form.stock}
                     onChange={(e) => setForm((prev) => ({ ...prev, stock: e.target.value }))}
-                    placeholder="Stock"
                     className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                  />
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label htmlFor="is_digital" className="text-zinc-300">
-                    Digital
-                  </Label>
-                  <Switch
-                    id="is_digital"
-                    checked={form.is_digital}
-                    onCheckedChange={(checked) => setForm((prev) => ({ ...prev, is_digital: checked }))}
-                    className="bg-zinc-800"
-                  />
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label htmlFor="is_preorder" className="text-zinc-300">
-                    Preorder
-                  </Label>
-                  <Switch
-                    id="is_preorder"
-                    checked={form.is_preorder}
-                    onCheckedChange={(checked) => setForm((prev) => ({ ...prev, is_preorder: checked }))}
-                    className="bg-zinc-800"
                   />
                 </div>
                 <div>
@@ -1218,886 +1490,850 @@ export default function EditProductPage() {
                     type="date"
                     value={form.release_date}
                     onChange={(e) => setForm((prev) => ({ ...prev, release_date: e.target.value }))}
-                    placeholder="Release date"
                     className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
                   />
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* SEO */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="SEO" section="seo" icon={Globe} />
-            {expandedSections.seo && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                <div>
-                  <Label htmlFor="meta_title" className="text-zinc-300">
-                    Meta Title
-                  </Label>
-                  <Input
-                    id="meta_title"
-                    value={form.meta_title}
-                    onChange={(e) => setForm((prev) => ({ ...prev, meta_title: e.target.value }))}
-                    placeholder="Meta title"
-                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="meta_description" className="text-zinc-300">
-                    Meta Description
-                  </Label>
-                  <Textarea
-                    id="meta_description"
-                    value={form.meta_description}
-                    onChange={(e) => setForm((prev) => ({ ...prev, meta_description: e.target.value }))}
-                    placeholder="Meta description"
-                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Status */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Status" section="status" icon={Settings} />
-            {expandedSections.status && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                <div className="flex items-center gap-4">
-                  <Label htmlFor="is_active" className="text-zinc-300">
-                    Active
-                  </Label>
+              <div className="flex flex-wrap gap-6 mt-4">
+                <div className="flex items-center gap-2">
                   <Switch
-                    id="is_active"
+                    checked={form.is_digital}
+                    onCheckedChange={(checked) => setForm((prev) => ({ ...prev, is_digital: checked }))}
+                    className="cursor-pointer"
+                  />
+                  <span className="text-zinc-300 text-sm">Digital Product</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={form.is_preorder}
+                    onCheckedChange={(checked) => setForm((prev) => ({ ...prev, is_preorder: checked }))}
+                    className="cursor-pointer"
+                  />
+                  <span className="text-zinc-300 text-sm">Pre-order</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
                     checked={form.is_active}
                     onCheckedChange={(checked) => setForm((prev) => ({ ...prev, is_active: checked }))}
-                    className="bg-zinc-800"
+                    className="cursor-pointer"
                   />
+                  <span className="text-zinc-300 text-sm">Active</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <Label htmlFor="is_featured" className="text-zinc-300">
-                    Featured
-                  </Label>
+                <div className="flex items-center gap-2">
                   <Switch
-                    id="is_featured"
                     checked={form.is_featured}
                     onCheckedChange={(checked) => setForm((prev) => ({ ...prev, is_featured: checked }))}
-                    className="bg-zinc-800"
+                    className="cursor-pointer"
                   />
+                  <span className="text-zinc-300 text-sm">Featured</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <Label htmlFor="is_bestseller" className="text-zinc-300">
-                    Bestseller
-                  </Label>
+                <div className="flex items-center gap-2">
                   <Switch
-                    id="is_bestseller"
                     checked={form.is_bestseller}
                     onCheckedChange={(checked) => setForm((prev) => ({ ...prev, is_bestseller: checked }))}
-                    className="bg-zinc-800"
+                    className="cursor-pointer"
                   />
+                  <span className="text-zinc-300 text-sm">Bestseller</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <Label htmlFor="is_new" className="text-zinc-300">
-                    New
-                  </Label>
+                <div className="flex items-center gap-2">
                   <Switch
-                    id="is_new"
                     checked={form.is_new}
                     onCheckedChange={(checked) => setForm((prev) => ({ ...prev, is_new: checked }))}
-                    className="bg-zinc-800"
+                    className="cursor-pointer"
                   />
+                  <span className="text-zinc-300 text-sm">New</span>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          {/* Region */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Region" section="region" icon={Globe} />
-            {expandedSections.region && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                <div>
-                  <Label htmlFor="region" className="text-zinc-300">
-                    Region
-                  </Label>
-                  <Select
-                    value={form.region}
-                    onValueChange={(value) => setForm((prev) => ({ ...prev, region: value }))}
-                  >
-                    <SelectTrigger className="mt-1.5 bg-zinc-800 border-zinc-700 text-white cursor-pointer">
-                      <SelectValue placeholder="Select region" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700">
-                      <SelectItem value="Global" className="text-white cursor-pointer">
-                        Global
-                      </SelectItem>
-                      <SelectItem value="Nepal" className="text-white cursor-pointer">
-                        Nepal
-                      </SelectItem>
-                      <SelectItem value="USA" className="text-white cursor-pointer">
-                        USA
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="regions_available" className="text-zinc-300">
-                    Regions Available
-                  </Label>
-                  <div className="flex flex-wrap gap-4">
-                    {form.regions_available.map((region, index) => (
-                      <div key={index} className="relative">
-                        <span className="bg-zinc-800 text-white px-2 py-1 rounded">{region}</span>
-                        <Button
-                          type="button"
-                          onClick={() => removeRegion(region)}
-                          className="absolute top-0 right-0 bg-red-500 hover:bg-red-400 text-white cursor-pointer rounded"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
+        {/* SEO */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <SectionHeader title="SEO" section="seo" icon={Search} />
+          {expandedSections.seo && (
+            <div className="p-6 space-y-4 border-t border-zinc-800">
+              <div>
+                <Label htmlFor="meta_title" className="text-zinc-300">
+                  Meta Title
+                </Label>
+                <Input
+                  id="meta_title"
+                  value={form.meta_title}
+                  onChange={(e) => setForm((prev) => ({ ...prev, meta_title: e.target.value }))}
+                  placeholder="SEO title (defaults to product title)"
+                  className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                />
+              </div>
+              <div>
+                <Label htmlFor="meta_description" className="text-zinc-300">
+                  Meta Description
+                </Label>
+                <Textarea
+                  id="meta_description"
+                  value={form.meta_description}
+                  onChange={(e) => setForm((prev) => ({ ...prev, meta_description: e.target.value }))}
+                  placeholder="SEO description"
+                  className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                  rows={3}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Region */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <SectionHeader title="Region" section="region" icon={Globe} />
+          {expandedSections.region && (
+            <div className="p-6 space-y-4 border-t border-zinc-800">
+              <div>
+                <Label htmlFor="region" className="text-zinc-300">
+                  Primary Region
+                </Label>
+                <Select value={form.region} onValueChange={(value) => setForm((prev) => ({ ...prev, region: value }))}>
+                  <SelectTrigger className="mt-1.5 bg-zinc-800 border-zinc-700 text-white cursor-pointer">
+                    <SelectValue placeholder="Select region" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-700">
+                    <SelectItem value="Global" className="text-white cursor-pointer">
+                      Global
+                    </SelectItem>
+                    <SelectItem value="Nepal" className="text-white cursor-pointer">
+                      Nepal
+                    </SelectItem>
+                    <SelectItem value="USA" className="text-white cursor-pointer">
+                      USA
+                    </SelectItem>
+                    <SelectItem value="Europe" className="text-white cursor-pointer">
+                      Europe
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-zinc-300 mb-2 block">Available Regions</Label>
+                <div className="flex gap-2">
                   <Input
-                    id="region_input"
                     value={regionInput}
                     onChange={(e) => setRegionInput(e.target.value)}
-                    placeholder="Add region"
-                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                    placeholder="Add region..."
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addRegion())}
                   />
                   <Button
                     type="button"
                     onClick={addRegion}
-                    className="mt-2 bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
+                    variant="outline"
+                    className="border-zinc-700 text-zinc-300 cursor-pointer bg-transparent hover:bg-zinc-800"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Region
+                    <Plus className="w-4 h-4" />
                   </Button>
                 </div>
+                {form.regions_available.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {form.regions_available.map((region, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1 bg-zinc-800 text-zinc-300 rounded-full text-sm flex items-center gap-2"
+                      >
+                        {region}
+                        <button
+                          type="button"
+                          onClick={() => removeRegion(region)}
+                          className="hover:text-red-400 cursor-pointer"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          {/* Additional */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Additional" section="additional" icon={HelpCircle} />
-            {expandedSections.additional && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">{/* Additional fields can be added here */}</div>
-            )}
-          </div>
-
-          {/* Platforms */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Platforms" section="platforms" icon={Monitor} />
-            {expandedSections.platforms && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {allPlatforms.map((platform) => (
-                    <div key={platform.id} className="flex items-center gap-4">
-                      <Label htmlFor={`platform-${platform.id}`} className="text-zinc-300">
+        {/* Platforms */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <SectionHeader title="Platforms" section="platforms" icon={Monitor} />
+          {expandedSections.platforms && (
+            <div className="p-6 space-y-4 border-t border-zinc-800">
+              <div>
+                <Label className="text-zinc-300 mb-3 block">Available Platforms</Label>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {allPlatforms.map((platform) => {
+                    const isSelected = selectedPlatforms.some((p) => p.platform_id === platform.id)
+                    return (
+                      <button
+                        key={platform.id}
+                        type="button"
+                        onClick={() => (isSelected ? removePlatform(platform.id) : addPlatform(platform.id))}
+                        className={`px-4 py-2 rounded-lg border transition-colors cursor-pointer ${
+                          isSelected
+                            ? "bg-amber-500/20 border-amber-500/50 text-amber-400"
+                            : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                        }`}
+                      >
                         {platform.name}
-                      </Label>
-                      <Input
-                        id={`platform-${platform.id}`}
-                        type="number"
-                        step="0.01"
-                        value={selectedPlatforms.find((sp) => sp.platform_id === platform.id)?.price_modifier || "0"}
-                        onChange={(e) => {
-                          const priceModifier = e.target.value
-                          setSelectedPlatforms((prev) => {
-                            const updated = [...prev]
-                            const index = updated.findIndex((sp) => sp.platform_id === platform.id)
-                            if (index !== -1) {
-                              updated[index].price_modifier = priceModifier
-                            } else {
-                              updated.push({
-                                platform_id: platform.id,
-                                price_modifier: priceModifier,
-                                is_available: true,
-                              })
-                            }
-                            return updated
-                          })
-                        }}
-                        placeholder="Price modifier"
-                        className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                      />
-                      <Switch
-                        id={`is_available-${platform.id}`}
-                        checked={selectedPlatforms.find((sp) => sp.platform_id === platform.id)?.is_available || true}
-                        onCheckedChange={(checked) => {
-                          setSelectedPlatforms((prev) => {
-                            const updated = [...prev]
-                            const index = updated.findIndex((sp) => sp.platform_id === platform.id)
-                            if (index !== -1) {
-                              updated[index].is_available = checked
-                            } else {
-                              updated.push({ platform_id: platform.id, price_modifier: "0", is_available: checked })
-                            }
-                            return updated
-                          })
-                        }}
-                        className="bg-zinc-800"
-                      />
-                    </div>
-                  ))}
+                      </button>
+                    )
+                  })}
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* Type Specific */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Type Specific" section="typeSpecific" icon={Tag} />
-            {expandedSections.typeSpecific && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                {form.product_type === "game" && (
-                  <div>
-                    <Label htmlFor="editions" className="text-zinc-300">
-                      Editions
-                    </Label>
-                    <div className="space-y-4">
-                      {editions.map((edition, index) => (
-                        <div key={index} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          <div>
-                            <Label htmlFor={`edition-name-${index}`} className="text-zinc-300">
-                              Name
-                            </Label>
-                            <Input
-                              id={`edition-name-${index}`}
-                              value={edition.name}
-                              onChange={(e) => updateEdition(index, "name", e.target.value)}
-                              placeholder="Edition name"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`edition-price-${index}`} className="text-zinc-300">
-                              Price
-                            </Label>
-                            <Input
-                              id={`edition-price-${index}`}
-                              type="number"
-                              step="0.01"
-                              value={edition.price}
-                              onChange={(e) => updateEdition(index, "price", e.target.value)}
-                              placeholder="Edition price"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`edition-is_default-${index}`} className="text-zinc-300">
-                              Default
-                            </Label>
-                            <Switch
-                              id={`edition-is_default-${index}`}
-                              checked={edition.is_default}
-                              onCheckedChange={(checked) => {
-                                const updated = [...editions]
-                                updated[index].is_default = checked
-                                setEditions(updated)
-                              }}
-                              className="bg-zinc-800"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`edition-description-${index}`} className="text-zinc-300">
-                              Description
-                            </Label>
-                            <Textarea
-                              id={`edition-description-${index}`}
-                              value={edition.description}
-                              onChange={(e) => updateEdition(index, "description", e.target.value)}
-                              placeholder="Edition description"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`edition-includes-${index}`} className="text-zinc-300">
-                              Includes
-                            </Label>
-                            <Textarea
-                              id={`edition-includes-${index}`}
-                              value={edition.includes.join(", ")}
-                              onChange={(e) =>
-                                updateEdition(index, "includes", e.target.value.split(", ").filter(Boolean))
-                              }
-                              placeholder="Includes"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`edition-image_url-${index}`} className="text-zinc-300">
-                              Image URL
-                            </Label>
-                            <Input
-                              id={`edition-image_url-${index}`}
-                              value={edition.image_url}
-                              onChange={(e) => updateEdition(index, "image_url", e.target.value)}
-                              placeholder="Image URL"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full flex justify-end">
-                            <Button
-                              type="button"
-                              onClick={() => removeEdition(index)}
-                              className="bg-red-500 hover:bg-red-400 text-white cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Remove Edition
-                            </Button>
-                          </div>
+                {selectedPlatforms.length > 0 && (
+                  <div className="space-y-3">
+                    <Label className="text-zinc-400 text-sm">Platform Price Modifiers</Label>
+                    {selectedPlatforms.map((sp) => {
+                      const platform = allPlatforms.find((p) => p.id === sp.platform_id)
+                      return (
+                        <div key={sp.platform_id} className="flex items-center gap-4 p-3 bg-zinc-800/50 rounded-lg">
+                          <span className="text-white flex-1">{platform?.name}</span>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={sp.price_modifier}
+                            onChange={(e) =>
+                              setSelectedPlatforms((prev) =>
+                                prev.map((p) =>
+                                  p.platform_id === sp.platform_id ? { ...p, price_modifier: e.target.value } : p,
+                                ),
+                              )
+                            }
+                            placeholder="Price modifier"
+                            className="w-32 bg-zinc-800 border-zinc-700 text-white"
+                          />
+                          <Switch
+                            checked={sp.is_available}
+                            onCheckedChange={(checked) =>
+                              setSelectedPlatforms((prev) =>
+                                prev.map((p) =>
+                                  p.platform_id === sp.platform_id ? { ...p, is_available: checked } : p,
+                                ),
+                              )
+                            }
+                            className="cursor-pointer"
+                          />
                         </div>
-                      ))}
-                      <Button
-                        type="button"
-                        onClick={addEdition}
-                        className="bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Edition
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                {form.product_type === "giftcard" && (
-                  <div>
-                    <Label htmlFor="denominations" className="text-zinc-300">
-                      Denominations
-                    </Label>
-                    <div className="space-y-4">
-                      {denominations.map((denomination, index) => (
-                        <div key={index} className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                          <div>
-                            <Label htmlFor={`denomination-value-${index}`} className="text-zinc-300">
-                              Value
-                            </Label>
-                            <Input
-                              id={`denomination-value-${index}`}
-                              type="number"
-                              step="0.01"
-                              value={denomination.value}
-                              onChange={(e) => updateDenomination(index, "value", e.target.value)}
-                              placeholder="Denomination value"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`denomination-price-${index}`} className="text-zinc-300">
-                              Price
-                            </Label>
-                            <Input
-                              id={`denomination-price-${index}`}
-                              type="number"
-                              step="0.01"
-                              value={denomination.price}
-                              onChange={(e) => updateDenomination(index, "price", e.target.value)}
-                              placeholder="Denomination price"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`denomination-currency-${index}`} className="text-zinc-300">
-                              Currency
-                            </Label>
-                            <Select
-                              value={denomination.currency}
-                              onValueChange={(value) => updateDenomination(index, "currency", value)}
-                            >
-                              <SelectTrigger className="mt-1.5 bg-zinc-800 border-zinc-700 text-white cursor-pointer">
-                                <SelectValue placeholder="Select currency" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-zinc-800 border-zinc-700">
-                                <SelectItem value="NPR" className="text-white cursor-pointer">
-                                  NPR
-                                </SelectItem>
-                                <SelectItem value="USD" className="text-white cursor-pointer">
-                                  USD
-                                </SelectItem>
-                                <SelectItem value="EUR" className="text-white cursor-pointer">
-                                  EUR
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Label htmlFor={`denomination-bonus_value-${index}`} className="text-zinc-300">
-                              Bonus Value
-                            </Label>
-                            <Input
-                              id={`denomination-bonus_value-${index}`}
-                              type="number"
-                              step="0.01"
-                              value={denomination.bonus_value}
-                              onChange={(e) => updateDenomination(index, "bonus_value", e.target.value)}
-                              placeholder="Bonus value"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`denomination-stock-${index}`} className="text-zinc-300">
-                              Stock
-                            </Label>
-                            <Input
-                              id={`denomination-stock-${index}`}
-                              type="number"
-                              value={denomination.stock}
-                              onChange={(e) => updateDenomination(index, "stock", e.target.value)}
-                              placeholder="Stock"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full flex justify-end">
-                            <Button
-                              type="button"
-                              onClick={() => removeDenomination(index)}
-                              className="bg-red-500 hover:bg-red-400 text-white cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Remove Denomination
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        onClick={addDenomination}
-                        className="bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Denomination
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                {form.product_type === "subscription" && (
-                  <div>
-                    <Label htmlFor="plans" className="text-zinc-300">
-                      Plans
-                    </Label>
-                    <div className="space-y-4">
-                      {plans.map((plan, planIndex) => (
-                        <div key={planIndex} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          <div>
-                            <Label htmlFor={`plan-name-${planIndex}`} className="text-zinc-300">
-                              Name
-                            </Label>
-                            <Input
-                              id={`plan-name-${planIndex}`}
-                              value={plan.name}
-                              onChange={(e) => updatePlan(planIndex, "name", e.target.value)}
-                              placeholder="Plan name"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`plan-max_devices-${planIndex}`} className="text-zinc-300">
-                              Max Devices
-                            </Label>
-                            <Input
-                              id={`plan-max_devices-${planIndex}`}
-                              type="number"
-                              value={plan.max_devices}
-                              onChange={(e) => updatePlan(planIndex, "max_devices", e.target.value)}
-                              placeholder="Max devices"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`plan-max_users-${planIndex}`} className="text-zinc-300">
-                              Max Users
-                            </Label>
-                            <Input
-                              id={`plan-max_users-${planIndex}`}
-                              type="number"
-                              value={plan.max_users}
-                              onChange={(e) => updatePlan(planIndex, "max_users", e.target.value)}
-                              placeholder="Max users"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`plan-description-${planIndex}`} className="text-zinc-300">
-                              Description
-                            </Label>
-                            <Textarea
-                              id={`plan-description-${planIndex}`}
-                              value={plan.description}
-                              onChange={(e) => updatePlan(planIndex, "description", e.target.value)}
-                              placeholder="Plan description"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`plan-features-${planIndex}`} className="text-zinc-300">
-                              Features
-                            </Label>
-                            <Textarea
-                              id={`plan-features-${planIndex}`}
-                              value={plan.features.join(", ")}
-                              onChange={(e) =>
-                                updatePlan(planIndex, "features", e.target.value.split(", ").filter(Boolean))
-                              }
-                              placeholder="Features"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`plan-quality-${planIndex}`} className="text-zinc-300">
-                              Quality
-                            </Label>
-                            <Input
-                              id={`plan-quality-${planIndex}`}
-                              value={plan.quality}
-                              onChange={(e) => updatePlan(planIndex, "quality", e.target.value)}
-                              placeholder="Quality"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`plan-color-${planIndex}`} className="text-zinc-300">
-                              Color
-                            </Label>
-                            <Input
-                              id={`plan-color-${planIndex}`}
-                              value={plan.color}
-                              onChange={(e) => updatePlan(planIndex, "color", e.target.value)}
-                              placeholder="Color"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`plan-durations-${planIndex}`} className="text-zinc-300">
-                              Durations
-                            </Label>
-                            <div className="space-y-4">
-                              {plan.durations.map((duration, durIndex) => (
-                                <div key={durIndex} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                  <div>
-                                    <Label
-                                      htmlFor={`duration-months-${planIndex}-${durIndex}`}
-                                      className="text-zinc-300"
-                                    >
-                                      Months
-                                    </Label>
-                                    <Input
-                                      id={`duration-months-${planIndex}-${durIndex}`}
-                                      type="number"
-                                      value={duration.months}
-                                      onChange={(e) =>
-                                        updatePlanDuration(planIndex, durIndex, "months", e.target.value)
-                                      }
-                                      placeholder="Months"
-                                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label
-                                      htmlFor={`duration-label-${planIndex}-${durIndex}`}
-                                      className="text-zinc-300"
-                                    >
-                                      Label
-                                    </Label>
-                                    <Input
-                                      id={`duration-label-${planIndex}-${durIndex}`}
-                                      value={duration.label}
-                                      onChange={(e) => updatePlanDuration(planIndex, durIndex, "label", e.target.value)}
-                                      placeholder="Label"
-                                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label
-                                      htmlFor={`duration-price-${planIndex}-${durIndex}`}
-                                      className="text-zinc-300"
-                                    >
-                                      Price
-                                    </Label>
-                                    <Input
-                                      id={`duration-price-${planIndex}-${durIndex}`}
-                                      type="number"
-                                      step="0.01"
-                                      value={duration.price}
-                                      onChange={(e) => updatePlanDuration(planIndex, durIndex, "price", e.target.value)}
-                                      placeholder="Price"
-                                      className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                                    />
-                                  </div>
-                                  <div className="col-span-full flex justify-end">
-                                    <Button
-                                      type="button"
-                                      onClick={() => removePlanDuration(planIndex, durIndex)}
-                                      className="bg-red-500 hover:bg-red-400 text-white cursor-pointer"
-                                    >
-                                      <Trash2 className="w-4 h-4 mr-2" />
-                                      Remove Duration
-                                    </Button>
-                                  </div>
-                                </div>
-                              ))}
-                              <Button
-                                type="button"
-                                onClick={() => addPlanDuration(planIndex)}
-                                className="bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
-                              >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Add Duration
-                              </Button>
-                            </div>
-                          </div>
-                          <div className="col-span-full flex justify-end">
-                            <Button
-                              type="button"
-                              onClick={() => removePlan(planIndex)}
-                              className="bg-red-500 hover:bg-red-400 text-white cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Remove Plan
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        onClick={addPlan}
-                        className="bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Plan
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                {form.product_type === "software" && (
-                  <div>
-                    <Label htmlFor="license_types" className="text-zinc-300">
-                      License Types
-                    </Label>
-                    <div className="space-y-4">
-                      {licenseTypes.map((licenseType, index) => (
-                        <div key={index} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          <div>
-                            <Label htmlFor={`license-type-name-${index}`} className="text-zinc-300">
-                              Name
-                            </Label>
-                            <Input
-                              id={`license-type-name-${index}`}
-                              value={licenseType.name}
-                              onChange={(e) => updateLicenseType(index, "name", e.target.value)}
-                              placeholder="License type name"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`license-type-max_users-${index}`} className="text-zinc-300">
-                              Max Users
-                            </Label>
-                            <Input
-                              id={`license-type-max_users-${index}`}
-                              type="number"
-                              value={licenseType.max_users}
-                              onChange={(e) => updateLicenseType(index, "max_users", e.target.value)}
-                              placeholder="Max users"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`license-type-max_devices-${index}`} className="text-zinc-300">
-                              Max Devices
-                            </Label>
-                            <Input
-                              id={`license-type-max_devices-${index}`}
-                              type="number"
-                              value={licenseType.max_devices}
-                              onChange={(e) => updateLicenseType(index, "max_devices", e.target.value)}
-                              placeholder="Max devices"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`license-type-description-${index}`} className="text-zinc-300">
-                              Description
-                            </Label>
-                            <Textarea
-                              id={`license-type-description-${index}`}
-                              value={licenseType.description}
-                              onChange={(e) => updateLicenseType(index, "description", e.target.value)}
-                              placeholder="License type description"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full">
-                            <Label htmlFor={`license-type-features-${index}`} className="text-zinc-300">
-                              Features
-                            </Label>
-                            <Textarea
-                              id={`license-type-features-${index}`}
-                              value={licenseType.features.join(", ")}
-                              onChange={(e) =>
-                                updateLicenseType(index, "features", e.target.value.split(", ").filter(Boolean))
-                              }
-                              placeholder="Features"
-                              className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                            />
-                          </div>
-                          <div className="col-span-full flex justify-end">
-                            <Button
-                              type="button"
-                              onClick={() => removeLicenseType(index)}
-                              className="bg-red-500 hover:bg-red-400 text-white cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Remove License Type
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        onClick={addLicenseType}
-                        className="bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add License Type
-                      </Button>
-                    </div>
+                      )
+                    })}
                   </div>
                 )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          {/* Tags */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="Tags" section="tags" icon={Tag} />
-            {expandedSections.tags && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                <div>
-                  <Label htmlFor="tags" className="text-zinc-300">
-                    Tags
-                  </Label>
-                  <div className="flex flex-wrap gap-4">
-                    {form.tags.map((tag, index) => (
-                      <div key={index} className="relative">
-                        <span className="bg-zinc-800 text-white px-2 py-1 rounded">{tag}</span>
+        {/* Game Editions - Only show when product type is game */}
+        {form.product_type === "game" && (
+          <div className="bg-zinc-900 border border-blue-500/30 rounded-xl overflow-hidden">
+            <div className="bg-blue-500/10 px-6 py-4 border-b border-blue-500/20">
+              <div className="flex items-center gap-3">
+                <Gamepad2 className="w-5 h-5 text-blue-400" />
+                <h3 className="text-white font-semibold">Game Editions</h3>
+                <span className="text-xs text-blue-400 bg-blue-500/20 px-2 py-0.5 rounded">Game Only</span>
+              </div>
+              <p className="text-zinc-400 text-sm mt-1">Add different editions like Standard, Deluxe, Ultimate</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  onClick={addEdition}
+                  variant="outline"
+                  size="sm"
+                  className="border-blue-500/30 text-blue-400 cursor-pointer bg-blue-500/10 hover:bg-blue-500/20"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Edition
+                </Button>
+              </div>
+              {editions.length === 0 ? (
+                <div className="text-center py-8 text-zinc-500">
+                  <Gamepad2 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>No editions added yet</p>
+                  <p className="text-sm">Click &quot;Add Edition&quot; to create game editions</p>
+                </div>
+              ) : (
+                editions.map((edition, index) => (
+                  <div key={index} className="p-4 bg-zinc-800/50 rounded-lg space-y-4 border border-zinc-700">
+                    <div className="flex items-start justify-between">
+                      <span className="text-white font-medium">Edition {index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeEdition(index)}
+                        className="text-zinc-500 hover:text-red-400 cursor-pointer p-1"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Name *</Label>
+                        <Input
+                          value={edition.name}
+                          onChange={(e) => updateEdition(index, "name", e.target.value)}
+                          placeholder="Standard, Deluxe, Ultimate..."
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Price (NPR) *</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={edition.price}
+                          onChange={(e) => updateEdition(index, "price", e.target.value)}
+                          placeholder="0.00"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Original Price</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={edition.original_price}
+                          onChange={(e) => updateEdition(index, "original_price", e.target.value)}
+                          placeholder="0.00"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Image URL</Label>
+                        <Input
+                          value={edition.image_url}
+                          onChange={(e) => updateEdition(index, "image_url", e.target.value)}
+                          placeholder="https://..."
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label className="text-zinc-400 text-sm">Description</Label>
+                        <Input
+                          value={edition.description}
+                          onChange={(e) => updateEdition(index, "description", e.target.value)}
+                          placeholder="What's included in this edition"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div className="sm:col-span-2 flex flex-wrap items-center gap-6">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={edition.is_default}
+                            onCheckedChange={(checked) => updateEdition(index, "is_default", checked)}
+                            className="cursor-pointer"
+                          />
+                          <span className="text-zinc-400 text-sm">Default Edition</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={edition.is_available}
+                            onCheckedChange={(checked) => updateEdition(index, "is_available", checked)}
+                            className="cursor-pointer"
+                          />
+                          <span className="text-zinc-400 text-sm">Available</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Gift Card Denominations - Only show when product type is giftcard */}
+        {form.product_type === "giftcard" && (
+          <div className="bg-zinc-900 border border-green-500/30 rounded-xl overflow-hidden">
+            <div className="bg-green-500/10 px-6 py-4 border-b border-green-500/20">
+              <div className="flex items-center gap-3">
+                <Gift className="w-5 h-5 text-green-400" />
+                <h3 className="text-white font-semibold">Gift Card Denominations</h3>
+                <span className="text-xs text-green-400 bg-green-500/20 px-2 py-0.5 rounded">Gift Card Only</span>
+              </div>
+              <p className="text-zinc-400 text-sm mt-1">Add different values like $10, $25, $50, $100</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  onClick={addDenomination}
+                  variant="outline"
+                  size="sm"
+                  className="border-green-500/30 text-green-400 cursor-pointer bg-green-500/10 hover:bg-green-500/20"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Denomination
+                </Button>
+              </div>
+              {denominations.length === 0 ? (
+                <div className="text-center py-8 text-zinc-500">
+                  <Gift className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>No denominations added yet</p>
+                  <p className="text-sm">Click &quot;Add Denomination&quot; to create gift card values</p>
+                </div>
+              ) : (
+                denominations.map((denom, index) => (
+                  <div key={index} className="p-4 bg-zinc-800/50 rounded-lg border border-zinc-700">
+                    <div className="flex items-start justify-between mb-4">
+                      <span className="text-white font-medium">Denomination {index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeDenomination(index)}
+                        className="text-zinc-500 hover:text-red-400 cursor-pointer p-1"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Face Value *</Label>
+                        <Input
+                          type="number"
+                          value={denom.value}
+                          onChange={(e) => updateDenomination(index, "value", e.target.value)}
+                          placeholder="100"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Selling Price *</Label>
+                        <Input
+                          type="number"
+                          value={denom.price}
+                          onChange={(e) => updateDenomination(index, "price", e.target.value)}
+                          placeholder="95"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Stock</Label>
+                        <Input
+                          type="number"
+                          value={denom.stock}
+                          onChange={(e) => updateDenomination(index, "stock", e.target.value)}
+                          placeholder="0"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Bonus Value</Label>
+                        <Input
+                          type="number"
+                          value={denom.bonus_value}
+                          onChange={(e) => updateDenomination(index, "bonus_value", e.target.value)}
+                          placeholder="0"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 mt-4">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={denom.is_popular}
+                          onCheckedChange={(checked) => updateDenomination(index, "is_popular", checked)}
+                          className="cursor-pointer"
+                        />
+                        <span className="text-zinc-400 text-sm">Popular</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={denom.is_available}
+                          onCheckedChange={(checked) => updateDenomination(index, "is_available", checked)}
+                          className="cursor-pointer"
+                        />
+                        <span className="text-zinc-400 text-sm">Available</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Subscription Plans - Only show when product type is subscription */}
+        {form.product_type === "subscription" && (
+          <div className="bg-zinc-900 border border-purple-500/30 rounded-xl overflow-hidden">
+            <div className="bg-purple-500/10 px-6 py-4 border-b border-purple-500/20">
+              <div className="flex items-center gap-3">
+                <MonitorPlay className="w-5 h-5 text-purple-400" />
+                <h3 className="text-white font-semibold">Subscription Plans & Durations</h3>
+                <span className="text-xs text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded">Subscription Only</span>
+              </div>
+              <p className="text-zinc-400 text-sm mt-1">
+                Add plans (Basic, Standard, Premium) and their durations with pricing
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  onClick={addPlan}
+                  variant="outline"
+                  size="sm"
+                  className="border-purple-500/30 text-purple-400 cursor-pointer bg-purple-500/10 hover:bg-purple-500/20"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Plan
+                </Button>
+              </div>
+              {plans.length === 0 ? (
+                <div className="text-center py-8 text-zinc-500">
+                  <MonitorPlay className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>No plans added yet</p>
+                  <p className="text-sm">Click &quot;Add Plan&quot; to create subscription plans</p>
+                </div>
+              ) : (
+                plans.map((plan, planIndex) => (
+                  <div key={planIndex} className="p-4 bg-zinc-800/50 rounded-lg space-y-4 border border-zinc-700">
+                    <div className="flex items-start justify-between">
+                      <span className="text-white font-medium">Plan {planIndex + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => removePlan(planIndex)}
+                        className="text-zinc-500 hover:text-red-400 cursor-pointer p-1"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Name *</Label>
+                        <Input
+                          value={plan.name}
+                          onChange={(e) => updatePlan(planIndex, "name", e.target.value)}
+                          placeholder="Basic, Standard, Premium..."
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Quality</Label>
+                        <Input
+                          value={plan.quality}
+                          onChange={(e) => updatePlan(planIndex, "quality", e.target.value)}
+                          placeholder="HD, Full HD, 4K..."
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Color (for UI)</Label>
+                        <Input
+                          value={plan.color}
+                          onChange={(e) => updatePlan(planIndex, "color", e.target.value)}
+                          placeholder="#8B5CF6"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Max Devices</Label>
+                        <Input
+                          type="number"
+                          value={plan.max_devices}
+                          onChange={(e) => updatePlan(planIndex, "max_devices", e.target.value)}
+                          placeholder="1"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-zinc-400 text-sm">Max Users</Label>
+                        <Input
+                          type="number"
+                          value={plan.max_users}
+                          onChange={(e) => updatePlan(planIndex, "max_users", e.target.value)}
+                          placeholder="1"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div className="sm:col-span-3">
+                        <Label className="text-zinc-400 text-sm">Description</Label>
+                        <Input
+                          value={plan.description}
+                          onChange={(e) => updatePlan(planIndex, "description", e.target.value)}
+                          placeholder="Plan description"
+                          className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={plan.is_popular}
+                          onCheckedChange={(checked) => updatePlan(planIndex, "is_popular", checked)}
+                          className="cursor-pointer"
+                        />
+                        <span className="text-zinc-400 text-sm">Popular</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={plan.is_available}
+                          onCheckedChange={(checked) => updatePlan(planIndex, "is_available", checked)}
+                          className="cursor-pointer"
+                        />
+                        <span className="text-zinc-400 text-sm">Available</span>
+                      </div>
+                    </div>
+
+                    {/* Durations for this plan */}
+                    <div className="mt-4 p-4 bg-zinc-900/50 rounded-lg border border-purple-500/20">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="w-4 h-4 text-purple-400" />
+                          <span className="text-white text-sm font-medium">Durations & Pricing</span>
+                        </div>
                         <Button
                           type="button"
-                          onClick={() => removeTag(tag)}
-                          className="absolute top-0 right-0 bg-red-500 hover:bg-red-400 text-white cursor-pointer rounded"
+                          onClick={() => addDuration(planIndex)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-purple-400 hover:text-purple-300 cursor-pointer"
                         >
-                          <X className="w-4 h-4" />
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add Duration
                         </Button>
                       </div>
-                    ))}
+                      {plan.durations.length === 0 ? (
+                        <p className="text-zinc-500 text-sm text-center py-4">
+                          No durations added. Click &quot;Add Duration&quot; to add pricing.
+                        </p>
+                      ) : (
+                        <div className="space-y-3">
+                          {plan.durations.map((duration, durIndex) => (
+                            <div
+                              key={durIndex}
+                              className="flex flex-wrap items-center gap-3 p-3 bg-zinc-800/50 rounded-lg"
+                            >
+                              <Input
+                                type="number"
+                                value={duration.months}
+                                onChange={(e) => updateDuration(planIndex, durIndex, "months", e.target.value)}
+                                placeholder="Months"
+                                className="w-20 bg-zinc-800 border-zinc-700 text-white"
+                              />
+                              <Input
+                                value={duration.label}
+                                onChange={(e) => updateDuration(planIndex, durIndex, "label", e.target.value)}
+                                placeholder="Label (e.g., 1 Month)"
+                                className="flex-1 min-w-[120px] bg-zinc-800 border-zinc-700 text-white"
+                              />
+                              <Input
+                                type="number"
+                                step="0.01"
+                                value={duration.price}
+                                onChange={(e) => updateDuration(planIndex, durIndex, "price", e.target.value)}
+                                placeholder="Price"
+                                className="w-28 bg-zinc-800 border-zinc-700 text-white"
+                              />
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={duration.is_popular}
+                                  onCheckedChange={(checked) =>
+                                    updateDuration(planIndex, durIndex, "is_popular", checked)
+                                  }
+                                  className="cursor-pointer"
+                                />
+                                <span className="text-zinc-400 text-xs">Popular</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeDuration(planIndex, durIndex)}
+                                className="text-zinc-500 hover:text-red-400 cursor-pointer p-1"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <Input
-                    id="tag_input"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    placeholder="Add tag"
-                    className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
-                  />
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Software License Types - Only show when product type is software */}
+        {form.product_type === "software" && (
+          <>
+            <div className="bg-zinc-900 border border-orange-500/30 rounded-xl overflow-hidden">
+              <div className="bg-orange-500/10 px-6 py-4 border-b border-orange-500/20">
+                <div className="flex items-center gap-3">
+                  <Settings className="w-5 h-5 text-orange-400" />
+                  <h3 className="text-white font-semibold">License Types</h3>
+                  <span className="text-xs text-orange-400 bg-orange-500/20 px-2 py-0.5 rounded">Software Only</span>
+                </div>
+                <p className="text-zinc-400 text-sm mt-1">Add license types like Personal, Business, Enterprise</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex justify-end">
                   <Button
                     type="button"
-                    onClick={addTag}
-                    className="mt-2 bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
+                    onClick={addLicenseType}
+                    variant="outline"
+                    size="sm"
+                    className="border-orange-500/30 text-orange-400 cursor-pointer bg-orange-500/10 hover:bg-orange-500/20"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Tag
+                    Add License Type
                   </Button>
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* FAQs */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="FAQs" section="faqs" icon={HelpCircle} />
-            {expandedSections.faqs && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                <div>
-                  <Label htmlFor="faqs" className="text-zinc-300">
-                    FAQs
-                  </Label>
-                  <div className="space-y-4">
-                    {faqs.map((faq, index) => (
-                      <div key={index} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {licenseTypes.length === 0 ? (
+                  <div className="text-center py-8 text-zinc-500">
+                    <Settings className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>No license types added yet</p>
+                    <p className="text-sm">Click &quot;Add License Type&quot; to create license options</p>
+                  </div>
+                ) : (
+                  licenseTypes.map((license, index) => (
+                    <div key={index} className="p-4 bg-zinc-800/50 rounded-lg space-y-4 border border-zinc-700">
+                      <div className="flex items-start justify-between">
+                        <span className="text-white font-medium">License Type {index + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeLicenseType(index)}
+                          className="text-zinc-500 hover:text-red-400 cursor-pointer p-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
-                          <Label htmlFor={`faq-question-${index}`} className="text-zinc-300">
-                            Question
-                          </Label>
+                          <Label className="text-zinc-400 text-sm">Name *</Label>
                           <Input
-                            id={`faq-question-${index}`}
-                            value={faq.question}
-                            onChange={(e) => updateFaq(index, "question", e.target.value)}
-                            placeholder="FAQ question"
-                            className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                            value={license.name}
+                            onChange={(e) => updateLicenseType(index, "name", e.target.value)}
+                            placeholder="Personal, Business..."
+                            className="mt-1 bg-zinc-800 border-zinc-700 text-white"
                           />
                         </div>
-                        <div className="col-span-full">
-                          <Label htmlFor={`faq-answer-${index}`} className="text-zinc-300">
-                            Answer
-                          </Label>
-                          <Textarea
-                            id={`faq-answer-${index}`}
-                            value={faq.answer}
-                            onChange={(e) => updateFaq(index, "answer", e.target.value)}
-                            placeholder="FAQ answer"
-                            className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                        <div>
+                          <Label className="text-zinc-400 text-sm">Price *</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={license.price}
+                            onChange={(e) => updateLicenseType(index, "price", e.target.value)}
+                            placeholder="0.00"
+                            className="mt-1 bg-zinc-800 border-zinc-700 text-white"
                           />
                         </div>
-                        <div className="col-span-full flex justify-end">
-                          <Button
-                            type="button"
-                            onClick={() => removeFaq(index)}
-                            className="bg-red-500 hover:bg-red-400 text-white cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Remove FAQ
-                          </Button>
+                        <div>
+                          <Label className="text-zinc-400 text-sm">Max Users</Label>
+                          <Input
+                            type="number"
+                            value={license.max_users}
+                            onChange={(e) => updateLicenseType(index, "max_users", e.target.value)}
+                            placeholder="1"
+                            className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-zinc-400 text-sm">Max Devices</Label>
+                          <Input
+                            type="number"
+                            value={license.max_devices}
+                            onChange={(e) => updateLicenseType(index, "max_devices", e.target.value)}
+                            placeholder="1"
+                            className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <Label className="text-zinc-400 text-sm">Description</Label>
+                          <Input
+                            value={license.description}
+                            onChange={(e) => updateLicenseType(index, "description", e.target.value)}
+                            placeholder="License description"
+                            className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                          />
                         </div>
                       </div>
-                    ))}
-                    <Button
-                      type="button"
-                      onClick={addFaq}
-                      className="bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add FAQ
-                    </Button>
-                  </div>
-                </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={license.is_popular}
+                            onCheckedChange={(checked) => updateLicenseType(index, "is_popular", checked)}
+                            className="cursor-pointer"
+                          />
+                          <span className="text-zinc-400 text-sm">Popular</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={license.is_available}
+                            onCheckedChange={(checked) => updateLicenseType(index, "is_available", checked)}
+                            className="cursor-pointer"
+                          />
+                          <span className="text-zinc-400 text-sm">Available</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* License Durations */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <SectionHeader title="License Durations" section="licenseDurations" icon={HelpCircle} />
-            {expandedSections.licenseDurations && (
-              <div className="p-6 space-y-4 border-t border-zinc-800">
-                <div>
-                  <Label htmlFor="license_durations" className="text-zinc-300">
-                    License Durations
-                  </Label>
-                  <div className="space-y-4">
-                    {licenseDurations.map((duration, index) => (
-                      <div key={index} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* License Durations */}
+            <div className="bg-zinc-900 border border-orange-500/30 rounded-xl overflow-hidden">
+              <div className="bg-orange-500/10 px-6 py-4 border-b border-orange-500/20">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-5 h-5 text-orange-400" />
+                  <h3 className="text-white font-semibold">License Durations</h3>
+                  <span className="text-xs text-orange-400 bg-orange-500/20 px-2 py-0.5 rounded">Software Only</span>
+                </div>
+                <p className="text-zinc-400 text-sm mt-1">Add duration options like 1 Year, 2 Years, Lifetime</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={addLicenseDuration}
+                    variant="outline"
+                    size="sm"
+                    className="border-orange-500/30 text-orange-400 cursor-pointer bg-orange-500/10 hover:bg-orange-500/20"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Duration
+                  </Button>
+                </div>
+                {licenseDurations.length === 0 ? (
+                  <div className="text-center py-8 text-zinc-500">
+                    <CreditCard className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>No durations added yet</p>
+                    <p className="text-sm">Click &quot;Add Duration&quot; to create license duration options</p>
+                  </div>
+                ) : (
+                  licenseDurations.map((duration, index) => (
+                    <div key={index} className="p-4 bg-zinc-800/50 rounded-lg border border-zinc-700">
+                      <div className="flex items-start justify-between mb-4">
+                        <span className="text-white font-medium">Duration {index + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeLicenseDuration(index)}
+                          className="text-zinc-500 hover:text-red-400 cursor-pointer p-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         <div>
-                          <Label htmlFor={`duration-duration_type-${index}`} className="text-zinc-300">
-                            Duration Type
-                          </Label>
+                          <Label className="text-zinc-400 text-sm">Duration Type</Label>
                           <Select
                             value={duration.duration_type}
                             onValueChange={(value) => updateLicenseDuration(index, "duration_type", value)}
                           >
-                            <SelectTrigger className="mt-1.5 bg-zinc-800 border-zinc-700 text-white cursor-pointer">
-                              <SelectValue placeholder="Select duration type" />
+                            <SelectTrigger className="mt-1 bg-zinc-800 border-zinc-700 text-white cursor-pointer">
+                              <SelectValue />
                             </SelectTrigger>
                             <SelectContent className="bg-zinc-800 border-zinc-700">
+                              <SelectItem value="1month" className="text-white cursor-pointer">
+                                1 Month
+                              </SelectItem>
+                              <SelectItem value="3months" className="text-white cursor-pointer">
+                                3 Months
+                              </SelectItem>
+                              <SelectItem value="6months" className="text-white cursor-pointer">
+                                6 Months
+                              </SelectItem>
                               <SelectItem value="1year" className="text-white cursor-pointer">
                                 1 Year
                               </SelectItem>
@@ -2111,72 +2347,153 @@ export default function EditProductPage() {
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor={`duration-label-${index}`} className="text-zinc-300">
-                            Label
-                          </Label>
+                          <Label className="text-zinc-400 text-sm">Label</Label>
                           <Input
-                            id={`duration-label-${index}`}
                             value={duration.label}
                             onChange={(e) => updateLicenseDuration(index, "label", e.target.value)}
-                            placeholder="Label"
-                            className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                            placeholder="1 Year License"
+                            className="mt-1 bg-zinc-800 border-zinc-700 text-white"
                           />
                         </div>
                         <div>
-                          <Label htmlFor={`duration-price_multiplier-${index}`} className="text-zinc-300">
-                            Price Multiplier
-                          </Label>
+                          <Label className="text-zinc-400 text-sm">Price Multiplier</Label>
                           <Input
-                            id={`duration-price_multiplier-${index}`}
                             type="number"
                             step="0.01"
                             value={duration.price_multiplier}
                             onChange={(e) => updateLicenseDuration(index, "price_multiplier", e.target.value)}
-                            placeholder="Price multiplier"
-                            className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                            placeholder="1.0"
+                            className="mt-1 bg-zinc-800 border-zinc-700 text-white"
                           />
                         </div>
                         <div>
-                          <Label htmlFor={`duration-discount_percent-${index}`} className="text-zinc-300">
-                            Discount Percent
-                          </Label>
+                          <Label className="text-zinc-400 text-sm">Discount %</Label>
                           <Input
-                            id={`duration-discount_percent-${index}`}
                             type="number"
-                            step="0.01"
                             value={duration.discount_percent}
                             onChange={(e) => updateLicenseDuration(index, "discount_percent", e.target.value)}
-                            placeholder="Discount percent"
-                            className="mt-1.5 bg-zinc-800 border-zinc-700 text-white"
+                            placeholder="0"
+                            className="mt-1 bg-zinc-800 border-zinc-700 text-white"
                           />
                         </div>
-                        <div className="col-span-full flex justify-end">
-                          <Button
-                            type="button"
-                            onClick={() => removeLicenseDuration(index)}
-                            className="bg-red-500 hover:bg-red-400 text-white cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Remove Duration
-                          </Button>
+                      </div>
+                      <div className="flex items-center gap-4 mt-4">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={duration.is_popular}
+                            onCheckedChange={(checked) => updateLicenseDuration(index, "is_popular", checked)}
+                            className="cursor-pointer"
+                          />
+                          <span className="text-zinc-400 text-sm">Popular</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={duration.is_available}
+                            onCheckedChange={(checked) => updateLicenseDuration(index, "is_available", checked)}
+                            className="cursor-pointer"
+                          />
+                          <span className="text-zinc-400 text-sm">Available</span>
                         </div>
                       </div>
-                    ))}
-                    <Button
-                      type="button"
-                      onClick={addLicenseDuration}
-                      className="bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Duration
-                    </Button>
-                  </div>
-                </div>
+                    </div>
+                  ))
+                )}
               </div>
+            </div>
+          </>
+        )}
+
+        {/* FAQs */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <SectionHeader title="FAQs" section="faqs" icon={HelpCircle} />
+          {expandedSections.faqs && (
+            <div className="p-6 space-y-4 border-t border-zinc-800">
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  onClick={addFaq}
+                  variant="outline"
+                  size="sm"
+                  className="border-zinc-700 text-zinc-300 cursor-pointer bg-transparent hover:bg-zinc-800"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add FAQ
+                </Button>
+              </div>
+              {faqs.length === 0 ? (
+                <div className="text-center py-8 text-zinc-500">
+                  <HelpCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>No FAQs added yet</p>
+                  <p className="text-sm">Click &quot;Add FAQ&quot; to create product FAQs</p>
+                </div>
+              ) : (
+                faqs.map((faq, index) => (
+                  <div key={index} className="p-4 bg-zinc-800/50 rounded-lg space-y-4 border border-zinc-700">
+                    <div className="flex items-start justify-between">
+                      <span className="text-white font-medium">FAQ {index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeFaq(index)}
+                        className="text-zinc-500 hover:text-red-400 cursor-pointer p-1"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div>
+                      <Label className="text-zinc-400 text-sm">Question</Label>
+                      <Input
+                        value={faq.question}
+                        onChange={(e) => updateFaq(index, "question", e.target.value)}
+                        placeholder="Enter question"
+                        className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-zinc-400 text-sm">Answer</Label>
+                      <Textarea
+                        value={faq.answer}
+                        onChange={(e) => updateFaq(index, "answer", e.target.value)}
+                        placeholder="Enter answer"
+                        className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                        rows={3}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={faq.is_active}
+                        onCheckedChange={(checked) => updateFaq(index, "is_active", checked)}
+                        className="cursor-pointer"
+                      />
+                      <span className="text-zinc-400 text-sm">Active</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Submit Button (Mobile) */}
+        <div className="sm:hidden">
+          <Button
+            type="submit"
+            disabled={saving}
+            className="w-full bg-amber-500 hover:bg-amber-400 text-black cursor-pointer"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </>
             )}
-          </div>
-        </form>
-      </div>
+          </Button>
+        </div>
+      </form>
     </div>
   )
 }
