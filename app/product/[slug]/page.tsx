@@ -409,7 +409,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     initialPrice = defaultEdition?.price || product.base_price || 0
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://ottsewa.store"
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.ottsewa.store"
   const productSchema = generateProductSchema(product, baseUrl)
   const breadcrumbSchema = generateBreadcrumbSchema(product, baseUrl)
 

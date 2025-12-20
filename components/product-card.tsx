@@ -57,7 +57,7 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
       "@context": "https://schema.org",
       "@type": "Product",
       name: product.title,
-      image: product.image_url || product.thumbnail_url || "https://ottsewa.store/placeholder.svg",
+      image: product.image_url || product.thumbnail_url || "https://www.ottsewa.store/placeholder.svg",
       description: product.short_description || `Buy ${product.title} at best price in Nepal`,
       sku: product.id,
       mpn: product.id,
@@ -88,7 +88,7 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
       },
       offers: {
         "@type": "Offer",
-        url: `https://ottsewa.store/product/${product.slug}`,
+        url: `https://www.ottsewa.store/product/${product.slug}`,
         priceCurrency: "NPR",
         price: priceValue.toString(),
         priceValidUntil: getPriceValidUntil(),
@@ -132,7 +132,7 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
         seller: {
           "@type": "Organization",
           name: "OTTSewa",
-          url: "https://ottsewa.store",
+          url: "https://www.ottsewa.store",
         },
       },
     }

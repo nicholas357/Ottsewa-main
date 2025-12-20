@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     "streaming service Nepal",
     "buy subscriptions online Nepal",
   ],
-  authors: [{ name: "OTTSewa", url: "https://ottsewa.store" }],
+  authors: [{ name: "OTTSewa", url: "https://www.ottsewa.store" }],
   creator: "OTTSewa",
   publisher: "OTTSewa",
   formatDetection: {
@@ -50,14 +50,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://ottsewa.store"),
+  metadataBase: new URL("https://www.ottsewa.store"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://ottsewa.store",
+    url: "https://www.ottsewa.store",
     siteName: "OTTSewa",
     title: "OTTSewa - Nepal's Best Streaming Subscription Provider",
     description:
