@@ -6,31 +6,63 @@ import { useEffect, useRef, useState } from "react"
 const trustBadges = [
   {
     icon: Shield,
-    title: "100% Genuine",
-    description: "All codes are sourced directly from authorized distributors ensuring authenticity",
+    title: "100% Genuine Codes",
+    description:
+      "All subscription codes are sourced directly from authorized distributors - no shared accounts, only authentic codes",
   },
   {
     icon: Clock,
     title: "Instant Delivery",
-    description: "Receive your codes within seconds after payment confirmation",
+    description: "Receive your streaming subscription codes within seconds after payment confirmation",
   },
   {
     icon: CreditCard,
     title: "Secure Payment",
-    description: "Multiple payment options with bank-grade encryption and security",
+    description: "Pay with eSewa, Khalti, bank transfer or card with bank-grade encryption",
   },
   {
     icon: Headphones,
-    title: "24/7 Support",
-    description: "Our dedicated team is always ready to help you with any issues",
+    title: "Nepal-Based Support",
+    description: "Our dedicated Nepali team is always ready to help you with any issues",
   },
 ]
 
+const streamingServices = [
+  "Netflix",
+  "Amazon Prime Video",
+  "HBO Max",
+  "JioHotstar",
+  "Disney+",
+  "Spotify",
+  "YouTube Premium",
+  "Apple TV+",
+]
+
 const stats = [
-  { value: 1000, suffix: "+", label: "Happy Customers", icon: Users },
-  { value: 99.9, suffix: "%", label: "Delivery Success", icon: TrendingUp },
-  { value: 500, suffix: "+", label: "Products Sold", icon: Sparkles },
-  { value: 4.9, suffix: "/5", label: "Customer Rating", icon: Star },
+  {
+    icon: Users,
+    value: 1000,
+    suffix: "+",
+    label: "Trusted by 1K+ Users",
+  },
+  {
+    icon: TrendingUp,
+    value: 500,
+    suffix: "",
+    label: "500+ Active Subscriptions",
+  },
+  {
+    icon: Sparkles,
+    value: 200,
+    suffix: "",
+    label: "200+ Happy Customers",
+  },
+  {
+    icon: Star,
+    value: 4.5,
+    suffix: "/5",
+    label: "Customer Rating",
+  },
 ]
 
 function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
@@ -94,9 +126,13 @@ export default function TrustSection() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 text-balance" itemProp="name">
             Why Choose <span className="text-amber-500">OTTSewa</span>?
           </h2>
-          <p className="text-zinc-400 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed" itemProp="description">
-            Nepal's leading destination for premium streaming subscriptions. We provide genuine codes at the best prices
-            with instant delivery.
+          <p
+            className="text-zinc-400 max-w-3xl mx-auto text-base sm:text-lg leading-relaxed mb-6"
+            itemProp="description"
+          >
+            Nepal's leading destination for premium streaming subscriptions. We provide genuine codes for genuine
+            subscriptions to Netflix, Amazon Prime Video, HBO Max, JioHotstar, Disney+, Spotify, and more - no shared
+            accounts, only authentic subscription codes.
           </p>
         </div>
 
@@ -132,7 +168,7 @@ export default function TrustSection() {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3">
-          {["Verified Seller", "SSL Secured", "Trusted by 1K+ Users", "Nepal Based Support"].map((signal, index) => (
+          {["Verified Seller", "SSL Secured", "Nepal Based Support"].map((signal, index) => (
             <div
               key={index}
               className="flex items-center gap-2 px-4 py-2 bg-zinc-900/30 border border-zinc-800/40 rounded-full"
