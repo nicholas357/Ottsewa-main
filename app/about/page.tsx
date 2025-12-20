@@ -89,7 +89,7 @@ const quickLinks = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-transparent">
       <PageHeader
         title="Nepal's #1 Digital Subscription Provider"
         description="Your one-stop destination for all streaming platforms and digital subscriptions. Get Netflix, HBO Max, Disney+, Spotify, and more at the best prices in Nepal."
@@ -106,20 +106,23 @@ export default function AboutPage() {
       </PageHeader>
 
       {/* Stats Section */}
-      <section className="py-12 border-y border-zinc-800/50 bg-zinc-900/20">
+      <section className="py-12 border-y border-white/[0.05]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="relative text-center p-6 bg-zinc-900/50 rounded-xl border border-zinc-800 hover:border-amber-500/30 transition-all group"
-              >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <stat.icon className="w-6 h-6 text-amber-500/60 mx-auto mb-3" />
-                <p className="text-3xl sm:text-4xl font-bold text-amber-500 mb-1">{stat.value}</p>
-                <p className="text-zinc-400 text-sm">{stat.label}</p>
+          <div className="rounded-2xl border border-white/[0.08] p-3">
+            <div className="bg-[#0f0f0f] rounded-xl p-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {stats.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="relative text-center p-6 bg-[#1a1a1a] border border-white/[0.05] rounded-xl hover:border-amber-500/20 transition-all group"
+                  >
+                    <stat.icon className="w-6 h-6 text-amber-500/60 mx-auto mb-3" />
+                    <p className="text-3xl sm:text-4xl font-bold text-amber-500 mb-1">{stat.value}</p>
+                    <p className="text-zinc-400 text-sm">{stat.label}</p>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
@@ -133,27 +136,30 @@ export default function AboutPage() {
               Access all your favorite streaming services with instant digital delivery
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {streamingPlatforms.map((platform) => (
-              <div
-                key={platform.name}
-                className="relative bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 text-center hover:border-amber-500/30 transition-all group overflow-hidden"
-              >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div
-                  className={`w-14 h-14 ${platform.bg} rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}
-                >
-                  <platform.icon className={`w-7 h-7 ${platform.color}`} />
-                </div>
-                <p className="text-white font-medium">{platform.name}</p>
+          <div className="rounded-2xl border border-white/[0.08] p-3">
+            <div className="bg-[#0f0f0f] rounded-xl p-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {streamingPlatforms.map((platform) => (
+                  <div
+                    key={platform.name}
+                    className="relative bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-6 text-center hover:border-amber-500/20 transition-all group overflow-hidden"
+                  >
+                    <div
+                      className={`w-14 h-14 ${platform.bg} rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}
+                    >
+                      <platform.icon className={`w-7 h-7 ${platform.color}`} />
+                    </div>
+                    <p className="text-white font-medium">{platform.name}</p>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 bg-zinc-900/30 border-y border-zinc-800/50">
+      <section className="py-16 bg-transparent border-y border-white/[0.05]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Why Choose OTTSewa?</h2>
@@ -161,10 +167,19 @@ export default function AboutPage() {
               We're committed to providing the best digital subscription experience in Nepal
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {values.map((value) => (
-              <SectionCard key={value.title} title={value.title} description={value.description} icon={value.icon} />
-            ))}
+          <div className="rounded-2xl border border-white/[0.08] p-3">
+            <div className="bg-[#0f0f0f] rounded-xl p-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {values.map((value) => (
+                  <SectionCard
+                    key={value.title}
+                    title={value.title}
+                    description={value.description}
+                    icon={value.icon}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -172,7 +187,7 @@ export default function AboutPage() {
       {/* Mission */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 sm:p-12 overflow-hidden">
+          <div className="relative bg-[#1E1E1E]/30 backdrop-blur-sm border border-zinc-800/30 rounded-2xl p-8 sm:p-12 overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl" />
             <Globe className="w-16 h-16 text-amber-500 mx-auto mb-6 relative" />

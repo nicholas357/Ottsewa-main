@@ -68,68 +68,69 @@ export function MobileBottomNav() {
         ${isVisible ? "translate-y-0" : "translate-y-full"}
       `}
     >
-      <div className="absolute -top-6 left-0 right-0 h-6 bg-gradient-to-t from-zinc-950 to-transparent pointer-events-none" />
+      <div className="absolute -top-6 left-0 right-0 h-6 bg-gradient-to-t from-[#0f0f0f] to-transparent pointer-events-none" />
 
-      <div className="relative bg-zinc-950 border-t border-zinc-800">
-        <div className="absolute top-0 left-4 right-4 h-px bg-amber-500/20" />
+      <div className="mx-2 mb-2 rounded-2xl border border-white/[0.08] p-[3px]">
+        <div className="relative bg-[#0f0f0f] rounded-xl overflow-hidden">
+          <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
-        <div className="flex items-stretch justify-evenly w-full max-w-lg mx-auto">
-          {navItems.map((item) => {
-            const active = isActive(item.href)
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                prefetch={true}
-                className={`
-                  relative flex-1 flex flex-col items-center justify-center
-                  min-h-[60px] py-2 cursor-pointer
-                  active:scale-95
-                  transition-transform duration-150
-                `}
-              >
-                {active && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-500 rounded-full" />
-                )}
-
-                <div
+          <div className="flex items-stretch justify-evenly w-full max-w-lg mx-auto">
+            {navItems.map((item) => {
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  prefetch={true}
                   className={`
-                    relative flex items-center justify-center w-9 h-9 rounded-lg
-                    transition-colors duration-150
-                    ${active ? "bg-amber-500/10" : ""}
+                    relative flex-1 flex flex-col items-center justify-center
+                    min-h-[56px] py-2 cursor-pointer
+                    active:scale-95
+                    transition-transform duration-150
                   `}
                 >
-                  <item.icon
+                  {active && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-500 rounded-full" />
+                  )}
+
+                  <div
                     className={`
-                      w-5 h-5 transition-colors duration-150
+                      relative flex items-center justify-center w-9 h-9 rounded-lg
+                      transition-colors duration-150
+                      ${active ? "bg-amber-500/10" : ""}
+                    `}
+                  >
+                    <item.icon
+                      className={`
+                        w-5 h-5 transition-colors duration-150
+                        ${active ? "text-amber-500" : "text-zinc-500"}
+                      `}
+                      strokeWidth={active ? 2.5 : 2}
+                    />
+
+                    {item.badge !== undefined && item.badge > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-amber-500 rounded-full flex items-center justify-center text-[10px] font-bold text-black leading-none">
+                        {item.badge > 99 ? "99+" : item.badge}
+                      </span>
+                    )}
+                  </div>
+
+                  <span
+                    className={`
+                      mt-0.5 text-[10px] font-medium
+                      transition-colors duration-150
                       ${active ? "text-amber-500" : "text-zinc-500"}
                     `}
-                    strokeWidth={active ? 2.5 : 2}
-                  />
+                  >
+                    {item.name}
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
 
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-amber-500 rounded-full flex items-center justify-center text-[10px] font-bold text-black leading-none">
-                      {item.badge > 99 ? "99+" : item.badge}
-                    </span>
-                  )}
-                </div>
-
-                <span
-                  className={`
-                    mt-0.5 text-[10px] font-medium
-                    transition-colors duration-150
-                    ${active ? "text-amber-500" : "text-zinc-500"}
-                  `}
-                >
-                  {item.name}
-                </span>
-              </Link>
-            )
-          })}
+          <div className="h-[env(safe-area-inset-bottom,0px)] bg-[#0f0f0f]" />
         </div>
-
-        {/* Safe area spacer */}
-        <div className="h-[env(safe-area-inset-bottom,0px)] bg-zinc-950" />
       </div>
     </nav>
   )

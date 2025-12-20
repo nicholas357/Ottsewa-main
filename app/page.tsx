@@ -195,7 +195,10 @@ export default function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(merchantListingJsonLd) }} />
 
-      <main className="min-h-screen bg-black" aria-label="OTTSewa Home - Digital Subscriptions & Gift Cards Nepal">
+      <main
+        className="min-h-screen bg-transparent"
+        aria-label="OTTSewa Home - Digital Subscriptions & Gift Cards Nepal"
+      >
         <HeroBanner />
         <CategoryIcons />
         <RecommendedSection />

@@ -7,7 +7,6 @@ import { createClient } from "@/lib/supabase/client"
 import { LayoutDashboard, Package, Heart, UserIcon, LogOut, Menu, X } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { showNotification } from "@/components/notification-provider"
@@ -24,43 +23,45 @@ interface Profile {
 
 function LayoutSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-transparent">
       <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
-          {/* Sidebar Skeleton */}
+          {/* Sidebar Skeleton - Double-box design */}
           <div className="lg:sticky lg:top-6 lg:self-start">
-            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-0 overflow-hidden">
-              {/* User Profile Skeleton */}
-              <div className="p-6 border-b border-zinc-800/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-zinc-800/80" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 w-24 bg-zinc-800/80 rounded" />
-                    <div className="h-3 w-32 bg-zinc-800/80 rounded" />
+            <div className="rounded-2xl border border-white/[0.08] p-3">
+              <div className="bg-[#0f0f0f] rounded-xl overflow-hidden">
+                {/* User Profile Skeleton */}
+                <div className="p-6 border-b border-white/[0.05]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-[#1a1a1a] animate-pulse" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 w-24 bg-[#1a1a1a] rounded animate-pulse" />
+                      <div className="h-3 w-32 bg-[#1a1a1a] rounded animate-pulse" />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Navigation Skeleton */}
-              <div className="p-3 space-y-1">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-10 bg-zinc-800/30 rounded-lg" />
-                ))}
-              </div>
+                {/* Navigation Skeleton */}
+                <div className="p-3 space-y-1">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="h-10 bg-[#1a1a1a] rounded-lg animate-pulse" />
+                  ))}
+                </div>
 
-              {/* Sign Out Skeleton */}
-              <div className="p-3 border-t border-zinc-800/50">
-                <div className="h-10 bg-zinc-800/30 rounded-lg" />
+                {/* Sign Out Skeleton */}
+                <div className="p-3 border-t border-white/[0.05]">
+                  <div className="h-10 bg-[#1a1a1a] rounded-lg animate-pulse" />
+                </div>
               </div>
             </div>
           </div>
 
           {/* Content Skeleton */}
           <div className="space-y-6">
-            <div className="h-8 w-48 bg-zinc-800/80 rounded" />
+            <div className="h-8 w-48 bg-[#1a1a1a] rounded animate-pulse" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-32 bg-zinc-900/50 border border-zinc-800/50 rounded-xl" />
+                <div key={i} className="h-32 bg-[#1a1a1a] border border-white/[0.05] rounded-xl animate-pulse" />
               ))}
             </div>
           </div>
@@ -131,9 +132,9 @@ export default function DashboardLayout({
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
-          <div className="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 bg-[#1a1a1a] border border-white/[0.05] rounded-xl flex items-center justify-center mx-auto mb-4">
             <UserIcon className="w-7 h-7 text-zinc-500" />
           </div>
           <div className="text-white text-lg font-medium mb-2">Profile not found</div>
@@ -157,7 +158,7 @@ export default function DashboardLayout({
   const SidebarContent = () => (
     <>
       {/* User Profile Summary */}
-      <div className="p-6 border-b border-zinc-800/50">
+      <div className="p-6 border-b border-white/[0.05]">
         <div className="flex items-center gap-3">
           <Avatar className="w-12 h-12">
             <AvatarFallback className="bg-amber-500 text-black text-lg font-bold">{userInitial}</AvatarFallback>
@@ -182,7 +183,7 @@ export default function DashboardLayout({
                 className={`w-full justify-between gap-3 rounded-lg mb-1 ${
                   isActive
                     ? "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 hover:text-amber-500"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                    : "text-zinc-400 hover:text-white hover:bg-[#1a1a1a]"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -199,11 +200,11 @@ export default function DashboardLayout({
       </nav>
 
       {/* Sign Out Button */}
-      <div className="p-3 border-t border-zinc-800/50">
+      <div className="p-3 border-t border-white/[0.05]">
         <Button
           onClick={handleLogout}
           variant="ghost"
-          className="w-full justify-start gap-3 text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg"
+          className="w-full justify-start gap-3 text-zinc-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg"
         >
           <LogOut className="w-4 h-4" />
           <span className="text-sm font-medium">SIGN OUT</span>
@@ -213,31 +214,39 @@ export default function DashboardLayout({
   )
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-transparent">
       <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="lg:hidden mb-4 flex items-center justify-between bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-3">
-          <Button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            size="icon"
-            variant="ghost"
-            className="text-white hover:bg-zinc-800/50 rounded-lg"
-            aria-label={sidebarOpen ? "Close menu" : "Open menu"}
-          >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
-          <h2 className="text-white text-lg font-bold">My Account</h2>
-          <div className="w-10" />
+        {/* Mobile Header - Double-box design */}
+        <div className="lg:hidden mb-4">
+          <div className="rounded-2xl border border-white/[0.08] p-3">
+            <div className="bg-[#0f0f0f] rounded-xl p-3 flex items-center justify-between">
+              <Button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                size="icon"
+                variant="ghost"
+                className="text-white hover:bg-[#1a1a1a] rounded-lg"
+                aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+              >
+                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+              <h2 className="text-white text-lg font-bold">My Account</h2>
+              <div className="w-10" />
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
+          {/* Sidebar - Double-box design */}
           <div
             className={`${
               sidebarOpen ? "block" : "hidden"
             } lg:block lg:sticky lg:top-6 lg:self-start transition-all duration-200 ease-out`}
           >
-            <Card className="bg-zinc-900/50 border-zinc-800/50 rounded-xl p-0 overflow-hidden shadow-xl">
-              <SidebarContent />
-            </Card>
+            <div className="rounded-2xl border border-white/[0.08] p-3">
+              <div className="bg-[#0f0f0f] rounded-xl overflow-hidden">
+                <SidebarContent />
+              </div>
+            </div>
           </div>
 
           {/* Main content */}

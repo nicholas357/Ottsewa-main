@@ -26,7 +26,6 @@ import {
   Copy,
   Check,
 } from "lucide-react"
-import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
@@ -211,14 +210,16 @@ export default function OrdersPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <div className="h-8 w-40 bg-zinc-800 rounded animate-pulse" />
-            <div className="h-4 w-64 bg-zinc-800 rounded mt-2 animate-pulse" />
+            <div className="h-8 w-40 bg-[#1a1a1a] rounded animate-pulse" />
+            <div className="h-4 w-64 bg-[#1a1a1a] rounded mt-2 animate-pulse" />
           </div>
         </div>
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-28 bg-zinc-900/50 border border-zinc-800/50 rounded-xl animate-pulse" />
-          ))}
+        <div className="rounded-2xl border border-white/[0.08] p-3">
+          <div className="bg-[#0f0f0f] rounded-xl p-4 space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-28 bg-[#1a1a1a] border border-white/[0.05] rounded-xl animate-pulse" />
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -231,16 +232,18 @@ export default function OrdersPage() {
           <h1 className="text-2xl font-bold text-white">My Orders</h1>
           <p className="text-zinc-400 text-sm mt-1">Track your purchases</p>
         </div>
-        <Card className="bg-zinc-900/50 border-zinc-800/50 rounded-xl p-8">
-          <div className="text-center">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
-            <p className="text-white font-medium mb-2">Failed to load orders</p>
-            <p className="text-zinc-500 text-sm mb-4">{error}</p>
-            <Button onClick={fetchOrders} className="bg-amber-500 hover:bg-amber-600 text-black cursor-pointer">
-              Try Again
-            </Button>
+        <div className="rounded-2xl border border-white/[0.08] p-3">
+          <div className="bg-[#0f0f0f] rounded-xl p-8">
+            <div className="text-center">
+              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
+              <p className="text-white font-medium mb-2">Failed to load orders</p>
+              <p className="text-zinc-500 text-sm mb-4">{error}</p>
+              <Button onClick={fetchOrders} className="bg-amber-500 hover:bg-amber-600 text-black cursor-pointer">
+                Try Again
+              </Button>
+            </div>
           </div>
-        </Card>
+        </div>
       </div>
     )
   }
@@ -265,240 +268,242 @@ export default function OrdersPage() {
         </Button>
       </div>
 
-      {orders.length === 0 ? (
-        <Card className="bg-zinc-900/50 border-zinc-800/50 rounded-xl p-12">
-          <div className="text-center">
-            <Package className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-            <h3 className="text-white text-lg font-medium mb-2">No orders yet</h3>
-            <p className="text-zinc-500 text-sm mb-6">Your purchases will appear here</p>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 px-5 py-2 bg-amber-500 hover:bg-amber-400 text-black font-medium rounded-lg transition-colors cursor-pointer"
-            >
-              Browse Products
-            </Link>
-          </div>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {orders.map((order) => {
-            const statusConfig = getStatusConfig(order.status)
-            const StatusIcon = statusConfig.icon
-            const paymentStatus = getPaymentProofStatus(order.payment_proof_status)
-            const PaymentIcon = paymentStatus.icon
-            const ProductTypeIcon = getProductTypeIcon(order.product?.product_type)
-            const isExpanded = expandedOrder === order.id
-
-            return (
-              <Card
-                key={order.id}
-                className="bg-zinc-900/50 border-zinc-800/50 hover:border-zinc-700/80 rounded-xl overflow-hidden transition-all"
+      <div className="rounded-2xl border border-white/[0.08] p-3">
+        <div className="bg-[#0f0f0f] rounded-xl p-4">
+          {orders.length === 0 ? (
+            <div className="text-center py-12">
+              <Package className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
+              <h3 className="text-white text-lg font-medium mb-2">No orders yet</h3>
+              <p className="text-zinc-500 text-sm mb-6">Your purchases will appear here</p>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 px-5 py-2 bg-amber-500 hover:bg-amber-400 text-black font-medium rounded-lg transition-colors cursor-pointer"
               >
-                {/* Main Row - Clickable to expand */}
-                <div className="p-4 cursor-pointer" onClick={() => setExpandedOrder(isExpanded ? null : order.id)}>
-                  <div className="flex items-start gap-4">
-                    {/* Product Image */}
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
-                      <Image
-                        src={order.product?.image_url || "/placeholder.svg?height=96&width=96&query=product"}
-                        alt={order.product?.title || "Product"}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute bottom-1 right-1 p-1 bg-black/60 rounded">
-                        <ProductTypeIcon className="w-3 h-3 text-amber-500" />
+                Browse Products
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {orders.map((order) => {
+                const statusConfig = getStatusConfig(order.status)
+                const StatusIcon = statusConfig.icon
+                const paymentStatus = getPaymentProofStatus(order.payment_proof_status)
+                const PaymentIcon = paymentStatus.icon
+                const ProductTypeIcon = getProductTypeIcon(order.product?.product_type)
+                const isExpanded = expandedOrder === order.id
+
+                return (
+                  <div
+                    key={order.id}
+                    className="bg-[#1a1a1a] border border-white/[0.05] hover:border-white/[0.1] rounded-xl overflow-hidden transition-all"
+                  >
+                    {/* Main Row - Clickable to expand */}
+                    <div className="p-4 cursor-pointer" onClick={() => setExpandedOrder(isExpanded ? null : order.id)}>
+                      <div className="flex items-start gap-4">
+                        {/* Product Image */}
+                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
+                          <Image
+                            src={order.product?.image_url || "/placeholder.svg?height=96&width=96&query=product"}
+                            alt={order.product?.title || "Product"}
+                            fill
+                            className="object-cover"
+                          />
+                          <div className="absolute bottom-1 right-1 p-1 bg-black/60 rounded">
+                            <ProductTypeIcon className="w-3 h-3 text-amber-500" />
+                          </div>
+                        </div>
+
+                        {/* Product Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <h3 className="text-white font-medium truncate text-base">
+                                {order.product?.title || "Unknown Product"}
+                              </h3>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <button
+                                  onClick={(e) => copyOrderId(order.id, e)}
+                                  className="text-amber-500 text-xs font-mono bg-amber-500/10 px-1.5 py-0.5 rounded flex items-center gap-1 hover:bg-amber-500/20 transition-colors cursor-pointer"
+                                  title="Click to copy Order ID"
+                                >
+                                  #{order.id.slice(0, 8).toUpperCase()}
+                                  {copiedId === order.id ? (
+                                    <Check className="w-3 h-3 text-green-500" />
+                                  ) : (
+                                    <Copy className="w-3 h-3" />
+                                  )}
+                                </button>
+                                <span className="text-zinc-600">•</span>
+                                <p className="text-zinc-500 text-xs flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {new Date(order.created_at).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <p className="text-white font-bold text-lg">NPR {order.amount.toLocaleString()}</p>
+                              <p className="text-zinc-500 text-xs">Qty: {order.quantity}</p>
+                            </div>
+                          </div>
+
+                          {/* Status Badges */}
+                          <div className="flex flex-wrap items-center gap-2 mt-3">
+                            <Badge className={`${statusConfig.color} text-xs px-2.5 py-1 border`}>
+                              <StatusIcon className="w-3 h-3 mr-1" />
+                              {statusConfig.label}
+                            </Badge>
+                            {order.payment_proof_url && (
+                              <Badge className={`${paymentStatus.color} text-xs px-2.5 py-1`}>
+                                <PaymentIcon className="w-3 h-3 mr-1" />
+                                {paymentStatus.label}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Expand/Collapse */}
+                        <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer flex-shrink-0">
+                          {isExpanded ? (
+                            <ChevronUp className="w-5 h-5 text-zinc-400" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-zinc-400" />
+                          )}
+                        </button>
                       </div>
                     </div>
 
-                    {/* Product Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <h3 className="text-white font-medium truncate text-base">
-                            {order.product?.title || "Unknown Product"}
-                          </h3>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <button
-                              onClick={(e) => copyOrderId(order.id, e)}
-                              className="text-amber-500 text-xs font-mono bg-amber-500/10 px-1.5 py-0.5 rounded flex items-center gap-1 hover:bg-amber-500/20 transition-colors cursor-pointer"
-                              title="Click to copy Order ID"
-                            >
-                              #{order.id.slice(0, 8).toUpperCase()}
-                              {copiedId === order.id ? (
-                                <Check className="w-3 h-3 text-green-500" />
-                              ) : (
-                                <Copy className="w-3 h-3" />
-                              )}
-                            </button>
-                            <span className="text-zinc-600">•</span>
-                            <p className="text-zinc-500 text-xs flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              {new Date(order.created_at).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })}
+                    {/* Expanded Details */}
+                    {isExpanded && (
+                      <div className="px-4 pb-4 border-t border-zinc-800/50 pt-4 space-y-4">
+                        {/* Product Selection Details */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {order.edition_name && (
+                            <div className="p-3 bg-zinc-800/50 rounded-lg">
+                              <p className="text-zinc-500 text-xs mb-1">Edition</p>
+                              <p className="text-white text-sm font-medium flex items-center gap-1.5">
+                                <Tag className="w-3.5 h-3.5 text-amber-500" />
+                                {order.edition_name}
+                              </p>
+                            </div>
+                          )}
+                          {order.plan_name && (
+                            <div className="p-3 bg-zinc-800/50 rounded-lg">
+                              <p className="text-zinc-500 text-xs mb-1">Plan</p>
+                              <p className="text-white text-sm font-medium flex items-center gap-1.5">
+                                <Package className="w-3.5 h-3.5 text-amber-500" />
+                                {order.plan_name}
+                              </p>
+                            </div>
+                          )}
+                          {order.duration_months && (
+                            <div className="p-3 bg-zinc-800/50 rounded-lg">
+                              <p className="text-zinc-500 text-xs mb-1">Duration</p>
+                              <p className="text-white text-sm font-medium flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-amber-500" />
+                                {order.duration_months} month{order.duration_months > 1 ? "s" : ""}
+                              </p>
+                            </div>
+                          )}
+                          {order.denomination_value && order.denomination_currency && (
+                            <div className="p-3 bg-zinc-800/50 rounded-lg">
+                              <p className="text-zinc-500 text-xs mb-1">Denomination</p>
+                              <p className="text-white text-sm font-medium flex items-center gap-1.5">
+                                <CreditCard className="w-3.5 h-3.5 text-amber-500" />
+                                {order.denomination_currency} {order.denomination_value}
+                              </p>
+                            </div>
+                          )}
+                          {order.license_type_name && (
+                            <div className="p-3 bg-zinc-800/50 rounded-lg">
+                              <p className="text-zinc-500 text-xs mb-1">License Type</p>
+                              <p className="text-white text-sm font-medium flex items-center gap-1.5">
+                                <Monitor className="w-3.5 h-3.5 text-amber-500" />
+                                {order.license_type_name}
+                              </p>
+                            </div>
+                          )}
+                          {order.license_duration && (
+                            <div className="p-3 bg-zinc-800/50 rounded-lg">
+                              <p className="text-zinc-500 text-xs mb-1">License Duration</p>
+                              <p className="text-white text-sm font-medium flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-amber-500" />
+                                {order.license_duration}
+                              </p>
+                            </div>
+                          )}
+                          {order.platform_name && (
+                            <div className="p-3 bg-zinc-800/50 rounded-lg">
+                              <p className="text-zinc-500 text-xs mb-1">Platform</p>
+                              <p className="text-white text-sm font-medium flex items-center gap-1.5">
+                                <Gamepad2 className="w-3.5 h-3.5 text-amber-500" />
+                                {order.platform_name}
+                              </p>
+                            </div>
+                          )}
+                          <div className="p-3 bg-zinc-800/50 rounded-lg">
+                            <p className="text-zinc-400">Payment Method</p>
+                            <p className="text-white text-sm font-medium flex items-center gap-1.5 capitalize">
+                              <CreditCard className="w-3.5 h-3.5 text-amber-500" />
+                              {order.payment_method || "N/A"}
                             </p>
                           </div>
                         </div>
-                        <div className="text-right flex-shrink-0">
-                          <p className="text-white font-bold text-lg">NPR {order.amount.toLocaleString()}</p>
-                          <p className="text-zinc-500 text-xs">Qty: {order.quantity}</p>
-                        </div>
-                      </div>
 
-                      {/* Status Badges */}
-                      <div className="flex flex-wrap items-center gap-2 mt-3">
-                        <Badge className={`${statusConfig.color} text-xs px-2.5 py-1 border`}>
-                          <StatusIcon className="w-3 h-3 mr-1" />
-                          {statusConfig.label}
-                        </Badge>
-                        {order.payment_proof_url && (
-                          <Badge className={`${paymentStatus.color} text-xs px-2.5 py-1`}>
-                            <PaymentIcon className="w-3 h-3 mr-1" />
-                            {paymentStatus.label}
-                          </Badge>
+                        {/* Price Breakdown */}
+                        <div className="p-3 bg-zinc-800/50 rounded-lg">
+                          <div className="flex justify-between text-sm mb-2">
+                            <span className="text-zinc-400">Unit Price</span>
+                            <span className="text-white">NPR {order.unit_price.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between text-sm mb-2">
+                            <span className="text-zinc-400">Quantity</span>
+                            <span className="text-white">{order.quantity}</span>
+                          </div>
+                          <div className="flex justify-between text-sm pt-2 border-t border-zinc-700">
+                            <span className="text-zinc-300 font-medium">Total</span>
+                            <span className="text-amber-500 font-bold">NPR {order.amount.toLocaleString()}</span>
+                          </div>
+                        </div>
+
+                        {/* View Product Link */}
+                        {order.product?.slug && (
+                          <Link
+                            href={`/product/${order.product.slug}`}
+                            className="inline-flex items-center gap-2 text-amber-500 hover:text-amber-400 text-sm font-medium cursor-pointer"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            View Product Details →
+                          </Link>
                         )}
-                      </div>
-                    </div>
 
-                    {/* Expand/Collapse */}
-                    <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer flex-shrink-0">
-                      {isExpanded ? (
-                        <ChevronUp className="w-5 h-5 text-zinc-400" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-zinc-400" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Expanded Details */}
-                {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-zinc-800/50 pt-4 space-y-4">
-                    {/* Product Selection Details */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {order.edition_name && (
-                        <div className="p-3 bg-zinc-800/50 rounded-lg">
-                          <p className="text-zinc-500 text-xs mb-1">Edition</p>
-                          <p className="text-white text-sm font-medium flex items-center gap-1.5">
-                            <Tag className="w-3.5 h-3.5 text-amber-500" />
-                            {order.edition_name}
-                          </p>
+                        {/* Copy Order ID */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-zinc-400">Order ID:</span>
+                          <span className="text-white font-mono">{order.id}</span>
+                          <button
+                            onClick={(e) => copyOrderId(order.id, e)}
+                            className="p-2 hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
+                          >
+                            {copiedId === order.id ? (
+                              <Check className="w-4 h-4 text-emerald-500" />
+                            ) : (
+                              <Copy className="w-4 h-4 text-zinc-400" />
+                            )}
+                          </button>
                         </div>
-                      )}
-                      {order.plan_name && (
-                        <div className="p-3 bg-zinc-800/50 rounded-lg">
-                          <p className="text-zinc-500 text-xs mb-1">Plan</p>
-                          <p className="text-white text-sm font-medium flex items-center gap-1.5">
-                            <Package className="w-3.5 h-3.5 text-amber-500" />
-                            {order.plan_name}
-                          </p>
-                        </div>
-                      )}
-                      {order.duration_months && (
-                        <div className="p-3 bg-zinc-800/50 rounded-lg">
-                          <p className="text-zinc-500 text-xs mb-1">Duration</p>
-                          <p className="text-white text-sm font-medium flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-amber-500" />
-                            {order.duration_months} month{order.duration_months > 1 ? "s" : ""}
-                          </p>
-                        </div>
-                      )}
-                      {order.denomination_value && order.denomination_currency && (
-                        <div className="p-3 bg-zinc-800/50 rounded-lg">
-                          <p className="text-zinc-500 text-xs mb-1">Denomination</p>
-                          <p className="text-white text-sm font-medium flex items-center gap-1.5">
-                            <CreditCard className="w-3.5 h-3.5 text-amber-500" />
-                            {order.denomination_currency} {order.denomination_value}
-                          </p>
-                        </div>
-                      )}
-                      {order.license_type_name && (
-                        <div className="p-3 bg-zinc-800/50 rounded-lg">
-                          <p className="text-zinc-500 text-xs mb-1">License Type</p>
-                          <p className="text-white text-sm font-medium flex items-center gap-1.5">
-                            <Monitor className="w-3.5 h-3.5 text-amber-500" />
-                            {order.license_type_name}
-                          </p>
-                        </div>
-                      )}
-                      {order.license_duration && (
-                        <div className="p-3 bg-zinc-800/50 rounded-lg">
-                          <p className="text-zinc-500 text-xs mb-1">License Duration</p>
-                          <p className="text-white text-sm font-medium flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-amber-500" />
-                            {order.license_duration}
-                          </p>
-                        </div>
-                      )}
-                      {order.platform_name && (
-                        <div className="p-3 bg-zinc-800/50 rounded-lg">
-                          <p className="text-zinc-500 text-xs mb-1">Platform</p>
-                          <p className="text-white text-sm font-medium flex items-center gap-1.5">
-                            <Gamepad2 className="w-3.5 h-3.5 text-amber-500" />
-                            {order.platform_name}
-                          </p>
-                        </div>
-                      )}
-                      <div className="p-3 bg-zinc-800/50 rounded-lg">
-                        <p className="text-zinc-400">Payment Method</p>
-                        <p className="text-white text-sm font-medium flex items-center gap-1.5 capitalize">
-                          <CreditCard className="w-3.5 h-3.5 text-amber-500" />
-                          {order.payment_method || "N/A"}
-                        </p>
                       </div>
-                    </div>
-
-                    {/* Price Breakdown */}
-                    <div className="p-3 bg-zinc-800/50 rounded-lg">
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-zinc-400">Unit Price</span>
-                        <span className="text-white">NPR {order.unit_price.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-zinc-400">Quantity</span>
-                        <span className="text-white">{order.quantity}</span>
-                      </div>
-                      <div className="flex justify-between text-sm pt-2 border-t border-zinc-700">
-                        <span className="text-zinc-300 font-medium">Total</span>
-                        <span className="text-amber-500 font-bold">NPR {order.amount.toLocaleString()}</span>
-                      </div>
-                    </div>
-
-                    {/* View Product Link */}
-                    {order.product?.slug && (
-                      <Link
-                        href={`/product/${order.product.slug}`}
-                        className="inline-flex items-center gap-2 text-amber-500 hover:text-amber-400 text-sm font-medium cursor-pointer"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        View Product Details →
-                      </Link>
                     )}
-
-                    {/* Copy Order ID */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-zinc-400">Order ID:</span>
-                      <span className="text-white font-mono">{order.id}</span>
-                      <button
-                        onClick={(e) => copyOrderId(order.id, e)}
-                        className="p-2 hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
-                      >
-                        {copiedId === order.id ? (
-                          <Check className="w-4 h-4 text-emerald-500" />
-                        ) : (
-                          <Copy className="w-4 h-4 text-zinc-400" />
-                        )}
-                      </button>
-                    </div>
                   </div>
-                )}
-              </Card>
-            )
-          })}
+                )
+              })}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   )
 }

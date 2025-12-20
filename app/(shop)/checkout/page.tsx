@@ -49,9 +49,9 @@ const paymentMethods = [
     description: "Pay with eSewa mobile wallet",
     icon: "/esewa-logo.png",
     qrCode: "/esewa-qr.png",
-    color: "from-green-500 to-green-600",
-    bgColor: "bg-green-500/10",
-    borderColor: "border-green-500",
+    color: "from-amber-500 to-amber-600",
+    bgColor: "bg-amber-500/10",
+    borderColor: "border-amber-500",
     accountName: "OTTSewa Nepal",
     accountNumber: "9869671451",
     bankName: "eSewa ID",
@@ -62,9 +62,9 @@ const paymentMethods = [
     description: "Pay with Khalti digital wallet",
     icon: "/khalti-logo.png",
     qrCode: "/khalti-qr.png",
-    color: "from-purple-500 to-purple-600",
-    bgColor: "bg-purple-500/10",
-    borderColor: "border-purple-500",
+    color: "from-amber-500 to-amber-600",
+    bgColor: "bg-amber-500/10",
+    borderColor: "border-amber-500",
     accountName: "OTTSewa Nepal",
     accountNumber: "9869671451",
     bankName: "Khalti ID",
@@ -75,9 +75,9 @@ const paymentMethods = [
     description: "Direct bank transfer via internet banking",
     icon: "/internet-banking-logo.png",
     qrCode: "/internet-banking-qr.png",
-    color: "from-blue-500 to-blue-600",
-    bgColor: "bg-blue-500/10",
-    borderColor: "border-blue-500",
+    color: "from-amber-500 to-amber-600",
+    bgColor: "bg-amber-500/10",
+    borderColor: "border-amber-500",
     accountName: "OTTSewa Nepal Pvt. Ltd.",
     accountNumber: "01234567890123",
     bankName: "Nepal Investment Bank Ltd.",
@@ -88,9 +88,9 @@ const paymentMethods = [
     description: "Pay securely via ConnectIPS",
     icon: "/connectips-logo.png",
     qrCode: "/connectips-qr.png",
-    color: "from-red-500 to-red-600",
-    bgColor: "bg-red-500/10",
-    borderColor: "border-red-500",
+    color: "from-amber-500 to-amber-600",
+    bgColor: "bg-amber-500/10",
+    borderColor: "border-amber-500",
     accountName: "OTTSewa Nepal Pvt. Ltd.",
     accountNumber: "01234567890123",
     bankName: "Nepal Investment Bank Ltd.",
@@ -262,50 +262,53 @@ export default function CheckoutPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950">
+      <div className="min-h-screen bg-transparent">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
           {/* Progress stepper skeleton */}
           <div className="flex items-center justify-center gap-1 sm:gap-2 mb-6 sm:mb-10">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-center gap-1 sm:gap-2">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-800/50 animate-pulse" />
-                <div className="hidden sm:block w-16 sm:w-20 h-4 rounded bg-zinc-800/50 animate-pulse" />
-                {i < 3 && <div className="w-4 sm:w-8 md:w-16 h-0.5 bg-zinc-800/50" />}
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#1a1a1a] animate-pulse" />
+                <div className="hidden sm:block w-16 sm:w-20 h-4 rounded bg-[#1a1a1a] animate-pulse" />
+                {i < 3 && <div className="w-4 sm:w-8 md:w-16 h-0.5 bg-white/[0.05]" />}
               </div>
             ))}
           </div>
 
           <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
-            {/* Main form skeleton */}
             <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-              <div className="rounded-xl sm:rounded-2xl border border-zinc-800/50 bg-zinc-900/30 p-4 sm:p-6">
-                <div className="w-32 sm:w-40 h-5 sm:h-6 rounded bg-zinc-800/50 mb-4 sm:mb-6 animate-pulse" />
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="w-full h-10 sm:h-12 rounded-lg bg-zinc-800/50 animate-pulse" />
-                  <div className="w-full h-10 sm:h-12 rounded-lg bg-zinc-800/50 animate-pulse" />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <div className="h-10 sm:h-12 rounded-lg bg-zinc-800/50 animate-pulse" />
-                    <div className="h-10 sm:h-12 rounded-lg bg-zinc-800/50 animate-pulse" />
+              <div className="rounded-2xl border border-white/[0.08] p-3">
+                <div className="bg-[#0f0f0f] rounded-xl p-4 sm:p-6">
+                  <div className="w-32 sm:w-40 h-5 sm:h-6 rounded bg-[#1a1a1a] mb-4 sm:mb-6 animate-pulse" />
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="w-full h-10 sm:h-12 rounded-lg bg-[#1a1a1a] animate-pulse" />
+                    <div className="w-full h-10 sm:h-12 rounded-lg bg-[#1a1a1a] animate-pulse" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                      <div className="h-10 sm:h-12 rounded-lg bg-[#1a1a1a] animate-pulse" />
+                      <div className="h-10 sm:h-12 rounded-lg bg-[#1a1a1a] animate-pulse" />
+                    </div>
+                    <div className="w-full h-10 sm:h-12 rounded-lg bg-[#1a1a1a] animate-pulse" />
                   </div>
-                  <div className="w-full h-10 sm:h-12 rounded-lg bg-zinc-800/50 animate-pulse" />
                 </div>
               </div>
             </div>
 
-            {/* Order summary skeleton - hidden on mobile in loading state */}
+            {/* Order summary skeleton with double-box */}
             <div className="hidden lg:block lg:col-span-1">
-              <div className="rounded-xl sm:rounded-2xl border border-zinc-800/50 bg-zinc-900/30 p-4 sm:p-6 sticky top-24">
-                <div className="w-28 sm:w-32 h-5 sm:h-6 rounded bg-zinc-800/50 mb-4 sm:mb-6 animate-pulse" />
-                <div className="space-y-3 sm:space-y-4">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="flex gap-3 sm:gap-4">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-zinc-800/50 animate-pulse" />
-                      <div className="flex-1 space-y-2">
-                        <div className="w-3/4 h-3 sm:h-4 rounded bg-zinc-800/50 animate-pulse" />
-                        <div className="w-1/2 h-2 sm:h-3 rounded bg-zinc-800/50 animate-pulse" />
+              <div className="rounded-2xl border border-white/[0.08] p-3 sticky top-24">
+                <div className="bg-[#0f0f0f] rounded-xl p-4 sm:p-6">
+                  <div className="w-28 sm:w-32 h-5 sm:h-6 rounded bg-[#1a1a1a] mb-4 sm:mb-6 animate-pulse" />
+                  <div className="space-y-3 sm:space-y-4">
+                    {[1, 2].map((i) => (
+                      <div key={i} className="flex gap-3 sm:gap-4">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-[#1a1a1a] animate-pulse" />
+                        <div className="flex-1 space-y-2">
+                          <div className="w-3/4 h-3 sm:h-4 rounded bg-[#1a1a1a] animate-pulse" />
+                          <div className="w-1/2 h-2 sm:h-3 rounded bg-[#1a1a1a] animate-pulse" />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -317,7 +320,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && step !== 4) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-transparent flex items-center justify-center px-4">
         <div className="text-center">
           <ShoppingBag className="w-12 h-12 sm:w-16 sm:h-16 text-zinc-600 mx-auto mb-4" />
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Your cart is empty</h2>
@@ -334,7 +337,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-transparent">
       <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Progress Stepper - Made fully responsive */}
         <div className="flex items-center justify-center gap-1 sm:gap-2 mb-6 sm:mb-10">
@@ -364,7 +367,7 @@ export default function CheckoutPage() {
         </div>
 
         {step === 4 ? (
-          /* Made success page responsive */
+          /* Success page with double-box design */
           <div className="max-w-2xl mx-auto px-1">
             {/* Success Header */}
             <div className="text-center mb-6 sm:mb-8">
@@ -380,174 +383,177 @@ export default function CheckoutPage() {
               </p>
             </div>
 
-            {/* Order Details Card - Made card responsive */}
-            <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-6">
-              {/* Order Header */}
-              <div className="bg-zinc-800/50 px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-800">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-zinc-400 text-xs sm:text-sm">Order Reference</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-white font-mono font-semibold text-amber-500 text-sm sm:text-base truncate">
-                        #{completedOrder?.orderId ? completedOrder.orderId.slice(0, 8).toUpperCase() : "---"}
+            <div className="rounded-2xl border border-white/[0.08] p-3 mb-4 sm:mb-6">
+              <div className="bg-[#0f0f0f] rounded-xl overflow-hidden">
+                {/* Order Header */}
+                <div className="bg-[#1a1a1a] px-4 sm:px-6 py-3 sm:py-4 border-b border-white/[0.05]">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-zinc-400 text-xs sm:text-sm">Order Reference</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-white font-mono font-semibold text-amber-500 text-sm sm:text-base truncate">
+                          #{completedOrder?.orderId ? completedOrder.orderId.slice(0, 8).toUpperCase() : "---"}
+                        </p>
+                        <button
+                          onClick={() => {
+                            if (completedOrder?.orderId) {
+                              navigator.clipboard.writeText(completedOrder.orderId)
+                              toast({ title: "Order ID copied to clipboard" })
+                            }
+                          }}
+                          className="p-1 hover:bg-white/[0.05] rounded transition-colors cursor-pointer flex-shrink-0"
+                        >
+                          <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-500" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-zinc-400 text-xs sm:text-sm">Date</p>
+                      <p className="text-white font-medium text-sm sm:text-base">
+                        {new Date().toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
                       </p>
-                      <button
-                        onClick={() => {
-                          if (completedOrder?.orderId) {
-                            navigator.clipboard.writeText(completedOrder.orderId)
-                            toast({ title: "Order ID copied to clipboard" })
-                          }
-                        }}
-                        className="p-1 hover:bg-zinc-700 rounded transition-colors cursor-pointer flex-shrink-0"
-                      >
-                        <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-500" />
-                      </button>
                     </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-zinc-400 text-xs sm:text-sm">Date</p>
-                    <p className="text-white font-medium text-sm sm:text-base">
-                      {new Date().toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </p>
+                </div>
+
+                {/* Order Items */}
+                <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/[0.05]">
+                  <h3 className="text-white font-medium mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                    <Package className="w-4 h-4 text-amber-500" />
+                    Order Items ({completedOrder?.items.length || 0})
+                  </h3>
+                  <div className="space-y-3">
+                    {completedOrder?.items.map((item) => (
+                      <div key={item.cartItemId} className="flex items-center gap-3">
+                        <div className="relative w-10 h-10 sm:w-14 sm:h-14 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
+                          <Image
+                            src={item.productImage || "/placeholder.svg?height=56&width=56&query=game"}
+                            alt={item.productTitle}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium text-xs sm:text-sm truncate">{item.productTitle}</p>
+                          <p className="text-zinc-500 text-xs truncate">
+                            {item.editionName ||
+                              item.planName ||
+                              item.denominationValue ||
+                              item.licenseTypeName ||
+                              "Standard"}
+                            {item.platformName && ` • ${item.platformName}`}
+                            {item.durationLabel && ` • ${item.durationLabel}`}
+                          </p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-white font-medium text-xs sm:text-sm">
+                            NPR {(item.price * item.quantity).toLocaleString()}
+                          </p>
+                          <p className="text-zinc-500 text-xs">Qty: {item.quantity}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
 
-              {/* Order Items */}
-              <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-800">
-                <h3 className="text-white font-medium mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
-                  <Package className="w-4 h-4 text-amber-500" />
-                  Order Items ({completedOrder?.items.length || 0})
-                </h3>
-                <div className="space-y-3">
-                  {completedOrder?.items.map((item) => (
-                    <div key={item.cartItemId} className="flex items-center gap-3">
-                      <div className="relative w-10 h-10 sm:w-14 sm:h-14 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
-                        <Image
-                          src={item.productImage || "/placeholder.svg?height=56&width=56&query=game"}
-                          alt={item.productTitle}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium text-xs sm:text-sm truncate">{item.productTitle}</p>
-                        <p className="text-zinc-500 text-xs truncate">
-                          {item.editionName ||
-                            item.planName ||
-                            item.denominationValue ||
-                            item.licenseTypeName ||
-                            "Standard"}
-                          {item.platformName && ` • ${item.platformName}`}
-                          {item.durationLabel && ` • ${item.durationLabel}`}
-                        </p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-white font-medium text-xs sm:text-sm">
-                          NPR {(item.price * item.quantity).toLocaleString()}
-                        </p>
-                        <p className="text-zinc-500 text-xs">Qty: {item.quantity}</p>
-                      </div>
+                {/* Order Summary */}
+                <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/[0.05]">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-zinc-400">Subtotal</span>
+                    <span className="text-white">NPR {(completedOrder?.subtotal || 0).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center mt-2 pt-2 border-t border-white/[0.05]">
+                    <span className="text-white font-semibold text-sm sm:text-base">Total Paid</span>
+                    <span className="text-amber-500 font-bold text-base sm:text-lg">
+                      NPR {(completedOrder?.total || 0).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Contact Info */}
+                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white/[0.03]">
+                  <h3 className="text-white font-medium mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+                    <User className="w-4 h-4 text-amber-500" />
+                    Contact Information
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
+                    <div className="flex items-center gap-2 text-zinc-400 truncate">
+                      <User className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                      <span className="truncate">{contactInfo.fullName}</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Order Summary */}
-              <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-800">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-zinc-400">Subtotal</span>
-                  <span className="text-white">NPR {(completedOrder?.subtotal || 0).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center mt-2 pt-2 border-t border-zinc-800">
-                  <span className="text-white font-semibold text-sm sm:text-base">Total Paid</span>
-                  <span className="text-amber-500 font-bold text-base sm:text-lg">
-                    NPR {(completedOrder?.total || 0).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
-              {/* Contact Info */}
-              <div className="px-4 sm:px-6 py-3 sm:py-4 bg-zinc-800/30">
-                <h3 className="text-white font-medium mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
-                  <User className="w-4 h-4 text-amber-500" />
-                  Contact Information
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
-                  <div className="flex items-center gap-2 text-zinc-400 truncate">
-                    <User className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                    <span className="truncate">{contactInfo.fullName}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-zinc-400 truncate">
-                    <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                    <span className="truncate">{contactInfo.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-zinc-400">
-                    <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                    <span>{contactInfo.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-zinc-400">
-                    <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                    <span>{contactInfo.city}</span>
+                    <div className="flex items-center gap-2 text-zinc-400 truncate">
+                      <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                      <span className="truncate">{contactInfo.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-zinc-400">
+                      <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                      <span>{contactInfo.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-zinc-400">
+                      <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                      <span>{contactInfo.city}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Status Timeline - Made responsive */}
-            <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6">
-              <h3 className="text-white font-medium mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
-                <Clock className="w-4 h-4 text-amber-500" />
-                Order Status
-              </h3>
-              <div className="relative">
-                <div className="absolute left-[9px] sm:left-[11px] top-5 sm:top-6 bottom-5 sm:bottom-6 w-0.5 bg-zinc-800" />
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 z-10">
-                      <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
+            {/* Status Timeline - Double-box design */}
+            <div className="rounded-2xl border border-white/[0.08] p-3 mb-4 sm:mb-6">
+              <div className="bg-[#0f0f0f] rounded-xl p-4 sm:p-6">
+                <h3 className="text-white font-medium mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                  <Clock className="w-4 h-4 text-amber-500" />
+                  Order Status
+                </h3>
+                <div className="relative">
+                  <div className="absolute left-[9px] sm:left-[11px] top-5 sm:top-6 bottom-5 sm:bottom-6 w-0.5 bg-white/[0.05]" />
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 z-10">
+                        <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-xs sm:text-sm">Order Received</p>
+                        <p className="text-zinc-500 text-xs">Your order has been placed successfully</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-white font-medium text-xs sm:text-sm">Order Received</p>
-                      <p className="text-zinc-500 text-xs">Your order has been placed successfully</p>
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 z-10 animate-pulse">
+                        <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-black" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-xs sm:text-sm">Payment Verification</p>
+                        <p className="text-zinc-500 text-xs">We're verifying your payment proof</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 z-10 animate-pulse">
-                      <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-black" />
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0 z-10">
+                        <Package className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-600" />
+                      </div>
+                      <div>
+                        <p className="text-zinc-500 font-medium text-xs sm:text-sm">Processing</p>
+                        <p className="text-zinc-600 text-xs">Preparing your digital keys</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-white font-medium text-xs sm:text-sm">Payment Verification</p>
-                      <p className="text-zinc-500 text-xs">We're verifying your payment proof</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0 z-10">
-                      <Package className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-600" />
-                    </div>
-                    <div>
-                      <p className="text-zinc-500 font-medium text-xs sm:text-sm">Processing</p>
-                      <p className="text-zinc-600 text-xs">Preparing your digital keys</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0 z-10">
-                      <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-600" />
-                    </div>
-                    <div>
-                      <p className="text-zinc-500 font-medium text-xs sm:text-sm">Delivery</p>
-                      <p className="text-zinc-600 text-xs">Keys sent to your email</p>
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0 z-10">
+                        <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-600" />
+                      </div>
+                      <div>
+                        <p className="text-zinc-500 font-medium text-xs sm:text-sm">Delivery</p>
+                        <p className="text-zinc-600 text-xs">Keys sent to your email</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-zinc-800 flex items-center gap-2 text-amber-500">
-                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="text-xs sm:text-sm font-medium">Estimated: 15-30 minutes after verification</span>
+                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/[0.05] flex items-center gap-2 text-amber-500">
+                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="text-xs sm:text-sm font-medium">Estimated: 15-30 minutes after verification</span>
+                </div>
               </div>
             </div>
 
@@ -586,552 +592,562 @@ export default function CheckoutPage() {
           <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-8">
             {/* Main Form */}
             <div className="lg:col-span-2 order-1">
-              {/* Step 1: Contact Information */}
+              {/* Step 1: Contact Information - Double-box design */}
               {step === 1 && (
-                <div className="rounded-xl sm:rounded-2xl border border-zinc-800/50 bg-zinc-900/30 backdrop-blur-sm overflow-hidden">
-                  <div className="p-4 sm:p-6 border-b border-zinc-800 bg-gradient-to-r from-amber-500/5 to-transparent">
-                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <User className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-                      </div>
-                      Contact Information
-                    </h2>
-                    <p className="text-zinc-400 text-xs sm:text-sm mt-1 ml-10 sm:ml-13">
-                      We'll use this to send your order confirmation
-                    </p>
-                  </div>
-
-                  <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                      <div className="md:col-span-2">
-                        <Label className="text-zinc-300 mb-1.5 sm:mb-2 flex items-center gap-2 text-xs sm:text-sm">
-                          <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500" />
-                          Full Name
-                        </Label>
-                        <Input
-                          type="text"
-                          placeholder="John Doe"
-                          value={contactInfo.fullName}
-                          onChange={(e) => setContactInfo({ ...contactInfo, fullName: e.target.value })}
-                          className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 h-10 sm:h-12 text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <Label className="text-zinc-300 mb-1.5 sm:mb-2 flex items-center gap-2 text-xs sm:text-sm">
-                          <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500" />
-                          Email Address
-                        </Label>
-                        <Input
-                          type="email"
-                          placeholder="you@example.com"
-                          value={contactInfo.email}
-                          onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
-                          className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 h-10 sm:h-12 text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <Label className="text-zinc-300 mb-1.5 sm:mb-2 flex items-center gap-2 text-xs sm:text-sm">
-                          <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500" />
-                          Phone Number
-                        </Label>
-                        <Input
-                          type="tel"
-                          placeholder="+977 98XXXXXXXX"
-                          value={contactInfo.phone}
-                          onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
-                          className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 h-10 sm:h-12 text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20"
-                          required
-                        />
-                      </div>
+                <div className="rounded-2xl border border-white/[0.08] p-3">
+                  <div className="bg-[#0f0f0f] rounded-xl overflow-hidden">
+                    <div className="p-4 sm:p-6 border-b border-white/[0.05] bg-gradient-to-r from-amber-500/5 to-transparent">
+                      <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <User className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+                        </div>
+                        Contact Information
+                      </h2>
+                      <p className="text-zinc-400 text-xs sm:text-sm mt-1 ml-10 sm:ml-13">
+                        We'll use this to send your order confirmation
+                      </p>
                     </div>
 
-                    <div className="border-t border-zinc-800 pt-4 sm:pt-6">
-                      <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
-                        <Building className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400" />
-                        Billing Address
-                      </h3>
-                      <div className="space-y-3 sm:space-y-4">
-                        <div>
-                          <Label className="text-zinc-300 mb-1.5 sm:mb-2 text-xs sm:text-sm">Street Address</Label>
+                    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                        <div className="md:col-span-2">
+                          <Label className="text-zinc-300 mb-1.5 sm:mb-2 flex items-center gap-2 text-xs sm:text-sm">
+                            <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500" />
+                            Full Name
+                          </Label>
                           <Input
-                            placeholder="123 Main Street"
-                            value={contactInfo.address}
-                            onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
+                            type="text"
+                            placeholder="John Doe"
+                            value={contactInfo.fullName}
+                            onChange={(e) => setContactInfo({ ...contactInfo, fullName: e.target.value })}
                             className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 h-10 sm:h-12 text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20"
                             required
                           />
                         </div>
+
                         <div>
-                          <Label className="text-zinc-300 mb-1.5 sm:mb-2 text-xs sm:text-sm">City</Label>
+                          <Label className="text-zinc-300 mb-1.5 sm:mb-2 flex items-center gap-2 text-xs sm:text-sm">
+                            <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500" />
+                            Email Address
+                          </Label>
                           <Input
-                            placeholder="Kathmandu"
-                            value={contactInfo.city}
-                            onChange={(e) => setContactInfo({ ...contactInfo, city: e.target.value })}
+                            type="email"
+                            placeholder="you@example.com"
+                            value={contactInfo.email}
+                            onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
+                            className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 h-10 sm:h-12 text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <Label className="text-zinc-300 mb-1.5 sm:mb-2 flex items-center gap-2 text-xs sm:text-sm">
+                            <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500" />
+                            Phone Number
+                          </Label>
+                          <Input
+                            type="tel"
+                            placeholder="+977 98XXXXXXXX"
+                            value={contactInfo.phone}
+                            onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
                             className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 h-10 sm:h-12 text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20"
                             required
                           />
                         </div>
                       </div>
-                    </div>
 
-                    <div className="border-t border-zinc-800 pt-4 sm:pt-6">
-                      <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
-                        <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400" />
-                        Special Note (Optional)
-                      </h3>
-                      <Textarea
-                        placeholder="Any special instructions or notes for your order..."
-                        value={contactInfo.specialNote}
-                        onChange={(e) => setContactInfo({ ...contactInfo, specialNote: e.target.value })}
-                        className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 min-h-[80px] sm:min-h-[100px] text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20 resize-none"
-                      />
-                    </div>
+                      <div className="border-t border-zinc-800 pt-4 sm:pt-6">
+                        <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                          <Building className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400" />
+                          Billing Address
+                        </h3>
+                        <div className="space-y-3 sm:space-y-4">
+                          <div>
+                            <Label className="text-zinc-300 mb-1.5 sm:mb-2 text-xs sm:text-sm">Street Address</Label>
+                            <Input
+                              placeholder="123 Main Street"
+                              value={contactInfo.address}
+                              onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
+                              className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 h-10 sm:h-12 text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-zinc-300 mb-1.5 sm:mb-2 text-xs sm:text-sm">City</Label>
+                            <Input
+                              placeholder="Kathmandu"
+                              value={contactInfo.city}
+                              onChange={(e) => setContactInfo({ ...contactInfo, city: e.target.value })}
+                              className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 h-10 sm:h-12 text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
 
-                    <Button
-                      onClick={() => handleNextStep(2)}
-                      disabled={
-                        !contactInfo.email ||
-                        !contactInfo.phone ||
-                        !contactInfo.address ||
-                        !contactInfo.fullName ||
-                        !contactInfo.city ||
-                        submitting
-                      }
-                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold h-12 sm:h-14 text-base sm:text-lg shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {submitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          Continue to Payment
-                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                        </>
-                      )}
-                    </Button>
+                      <div className="border-t border-zinc-800 pt-4 sm:pt-6">
+                        <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                          <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400" />
+                          Special Note (Optional)
+                        </h3>
+                        <Textarea
+                          placeholder="Any special instructions or notes for your order..."
+                          value={contactInfo.specialNote}
+                          onChange={(e) => setContactInfo({ ...contactInfo, specialNote: e.target.value })}
+                          className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 min-h-[80px] sm:min-h-[100px] text-sm sm:text-base focus:border-amber-500 focus:ring-amber-500/20 resize-none"
+                        />
+                      </div>
+
+                      <Button
+                        onClick={() => handleNextStep(2)}
+                        disabled={
+                          !contactInfo.email ||
+                          !contactInfo.phone ||
+                          !contactInfo.address ||
+                          !contactInfo.fullName ||
+                          !contactInfo.city ||
+                          submitting
+                        }
+                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold h-12 sm:h-14 text-base sm:text-lg shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {submitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            Continue to Payment
+                            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
 
               {step === 2 && (
-                <div className="rounded-xl sm:rounded-2xl border border-zinc-800/50 bg-zinc-900/30 backdrop-blur-sm overflow-hidden">
-                  <div className="p-4 sm:p-6 border-b border-zinc-800 bg-gradient-to-r from-amber-500/5 to-transparent">
-                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-                      </div>
-                      Select Payment Method
-                    </h2>
-                    <p className="text-zinc-400 text-xs sm:text-sm mt-1 ml-10 sm:ml-13">
-                      Choose your preferred payment option
-                    </p>
-                  </div>
+                <div className="rounded-2xl border border-white/[0.08] p-3">
+                  <div className="bg-[#0f0f0f] rounded-xl overflow-hidden">
+                    <div className="p-4 sm:p-6 border-b border-white/[0.05] bg-gradient-to-r from-amber-500/5 to-transparent">
+                      <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+                        </div>
+                        Select Payment Method
+                      </h2>
+                      <p className="text-zinc-400 text-xs sm:text-sm mt-1 ml-10 sm:ml-13">
+                        Choose your preferred payment option
+                      </p>
+                    </div>
 
-                  <div className="p-4 sm:p-6 space-y-4">
-                    {/* Payment Options Grid - Single column on mobile */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                      {paymentMethods.map((method) => (
-                        <div
-                          key={method.id}
-                          onClick={() => setSelectedPayment(method.id)}
-                          className={`p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                            selectedPayment === method.id
-                              ? `${method.borderColor} ${method.bgColor}`
-                              : "border-zinc-700 hover:border-zinc-600 bg-zinc-800/30"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <div
-                              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ${
-                                selectedPayment === method.id ? method.bgColor : "bg-zinc-700/50"
-                              }`}
-                            >
-                              <Image
-                                src={method.icon || "/placeholder.svg"}
-                                alt={method.name}
-                                width={32}
-                                height={32}
-                                className="object-contain w-6 h-6 sm:w-8 sm:h-8"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-white font-semibold text-sm sm:text-base">{method.name}</h3>
-                              <p className="text-zinc-400 text-xs truncate">{method.description}</p>
-                            </div>
-                            <div
-                              className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                                selectedPayment === method.id
-                                  ? `${method.borderColor} bg-gradient-to-r ${method.color}`
-                                  : "border-zinc-600"
-                              }`}
-                            >
-                              {selectedPayment === method.id && (
-                                <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
-                              )}
+                    <div className="p-4 sm:p-6 space-y-4">
+                      {/* Payment Options Grid - Single column on mobile */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        {paymentMethods.map((method) => (
+                          <div
+                            key={method.id}
+                            onClick={() => setSelectedPayment(method.id)}
+                            className={`p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                              selectedPayment === method.id
+                                ? `${method.borderColor} ${method.bgColor}`
+                                : "border-zinc-700 hover:border-zinc-600 bg-zinc-800/30"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div
+                                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ${
+                                  selectedPayment === method.id ? method.bgColor : "bg-zinc-700/50"
+                                }`}
+                              >
+                                <Image
+                                  src={method.icon || "/placeholder.svg"}
+                                  alt={method.name}
+                                  width={32}
+                                  height={32}
+                                  className="object-contain w-6 h-6 sm:w-8 sm:h-8"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-white font-semibold text-sm sm:text-base">{method.name}</h3>
+                                <p className="text-zinc-400 text-xs truncate">{method.description}</p>
+                              </div>
+                              <div
+                                className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                  selectedPayment === method.id
+                                    ? `${method.borderColor} bg-gradient-to-r ${method.color}`
+                                    : "border-zinc-600"
+                                }`}
+                              >
+                                {selectedPayment === method.id && (
+                                  <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
+                                )}
+                              </div>
                             </div>
                           </div>
+                        ))}
+                      </div>
+
+                      {/* Trust Badges */}
+                      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-4 border-t border-zinc-800 mt-4 sm:mt-6">
+                        <div className="flex items-center gap-2 text-zinc-400 text-xs sm:text-sm">
+                          <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
+                          <span>Secure Payment</span>
                         </div>
-                      ))}
-                    </div>
-
-                    {/* Trust Badges */}
-                    <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-4 border-t border-zinc-800 mt-4 sm:mt-6">
-                      <div className="flex items-center gap-2 text-zinc-400 text-xs sm:text-sm">
-                        <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
-                        <span>Secure Payment</span>
+                        <div className="flex items-center gap-2 text-zinc-400 text-xs sm:text-sm">
+                          <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
+                          <span>Instant Verification</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-zinc-400 text-xs sm:text-sm">
-                        <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
-                        <span>Instant Verification</span>
-                      </div>
-                    </div>
 
-                    <div className="flex gap-3 sm:gap-4 pt-4">
-                      <Button
-                        onClick={() => setStep(1)}
-                        variant="outline"
-                        className="flex-1 border-zinc-700 text-white hover:bg-zinc-800 h-10 sm:h-12 text-sm sm:text-base cursor-pointer"
-                      >
-                        <ChevronLeft className="w-4 h-4 mr-1 sm:mr-2" />
-                        Back
-                      </Button>
-                      <Button
-                        onClick={() => handleNextStep(3)}
-                        disabled={!selectedPayment || submitting}
-                        className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold h-10 sm:h-12 text-sm sm:text-base shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {submitting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-1 sm:mr-2 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            Continue
-                            <ChevronRight className="w-4 h-4 ml-1 sm:ml-2" />
-                          </>
-                        )}
-                      </Button>
+                      <div className="flex gap-3 sm:gap-4 pt-4">
+                        <Button
+                          onClick={() => setStep(1)}
+                          variant="outline"
+                          className="flex-1 border-zinc-700 text-white hover:bg-zinc-800 h-10 sm:h-12 text-sm sm:text-base cursor-pointer"
+                        >
+                          <ChevronLeft className="w-4 h-4 mr-1 sm:mr-2" />
+                          Back
+                        </Button>
+                        <Button
+                          onClick={() => handleNextStep(3)}
+                          disabled={!selectedPayment || submitting}
+                          className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold h-10 sm:h-12 text-sm sm:text-base shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {submitting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-1 sm:mr-2 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              Continue
+                              <ChevronRight className="w-4 h-4 ml-1 sm:ml-2" />
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
               {step === 3 && (
-                <div className="rounded-xl sm:rounded-2xl border border-zinc-800/50 bg-zinc-900/30 backdrop-blur-sm overflow-hidden">
-                  <div className="p-4 sm:p-6 border-b border-zinc-800 bg-gradient-to-r from-amber-500/5 to-transparent">
-                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <QrCode className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-                      </div>
-                      Complete Payment
-                    </h2>
-                    <p className="text-zinc-400 text-xs sm:text-sm mt-1 ml-10 sm:ml-13">
-                      Pay via {selectedPaymentMethod?.name} and upload your proof
-                    </p>
-                  </div>
-
-                  <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-                    {/* Selected Payment Method Badge */}
-                    {selectedPaymentMethod && (
-                      <div
-                        className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${selectedPaymentMethod.bgColor} border ${selectedPaymentMethod.borderColor}`}
-                      >
-                        <Image
-                          src={selectedPaymentMethod.icon || "/placeholder.svg"}
-                          alt={selectedPaymentMethod.name}
-                          width={20}
-                          height={20}
-                          className="object-contain w-4 h-4 sm:w-5 sm:h-5"
-                        />
-                        <span className="text-white font-medium text-xs sm:text-sm">
-                          Paying with {selectedPaymentMethod.name}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* QR Code Display - Stack vertically on mobile */}
-                    <div className="bg-gradient-to-br from-zinc-800/80 to-zinc-800/30 border border-zinc-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
-                      <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8">
-                        {/* QR Code */}
-                        <div className="flex flex-col items-center">
-                          <p className="text-zinc-400 text-xs sm:text-sm mb-3 sm:mb-4">
-                            Scan with {selectedPaymentMethod?.name || "your app"}
-                          </p>
-                          <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl">
-                            <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 relative rounded-lg overflow-hidden">
-                              {selectedPaymentMethod?.qrCode ? (
-                                <Image
-                                  src={selectedPaymentMethod.qrCode || "/placeholder.svg"}
-                                  alt={`${selectedPaymentMethod.name} QR Code`}
-                                  fill
-                                  className="object-contain"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-zinc-100 flex items-center justify-center">
-                                  <QrCode className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 text-zinc-800" />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="mt-3 sm:mt-4 text-center">
-                            <p className="text-zinc-500 text-xs sm:text-sm">Amount to Pay</p>
-                            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-500">
-                              NPR {total.toLocaleString()}
-                            </p>
-                          </div>
+                <div className="rounded-2xl border border-white/[0.08] p-3">
+                  <div className="bg-[#0f0f0f] rounded-xl overflow-hidden">
+                    <div className="p-4 sm:p-6 border-b border-white/[0.05] bg-gradient-to-r from-amber-500/5 to-transparent">
+                      <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <QrCode className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
                         </div>
-
-                        {/* Account Details */}
-                        <div className="flex flex-col justify-center space-y-3 sm:space-y-4">
-                          <h3 className="text-white font-semibold text-base sm:text-lg mb-1 sm:mb-2">
-                            Payment Instructions
-                          </h3>
-
-                          <div className="bg-zinc-900/50 border border-zinc-700 rounded-xl p-3 sm:p-5 space-y-3 sm:space-y-4">
-                            <div className="flex items-center gap-2 sm:gap-3">
-                              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                                <QrCode className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-                              </div>
-                              <div>
-                                <p className="text-white font-medium text-sm sm:text-base">Scan the QR Code</p>
-                                <p className="text-zinc-400 text-xs sm:text-sm">
-                                  Use your {selectedPaymentMethod?.name} app to scan
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 sm:gap-3">
-                              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                                <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-                              </div>
-                              <div>
-                                <p className="text-white font-medium text-sm sm:text-base">Complete Payment</p>
-                                <p className="text-zinc-400 text-xs sm:text-sm">
-                                  Pay NPR {total.toLocaleString()} to complete your order
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 sm:gap-3">
-                              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                                <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
-                              </div>
-                              <div>
-                                <p className="text-white font-medium text-sm sm:text-base">Upload Proof</p>
-                                <p className="text-zinc-400 text-xs sm:text-sm">Take a screenshot and upload below</p>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Quick tip */}
-                          <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3 sm:p-4">
-                            <p className="text-amber-400 text-xs sm:text-sm flex items-start gap-2">
-                              <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
-                              <span>
-                                After payment, upload your payment screenshot as proof. Your order will be processed
-                                within 5-15 minutes after verification.
-                              </span>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                        Complete Payment
+                      </h2>
+                      <p className="text-zinc-400 text-xs sm:text-sm mt-1 ml-10 sm:ml-13">
+                        Pay via {selectedPaymentMethod?.name} and upload your proof
+                      </p>
                     </div>
 
-                    {/* Upload Payment Proof */}
-                    <div className="space-y-2 sm:space-y-3">
-                      <Label className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold">
-                        <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-                        Upload Payment Screenshot
-                      </Label>
-                      <div
-                        className={`border-2 border-dashed rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 text-center transition-all cursor-pointer ${
-                          paymentProof
-                            ? "border-green-500/50 bg-green-500/5"
-                            : "border-zinc-700 hover:border-zinc-500 bg-zinc-800/30"
-                        }`}
-                      >
-                        <input
-                          type="file"
-                          id="payment-proof"
-                          accept="image/*"
-                          onChange={handleFileUpload}
-                          className="hidden"
-                        />
-                        <label htmlFor="payment-proof" className="cursor-pointer flex flex-col items-center">
-                          {previewUrl ? (
-                            <div className="relative">
-                              <Image
-                                src={previewUrl || "/placeholder.svg"}
-                                alt="Payment proof"
-                                width={200}
-                                height={200}
-                                className="rounded-xl object-cover max-h-40 sm:max-h-48 w-auto"
-                              />
-                              <div className="absolute -top-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center">
-                                <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                      {/* Selected Payment Method Badge */}
+                      {selectedPaymentMethod && (
+                        <div
+                          className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${selectedPaymentMethod.bgColor} border ${selectedPaymentMethod.borderColor}`}
+                        >
+                          <Image
+                            src={selectedPaymentMethod.icon || "/placeholder.svg"}
+                            alt={selectedPaymentMethod.name}
+                            width={20}
+                            height={20}
+                            className="object-contain w-4 h-4 sm:w-5 sm:h-5"
+                          />
+                          <span className="text-white font-medium text-xs sm:text-sm">
+                            Paying with {selectedPaymentMethod.name}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* QR Code Display - Stack vertically on mobile */}
+                      <div className="bg-gradient-to-br from-zinc-800/80 to-zinc-800/30 border border-zinc-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
+                        <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8">
+                          {/* QR Code */}
+                          <div className="flex flex-col items-center">
+                            <p className="text-zinc-400 text-xs sm:text-sm mb-3 sm:mb-4">
+                              Scan with {selectedPaymentMethod?.name || "your app"}
+                            </p>
+                            <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl">
+                              <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 relative rounded-lg overflow-hidden">
+                                {selectedPaymentMethod?.qrCode ? (
+                                  <Image
+                                    src={selectedPaymentMethod.qrCode || "/placeholder.svg"}
+                                    alt={`${selectedPaymentMethod.name} QR Code`}
+                                    fill
+                                    className="object-contain"
+                                    priority
+                                    loading="eager"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-zinc-100 flex items-center justify-center">
+                                    <QrCode className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 text-zinc-800" />
+                                  </div>
+                                )}
                               </div>
                             </div>
+                            <div className="mt-3 sm:mt-4 text-center">
+                              <p className="text-zinc-500 text-xs sm:text-sm">Amount to Pay</p>
+                              <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-500">
+                                NPR {total.toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Account Details */}
+                          <div className="flex flex-col justify-center space-y-3 sm:space-y-4">
+                            <h3 className="text-white font-semibold text-base sm:text-lg mb-1 sm:mb-2">
+                              Payment Instructions
+                            </h3>
+
+                            <div className="bg-zinc-900/50 border border-zinc-700 rounded-xl p-3 sm:p-5 space-y-3 sm:space-y-4">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                                  <QrCode className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+                                </div>
+                                <div>
+                                  <p className="text-white font-medium text-sm sm:text-base">Scan the QR Code</p>
+                                  <p className="text-zinc-400 text-xs sm:text-sm">
+                                    Use your {selectedPaymentMethod?.name} app to scan
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                                  <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                                </div>
+                                <div>
+                                  <p className="text-white font-medium text-sm sm:text-base">Complete Payment</p>
+                                  <p className="text-zinc-400 text-xs sm:text-sm">
+                                    Pay NPR {total.toLocaleString()} to complete your order
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                                  <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                                </div>
+                                <div>
+                                  <p className="text-white font-medium text-sm sm:text-base">Upload Proof</p>
+                                  <p className="text-zinc-400 text-xs sm:text-sm">Take a screenshot and upload below</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Quick tip */}
+                            <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3 sm:p-4">
+                              <p className="text-amber-400 text-xs sm:text-sm flex items-start gap-2">
+                                <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
+                                <span>
+                                  After payment, upload your payment screenshot as proof. Your order will be processed
+                                  within 5-15 minutes after verification.
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Upload Payment Proof */}
+                      <div className="space-y-2 sm:space-y-3">
+                        <Label className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold">
+                          <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+                          Upload Payment Screenshot
+                        </Label>
+                        <div
+                          className={`border-2 border-dashed rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 text-center transition-all cursor-pointer ${
+                            paymentProof
+                              ? "border-green-500/50 bg-green-500/5"
+                              : "border-zinc-700 hover:border-zinc-500 bg-zinc-800/30"
+                          }`}
+                        >
+                          <input
+                            type="file"
+                            id="payment-proof"
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                          <label htmlFor="payment-proof" className="cursor-pointer flex flex-col items-center">
+                            {previewUrl ? (
+                              <div className="relative">
+                                <Image
+                                  src={previewUrl || "/placeholder.svg"}
+                                  alt="Payment proof"
+                                  width={200}
+                                  height={200}
+                                  className="rounded-xl object-cover max-h-40 sm:max-h-48 w-auto"
+                                />
+                                <div className="absolute -top-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-zinc-700/50 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                                  <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-zinc-400" />
+                                </div>
+                                <p className="text-white font-medium mb-1 text-sm sm:text-base">
+                                  Click to upload screenshot
+                                </p>
+                                <p className="text-zinc-500 text-xs sm:text-sm">PNG, JPG up to 10MB</p>
+                              </>
+                            )}
+                            {paymentProof && (
+                              <div className="mt-3 sm:mt-4 text-center">
+                                <p className="text-green-400 font-medium text-xs sm:text-sm truncate max-w-[200px]">
+                                  {paymentProof.name}
+                                </p>
+                                <p className="text-zinc-500 text-xs mt-1">
+                                  {(paymentProof.size / 1024 / 1024).toFixed(2)} MB
+                                </p>
+                              </div>
+                            )}
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Important Note */}
+                      <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 sm:p-4 flex gap-2 sm:gap-3">
+                        <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                        <div className="text-xs sm:text-sm text-blue-300">
+                          <p className="font-semibold mb-1">Important</p>
+                          <p className="text-blue-400/80">
+                            Ensure your screenshot clearly shows the transaction amount, date, and reference number.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Error Display */}
+                      {orderError && (
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 sm:p-4 flex gap-2 sm:gap-3">
+                          <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                          <div className="text-xs sm:text-sm text-red-300">
+                            <p className="font-semibold mb-1">Error</p>
+                            <p className="text-red-400/80">{orderError}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex gap-3 sm:gap-4 pt-2">
+                        <Button
+                          onClick={() => setStep(2)}
+                          variant="outline"
+                          className="flex-1 border-zinc-700 text-white hover:bg-zinc-800 h-10 sm:h-12 text-sm sm:text-base cursor-pointer"
+                        >
+                          <ChevronLeft className="w-4 h-4 mr-1 sm:mr-2" />
+                          Back
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            handleSubmit()
+                          }}
+                          disabled={!paymentProof || submitting}
+                          className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold h-10 sm:h-12 text-sm sm:text-base shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {submitting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-1 sm:mr-2 animate-spin" />
+                              Placing Order...
+                            </>
                           ) : (
                             <>
-                              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-zinc-700/50 rounded-full flex items-center justify-center mb-3 sm:mb-4">
-                                <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-zinc-400" />
-                              </div>
-                              <p className="text-white font-medium mb-1 text-sm sm:text-base">
-                                Click to upload screenshot
-                              </p>
-                              <p className="text-zinc-500 text-xs sm:text-sm">PNG, JPG up to 10MB</p>
+                              <Lock className="w-4 h-4 mr-1 sm:mr-2" />
+                              Place Order
                             </>
                           )}
-                          {paymentProof && (
-                            <div className="mt-3 sm:mt-4 text-center">
-                              <p className="text-green-400 font-medium text-xs sm:text-sm truncate max-w-[200px]">
-                                {paymentProof.name}
-                              </p>
-                              <p className="text-zinc-500 text-xs mt-1">
-                                {(paymentProof.size / 1024 / 1024).toFixed(2)} MB
-                              </p>
-                            </div>
-                          )}
-                        </label>
+                        </Button>
                       </div>
-                    </div>
-
-                    {/* Important Note */}
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 sm:p-4 flex gap-2 sm:gap-3">
-                      <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <div className="text-xs sm:text-sm text-blue-300">
-                        <p className="font-semibold mb-1">Important</p>
-                        <p className="text-blue-400/80">
-                          Ensure your screenshot clearly shows the transaction amount, date, and reference number.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Error Display */}
-                    {orderError && (
-                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 sm:p-4 flex gap-2 sm:gap-3">
-                        <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                        <div className="text-xs sm:text-sm text-red-300">
-                          <p className="font-semibold mb-1">Error</p>
-                          <p className="text-red-400/80">{orderError}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex gap-3 sm:gap-4 pt-2">
-                      <Button
-                        onClick={() => setStep(2)}
-                        variant="outline"
-                        className="flex-1 border-zinc-700 text-white hover:bg-zinc-800 h-10 sm:h-12 text-sm sm:text-base cursor-pointer"
-                      >
-                        <ChevronLeft className="w-4 h-4 mr-1 sm:mr-2" />
-                        Back
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          handleSubmit()
-                        }}
-                        disabled={!paymentProof || submitting}
-                        className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold h-10 sm:h-12 text-sm sm:text-base shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {submitting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-1 sm:mr-2 animate-spin" />
-                            Placing Order...
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="w-4 h-4 mr-1 sm:mr-2" />
-                            Place Order
-                          </>
-                        )}
-                      </Button>
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Order Summary Sidebar - Show at bottom on mobile, sticky on desktop */}
+            {/* Order Summary Sidebar - Double-box design */}
             <div className="lg:col-span-1 order-2">
-              <div className="rounded-xl sm:rounded-2xl border border-zinc-800/50 bg-zinc-900/30 backdrop-blur-sm p-4 sm:p-6 lg:sticky lg:top-24">
-                <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-                  Order Summary
-                </h3>
+              <div className="rounded-2xl border border-white/[0.08] p-3 lg:sticky lg:top-24">
+                <div className="bg-[#0f0f0f] rounded-xl p-4 sm:p-6">
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+                    Order Summary
+                  </h3>
 
-                <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 max-h-48 sm:max-h-64 overflow-y-auto">
-                  {items.map((item) => (
-                    <div key={item.cartItemId} className="flex gap-2 sm:gap-3">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-zinc-800 overflow-hidden flex-shrink-0">
-                        {item.productImage ? (
-                          <Image
-                            src={item.productImage || "/placeholder.svg"}
-                            alt={item.productTitle}
-                            width={64}
-                            height={64}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-600" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-white text-xs sm:text-sm font-medium truncate">{item.productTitle}</h4>
-                        <div className="text-zinc-500 text-xs space-y-0.5">
-                          {item.editionName && <p className="truncate">Edition: {item.editionName}</p>}
-                          {item.platformName && <p className="truncate">Platform: {item.platformName}</p>}
-                          {item.planName && <p className="truncate">Plan: {item.planName}</p>}
-                          {item.durationLabel && <p className="truncate">Duration: {item.durationLabel}</p>}
-                          {item.licenseTypeName && <p className="truncate">License: {item.licenseTypeName}</p>}
-                          {item.licenseDurationLabel && (
-                            <p className="truncate">Duration: {item.licenseDurationLabel}</p>
+                  <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 max-h-48 sm:max-h-64 overflow-y-auto">
+                    {items.map((item) => (
+                      <div key={item.cartItemId} className="flex gap-2 sm:gap-3">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-zinc-800 overflow-hidden flex-shrink-0">
+                          {item.productImage ? (
+                            <Image
+                              src={item.productImage || "/placeholder.svg"}
+                              alt={item.productTitle}
+                              width={64}
+                              height={64}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-600" />
+                            </div>
                           )}
-                          {item.denominationValue && <p>Value: NPR {item.denominationValue}</p>}
-                          <p>Qty: {item.quantity}</p>
                         </div>
-                        <p className="text-amber-500 font-semibold text-xs sm:text-sm mt-1">
-                          NPR {(item.price * item.quantity).toFixed(2)}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-white text-xs sm:text-sm font-medium truncate">{item.productTitle}</h4>
+                          <div className="text-zinc-500 text-xs space-y-0.5">
+                            {item.editionName && <p className="truncate">Edition: {item.editionName}</p>}
+                            {item.platformName && <p className="truncate">Platform: {item.platformName}</p>}
+                            {item.planName && <p className="truncate">Plan: {item.planName}</p>}
+                            {item.durationLabel && <p className="truncate">Duration: {item.durationLabel}</p>}
+                            {item.licenseTypeName && <p className="truncate">License: {item.licenseTypeName}</p>}
+                            {item.licenseDurationLabel && (
+                              <p className="truncate">Duration: {item.licenseDurationLabel}</p>
+                            )}
+                            {item.denominationValue && <p>Value: NPR {item.denominationValue}</p>}
+                            <p>Qty: {item.quantity}</p>
+                          </div>
+                          <p className="text-amber-500 font-semibold text-xs sm:text-sm mt-1">
+                            NPR {(item.price * item.quantity).toFixed(2)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border-t border-zinc-800 pt-3 sm:pt-4 space-y-2">
-                  <div className="flex justify-between text-zinc-400 text-xs sm:text-sm">
-                    <span>Subtotal</span>
-                    <span>NPR {subtotal.toFixed(2)}</span>
+                    ))}
                   </div>
-                  <div className="flex justify-between text-white font-bold text-base sm:text-lg pt-2 border-t border-zinc-800">
-                    <span>Total</span>
-                    <span className="text-amber-500">NPR {total.toFixed(2)}</span>
-                  </div>
-                </div>
 
-                {/* Trust Badges - Smaller on mobile */}
-                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-zinc-800">
-                  <div className="grid grid-cols-3 gap-1 sm:gap-2">
-                    <div className="flex flex-col items-center text-center p-1.5 sm:p-2">
-                      <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mb-0.5 sm:mb-1" />
-                      <span className="text-zinc-400 text-xs">Secure</span>
+                  <div className="border-t border-zinc-800 pt-3 sm:pt-4 space-y-2">
+                    <div className="flex justify-between text-zinc-400 text-xs sm:text-sm">
+                      <span>Subtotal</span>
+                      <span>NPR {subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex flex-col items-center text-center p-1.5 sm:p-2">
-                      <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 mb-0.5 sm:mb-1" />
-                      <span className="text-zinc-400 text-xs">Instant</span>
+                    <div className="flex justify-between text-white font-bold text-base sm:text-lg pt-2 border-t border-zinc-800">
+                      <span>Total</span>
+                      <span className="text-amber-500">NPR {total.toFixed(2)}</span>
                     </div>
-                    <div className="flex flex-col items-center text-center p-1.5 sm:p-2">
-                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mb-0.5 sm:mb-1" />
-                      <span className="text-zinc-400 text-xs">Verified</span>
+                  </div>
+
+                  {/* Trust Badges - Smaller on mobile */}
+                  <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-zinc-800">
+                    <div className="grid grid-cols-3 gap-1 sm:gap-2">
+                      <div className="flex flex-col items-center text-center p-1.5 sm:p-2">
+                        <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mb-0.5 sm:mb-1" />
+                        <span className="text-zinc-400 text-xs">Secure</span>
+                      </div>
+                      <div className="flex flex-col items-center text-center p-1.5 sm:p-2">
+                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 mb-0.5 sm:mb-1" />
+                        <span className="text-zinc-400 text-xs">Instant</span>
+                      </div>
+                      <div className="flex flex-col items-center text-center p-1.5 sm:p-2">
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mb-0.5 sm:mb-1" />
+                        <span className="text-zinc-400 text-xs">Verified</span>
+                      </div>
                     </div>
                   </div>
                 </div>

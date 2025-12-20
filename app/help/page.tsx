@@ -113,7 +113,7 @@ const supportChannels = [
 
 export default function HelpPage() {
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-transparent">
       <PageHeader
         icon={HelpCircle}
         title="Help Center"
@@ -127,7 +127,7 @@ export default function HelpPage() {
             <input
               type="text"
               placeholder="Search for help articles, topics, or questions..."
-              className="w-full bg-zinc-900/80 border border-zinc-800 rounded-xl pl-12 pr-4 py-4 text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="w-full bg-[#1a1a1a] border border-white/[0.08] rounded-xl pl-12 pr-4 py-4 text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors"
             />
           </div>
         </div>
@@ -140,24 +140,27 @@ export default function HelpPage() {
             <span className="w-1 h-6 bg-amber-500 rounded-full" />
             Browse by Category
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {helpCategories.map((category) => (
-              <Link
-                key={category.title}
-                href={category.href}
-                className="group relative bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 hover:border-amber-500/30 transition-all"
-              >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
-                  <category.icon className="w-6 h-6 text-amber-500" />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-amber-400 transition-colors">
-                  {category.title}
-                </h3>
-                <p className="text-zinc-500 text-sm mb-3">{category.description}</p>
-                <span className="text-amber-500/60 text-xs">{category.articles} articles</span>
-              </Link>
-            ))}
+          <div className="rounded-2xl border border-white/[0.08] p-3">
+            <div className="bg-[#0f0f0f] rounded-xl p-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {helpCategories.map((category) => (
+                  <Link
+                    key={category.title}
+                    href={category.href}
+                    className="group relative bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-6 hover:border-amber-500/20 transition-all"
+                  >
+                    <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
+                      <category.icon className="w-6 h-6 text-amber-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-amber-400 transition-colors">
+                      {category.title}
+                    </h3>
+                    <p className="text-zinc-500 text-sm mb-3">{category.description}</p>
+                    <span className="text-amber-500/60 text-xs">{category.articles} articles</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -169,27 +172,29 @@ export default function HelpPage() {
               <span className="w-1 h-6 bg-amber-500 rounded-full" />
               Popular Articles
             </h2>
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl divide-y divide-zinc-800">
-              {popularArticles.map((article, index) => (
-                <Link
-                  key={index}
-                  href={article.href}
-                  className="flex items-center justify-between p-4 hover:bg-zinc-800/50 transition-colors group first:rounded-t-xl last:rounded-b-xl"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center">
-                      <FileText className="w-4 h-4 text-amber-500" />
+            <div className="rounded-2xl border border-white/[0.08] p-3">
+              <div className="bg-[#0f0f0f] rounded-xl divide-y divide-white/[0.05]">
+                {popularArticles.map((article, index) => (
+                  <Link
+                    key={index}
+                    href={article.href}
+                    className="flex items-center justify-between p-4 hover:bg-[#1a1a1a] transition-colors group first:rounded-t-xl last:rounded-b-xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center">
+                        <FileText className="w-4 h-4 text-amber-500" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium group-hover:text-amber-400 transition-colors">
+                          {article.title}
+                        </p>
+                        <span className="text-zinc-500 text-xs">{article.category}</span>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-white font-medium group-hover:text-amber-400 transition-colors">
-                        {article.title}
-                      </p>
-                      <span className="text-zinc-500 text-xs">{article.category}</span>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-                </Link>
-              ))}
+                    <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -199,33 +204,35 @@ export default function HelpPage() {
               <span className="w-1 h-6 bg-amber-500 rounded-full" />
               Get Support
             </h2>
-            <div className="space-y-4">
-              {supportChannels.map((channel) => (
-                <div
-                  key={channel.title}
-                  className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 hover:border-amber-500/30 transition-all"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <channel.icon className="w-5 h-5 text-amber-500" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-white font-medium mb-1">{channel.title}</h3>
-                      <p className="text-zinc-500 text-sm mb-2">{channel.description}</p>
-                      <div className="flex items-center gap-4 text-xs">
-                        <span className="flex items-center gap-1 text-zinc-400">
-                          <Clock className="w-3 h-3" />
-                          {channel.availability}
-                        </span>
-                        <span className="flex items-center gap-1 text-amber-400">
-                          <Zap className="w-3 h-3" />
-                          {channel.responseTime}
-                        </span>
+            <div className="rounded-2xl border border-white/[0.08] p-3">
+              <div className="bg-[#0f0f0f] rounded-xl p-4 space-y-4">
+                {supportChannels.map((channel) => (
+                  <div
+                    key={channel.title}
+                    className="bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-4 hover:border-amber-500/20 transition-all"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <channel.icon className="w-5 h-5 text-amber-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-white font-medium mb-1">{channel.title}</h3>
+                        <p className="text-zinc-500 text-sm mb-2">{channel.description}</p>
+                        <div className="flex items-center gap-4 text-xs">
+                          <span className="flex items-center gap-1 text-zinc-400">
+                            <Clock className="w-3 h-3" />
+                            {channel.availability}
+                          </span>
+                          <span className="flex items-center gap-1 text-amber-400">
+                            <Zap className="w-3 h-3" />
+                            {channel.responseTime}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -236,31 +243,43 @@ export default function HelpPage() {
             <span className="w-1 h-6 bg-amber-500 rounded-full" />
             Quick Actions
           </h2>
-          <div className="grid sm:grid-cols-3 gap-4">
-            <SectionCard title="Track Your Order" description="Check the status of your recent orders" icon={Package}>
-              <Link
-                href="/orders"
-                className="inline-flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm mt-3 font-medium"
-              >
-                View Orders <ArrowRight className="w-3 h-3" />
-              </Link>
-            </SectionCard>
-            <SectionCard title="Browse FAQ" description="Find answers to common questions" icon={HelpCircle}>
-              <Link
-                href="/faq"
-                className="inline-flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm mt-3 font-medium"
-              >
-                View FAQ <ArrowRight className="w-3 h-3" />
-              </Link>
-            </SectionCard>
-            <SectionCard title="Refund Policy" description="Learn about our refund and return policy" icon={CreditCard}>
-              <Link
-                href="/refund-policy"
-                className="inline-flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm mt-3 font-medium"
-              >
-                View Policy <ArrowRight className="w-3 h-3" />
-              </Link>
-            </SectionCard>
+          <div className="rounded-2xl border border-white/[0.08] p-3">
+            <div className="bg-[#0f0f0f] rounded-xl p-4 space-y-4">
+              <div className="grid sm:grid-cols-3 gap-4">
+                <SectionCard
+                  title="Track Your Order"
+                  description="Check the status of your recent orders"
+                  icon={Package}
+                >
+                  <Link
+                    href="/orders"
+                    className="inline-flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm mt-3 font-medium"
+                  >
+                    View Orders <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </SectionCard>
+                <SectionCard title="Browse FAQ" description="Find answers to common questions" icon={HelpCircle}>
+                  <Link
+                    href="/faq"
+                    className="inline-flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm mt-3 font-medium"
+                  >
+                    View FAQ <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </SectionCard>
+                <SectionCard
+                  title="Refund Policy"
+                  description="Learn about our refund and return policy"
+                  icon={CreditCard}
+                >
+                  <Link
+                    href="/refund-policy"
+                    className="inline-flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm mt-3 font-medium"
+                  >
+                    View Policy <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </SectionCard>
+              </div>
+            </div>
           </div>
         </section>
 

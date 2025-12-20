@@ -1,13 +1,39 @@
 "use client"
 
+import { motion } from "framer-motion"
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, CreditCard } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useEffect, useState } from "react"
+
+const containerVariants = {
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+}
+
+const itemVariants = {
+  visible: {
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+}
 
 export default function Footer() {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   return (
     <footer
-      className="relative bg-black/50 border-t border-amber-500/[0.08]"
+      className="relative bg-transparent border-t border-amber-500/[0.08]"
       itemScope
       itemType="https://schema.org/Organization"
       role="contentinfo"
@@ -15,9 +41,16 @@ export default function Footer() {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10"
+          initial={false}
+          animate={isMounted ? "visible" : undefined}
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={containerVariants}
+        >
           {/* Company Info */}
-          <div>
+          <motion.div variants={itemVariants}>
             <div className="flex items-center gap-2 mb-4">
               <div className="relative w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent h-1/2" />
@@ -58,10 +91,10 @@ export default function Footer() {
                 ))}
               </ul>
             </nav>
-          </div>
+          </motion.div>
 
           {/* Quick Links */}
-          <nav aria-label="Quick links">
+          <motion.nav aria-label="Quick links" variants={itemVariants}>
             <h3 className="text-white font-medium text-sm mb-4">Quick Links</h3>
             <ul className="space-y-2.5 list-none">
               {[
@@ -79,10 +112,10 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </nav>
+          </motion.nav>
 
           {/* Support */}
-          <nav aria-label="Support links">
+          <motion.nav aria-label="Support links" variants={itemVariants}>
             <h3 className="text-white font-medium text-sm mb-4">Support</h3>
             <ul className="space-y-2.5 list-none">
               {[
@@ -101,10 +134,15 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </nav>
+          </motion.nav>
 
           {/* Contact */}
-          <div itemProp="contactPoint" itemScope itemType="https://schema.org/ContactPoint">
+          <motion.div
+            itemProp="contactPoint"
+            itemScope
+            itemType="https://schema.org/ContactPoint"
+            variants={itemVariants}
+          >
             <meta itemProp="contactType" content="customer service" />
             <meta itemProp="availableLanguage" content="English" />
             <h3 className="text-white font-medium text-sm mb-4">Contact Us</h3>
@@ -137,7 +175,7 @@ export default function Footer() {
                   </a>
                 </li>
                 <li
-                  className="flex items-center gap-2 text-zinc-500 text-sm"
+                  className="flex items-center gap-2 text-zinc-400 text-sm"
                   itemProp="address"
                   itemScope
                   itemType="https://schema.org/PostalAddress"
@@ -147,10 +185,17 @@ export default function Footer() {
                 </li>
               </ul>
             </address>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="border-t border-amber-500/[0.08] pt-8 mb-8">
+        <motion.div
+          className="border-t border-amber-500/[0.08] pt-8 mb-8"
+          initial={false}
+          animate={isMounted ? { opacity: 1, y: 0 } : undefined}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           <div className="flex flex-col items-center gap-4">
             <div className="flex items-center gap-2 text-zinc-400 text-sm">
               <CreditCard className="w-4 h-4 text-amber-500" aria-hidden="true" />
@@ -179,10 +224,17 @@ export default function Footer() {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Bottom Bar */}
-        <div className="relative border-t border-amber-500/[0.08] pt-6">
+        {/* Bottom Bar - Use initial={false} for SEO */}
+        <motion.div
+          className="relative border-t border-amber-500/[0.08] pt-6"
+          initial={false}
+          animate={isMounted ? { opacity: 1 } : undefined}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/15 to-transparent" />
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-zinc-600 text-sm">
@@ -205,7 +257,7 @@ export default function Footer() {
               </ul>
             </nav>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <meta itemProp="url" content="https://ottsewa.store" />

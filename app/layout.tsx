@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter, Poppins } from "next/font/google"
+import { Inter, Montserrat } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
@@ -16,11 +16,17 @@ import { RouteTransitionBar } from "@/components/route-transition"
 import { ScrollToTopButton } from "@/components/scroll-to-top-button"
 import { BlendBackground } from "@/components/blend-background"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
-const poppins = Poppins({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
+  variable: "--font-inter",
+  display: "swap",
+})
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800", "900"],
+  variable: "--font-montserrat",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -109,8 +115,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#000000" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#121212" },
+    { media: "(prefers-color-scheme: dark)", color: "#121212" },
   ],
 }
 
@@ -120,12 +126,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-black">
+    <html lang="en" className="bg-[#121212]">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className={`${inter.variable} ${poppins.variable} font-sans antialiased bg-black`}>
+      <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased bg-[#121212]`}>
         <BlendBackground />
         <WishlistProvider>
           <CartProvider>

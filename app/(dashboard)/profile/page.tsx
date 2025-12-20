@@ -116,191 +116,170 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Card */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-        {/* Avatar Section */}
-        <div className="flex items-center gap-4 mb-6 pb-6 border-b border-zinc-800">
-          <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-2xl font-bold text-black flex-shrink-0">
-            {profile.full_name?.charAt(0).toUpperCase() || "U"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-semibold text-white truncate">{profile.full_name || "User"}</h2>
-            <p className="text-zinc-500 text-sm truncate">{profile.email}</p>
-            <div
-              className={`inline-flex items-center gap-1.5 px-2 py-0.5 mt-2 rounded-full text-xs font-medium ${
-                isAdmin
-                  ? "bg-amber-500/10 border border-amber-500/20 text-amber-400"
-                  : "bg-zinc-800 border border-zinc-700 text-zinc-400"
-              }`}
-            >
-              <Shield className="w-3 h-3" />
-              {isAdmin ? "Administrator" : "Member"}
+      <div className="rounded-2xl border border-white/[0.08] p-3">
+        <div className="bg-[#0f0f0f] rounded-xl p-6">
+          {/* Avatar Section */}
+          <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/[0.05]">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-2xl font-bold text-black flex-shrink-0">
+              {profile.full_name?.charAt(0).toUpperCase() || "U"}
             </div>
-          </div>
-        </div>
-
-        {/* Profile Information */}
-        <div className="space-y-3 mb-6">
-          <div className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg">
-            <Mail className="w-4 h-4 text-zinc-500" />
             <div className="flex-1 min-w-0">
-              <p className="text-zinc-500 text-xs">Email</p>
-              <p className="text-white text-sm truncate">{profile.email}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg">
-            <Calendar className="w-4 h-4 text-zinc-500" />
-            <div className="flex-1 min-w-0">
-              <p className="text-zinc-500 text-xs">Member Since</p>
-              <p className="text-white text-sm">
-                {new Date(profile.created_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg">
-            <Heart className="w-4 h-4 text-zinc-500" />
-            <div className="flex-1 min-w-0">
-              <p className="text-zinc-500 text-xs">Account ID</p>
-              <p className="text-white text-sm font-mono text-xs truncate">{profile.id}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Edit Section */}
-        <div className="border-t border-zinc-800 pt-5">
-          {isEditing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Full Name</label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
-                  className="w-full px-3 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-all text-sm"
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleUpdateProfile}
-                  disabled={isSaving}
-                  className="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-medium rounded-lg transition-all text-sm disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="w-4 h-4 bg-zinc-800 rounded-lg animate-spin"></div>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Save
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => {
-                    setIsEditing(false)
-                    setFullName(profile.full_name || "")
-                  }}
-                  className="flex-1 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-lg transition-all text-sm flex items-center justify-center gap-2"
-                >
-                  <X className="w-4 h-4" />
-                  Cancel
-                </button>
+              <h2 className="text-lg font-semibold text-white truncate">{profile.full_name || "User"}</h2>
+              <p className="text-zinc-500 text-sm truncate">{profile.email}</p>
+              <div
+                className={`inline-flex items-center gap-1.5 px-2 py-0.5 mt-2 rounded-full text-xs font-medium ${
+                  isAdmin
+                    ? "bg-amber-500/10 border border-amber-500/20 text-amber-400"
+                    : "bg-[#1a1a1a] border border-white/[0.05] text-zinc-400"
+                }`}
+              >
+                <Shield className="w-3 h-3" />
+                {isAdmin ? "Administrator" : "Member"}
               </div>
             </div>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-lg transition-all text-sm"
-            >
-              <Edit2 size={14} />
-              Edit Profile
-            </button>
-          )}
+          </div>
+
+          {/* Profile Information */}
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-white/[0.05] rounded-lg">
+              <Mail className="w-4 h-4 text-zinc-500" />
+              <div className="flex-1 min-w-0">
+                <p className="text-zinc-500 text-xs">Email</p>
+                <p className="text-white text-sm truncate">{profile.email}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-white/[0.05] rounded-lg">
+              <Calendar className="w-4 h-4 text-zinc-500" />
+              <div className="flex-1 min-w-0">
+                <p className="text-zinc-500 text-xs">Member Since</p>
+                <p className="text-white text-sm">
+                  {new Date(profile.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-white/[0.05] rounded-lg">
+              <Heart className="w-4 h-4 text-zinc-500" />
+              <div className="flex-1 min-w-0">
+                <p className="text-zinc-500 text-xs">Account ID</p>
+                <p className="text-white text-sm font-mono text-xs truncate">{profile.id}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Edit Section */}
+          <div className="border-t border-white/[0.05] pt-5">
+            {isEditing ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name"
+                    className="w-full px-3 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-all text-sm"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleUpdateProfile}
+                    disabled={isSaving}
+                    className="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-medium rounded-lg transition-all text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="w-4 h-4 bg-zinc-800 rounded-lg animate-spin"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Save
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false)
+                      setFullName(profile.full_name || "")
+                    }}
+                    className="flex-1 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-lg transition-all text-sm flex items-center justify-center gap-2"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-lg transition-all text-sm"
+              >
+                <Edit2 size={14} />
+                Edit Profile
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       <div>
         <h2 className="text-xl font-semibold text-white mb-4">Settings & Preferences</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Notifications */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all group">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                <Bell className="w-5 h-5 text-amber-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-white font-medium text-sm mb-1">Notifications</h3>
-                <p className="text-zinc-500 text-xs">Manage your notification preferences</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Security */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all group">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                <Lock className="w-5 h-5 text-amber-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-white font-medium text-sm mb-1">Security</h3>
-                <p className="text-zinc-500 text-xs">Password and security settings</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Language & Region */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all group">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                <Globe className="w-5 h-5 text-amber-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-white font-medium text-sm mb-1">Language & Region</h3>
-                <p className="text-zinc-500 text-xs">Set your language and region</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Appearance */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all group">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                <Palette className="w-5 h-5 text-amber-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-white font-medium text-sm mb-1">Appearance</h3>
-                <p className="text-zinc-500 text-xs">Customize your interface theme</p>
-              </div>
+        <div className="rounded-2xl border border-white/[0.08] p-3">
+          <div className="bg-[#0f0f0f] rounded-xl p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Settings cards */}
+              {[
+                { icon: Bell, title: "Notifications", desc: "Manage your notification preferences" },
+                { icon: Lock, title: "Security", desc: "Password and security settings" },
+                { icon: Globe, title: "Language & Region", desc: "Set your language and region" },
+                { icon: Palette, title: "Appearance", desc: "Customize your interface theme" },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-5 hover:border-amber-500/20 transition-all group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                      <item.icon className="w-5 h-5 text-amber-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-white font-medium text-sm mb-1">{item.title}</h3>
+                      <p className="text-zinc-500 text-xs">{item.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Quick Links */}
+      {/* Admin Access */}
       {isAdmin && (
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-amber-500" />
+        <div className="rounded-2xl border border-amber-500/20 p-3">
+          <div className="bg-amber-500/5 rounded-xl p-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="text-amber-400 font-medium text-sm">Admin Access</h3>
+                  <p className="text-amber-500/70 text-xs">Manage users and site settings</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-amber-400 font-medium text-sm">Admin Access</h3>
-                <p className="text-amber-500/70 text-xs">Manage users and site settings</p>
-              </div>
+              <Link
+                href="/admin"
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-medium rounded-lg transition-all text-sm"
+              >
+                Open Dashboard
+              </Link>
             </div>
-            <Link
-              href="/admin"
-              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-medium rounded-lg transition-all text-sm"
-            >
-              Open Dashboard
-            </Link>
           </div>
         </div>
       )}

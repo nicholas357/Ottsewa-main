@@ -96,7 +96,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-transparent">
       <PageHeader
         icon={MessageSquare}
         title="Contact Us"
@@ -106,22 +106,25 @@ export default function ContactPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Contact Methods Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
-          {contactMethods.map((method) => (
-            <a
-              key={method.title}
-              href={method.href}
-              className="group relative bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 hover:border-amber-500/30 transition-all"
-            >
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
-                <method.icon className="w-6 h-6 text-amber-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-1">{method.title}</h3>
-              <p className="text-zinc-500 text-sm mb-2">{method.description}</p>
-              <p className="text-amber-400 font-medium text-sm">{method.value}</p>
-            </a>
-          ))}
+        <div className="rounded-2xl border border-white/[0.08] p-3 mb-16">
+          <div className="bg-[#0f0f0f] rounded-xl p-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {contactMethods.map((method) => (
+                <a
+                  key={method.title}
+                  href={method.href}
+                  className="group relative bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-6 hover:border-amber-500/20 transition-all"
+                >
+                  <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
+                    <method.icon className="w-6 h-6 text-amber-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-1">{method.title}</h3>
+                  <p className="text-zinc-500 text-sm mb-2">{method.description}</p>
+                  <p className="text-amber-400 font-medium text-sm">{method.value}</p>
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Main Content Grid */}
@@ -129,146 +132,152 @@ export default function ContactPage() {
           {/* Left Sidebar */}
           <div className="space-y-6">
             {/* Response Time Card */}
-            <div className="relative bg-amber-500/5 border border-amber-500/20 rounded-xl p-6">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-              <Clock className="w-8 h-8 text-amber-500 mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">Quick Response Time</h3>
-              <p className="text-zinc-400 text-sm mb-4">
-                We aim to respond to all inquiries within 24 hours during business days.
-              </p>
-              <div className="flex items-center gap-2 text-amber-400 text-sm">
-                <CheckCircle className="w-4 h-4" />
-                <span>Average response: 2-4 hours</span>
+            <div className="rounded-2xl border border-amber-500/20 p-3">
+              <div className="bg-amber-500/5 rounded-xl p-6">
+                <Clock className="w-8 h-8 text-amber-500 mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">Quick Response Time</h3>
+                <p className="text-zinc-400 text-sm mb-4">
+                  We aim to respond to all inquiries within 24 hours during business days.
+                </p>
+                <div className="flex items-center gap-2 text-amber-400 text-sm">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Average response: 2-4 hours</span>
+                </div>
               </div>
             </div>
 
             {/* FAQ Prompt */}
-            <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 group hover:border-amber-500/30 transition-all">
-              <h3 className="text-lg font-semibold text-white mb-2">Check our FAQ</h3>
-              <p className="text-zinc-400 text-sm mb-4">
-                Find instant answers to common questions about orders, payments, and more.
-              </p>
-              <Link
-                href="/faq"
-                className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors"
-              >
-                Browse FAQ
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+            <div className="rounded-2xl border border-white/[0.08] p-3">
+              <div className="bg-[#0f0f0f] rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-2">Check our FAQ</h3>
+                <p className="text-zinc-400 text-sm mb-4">
+                  Find instant answers to common questions about orders, payments, and more.
+                </p>
+                <Link
+                  href="/faq"
+                  className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors"
+                >
+                  Browse FAQ
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
 
             {/* Social Links */}
-            <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Follow Us</h3>
-              <div className="flex gap-3">
-                {[
-                  { Icon: Facebook, href: "#", label: "Facebook" },
-                  { Icon: Instagram, href: "#", label: "Instagram" },
-                ].map(({ Icon, href, label }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    className="w-10 h-10 bg-zinc-800 hover:bg-amber-500/10 border border-zinc-700 hover:border-amber-500/30 rounded-lg flex items-center justify-center transition-all group"
-                    aria-label={label}
-                  >
-                    <Icon className="w-5 h-5 text-zinc-400 group-hover:text-amber-400 transition-colors" />
-                  </a>
-                ))}
+            <div className="rounded-2xl border border-white/[0.08] p-3">
+              <div className="bg-[#0f0f0f] rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Follow Us</h3>
+                <div className="flex gap-3">
+                  {[
+                    { Icon: Facebook, href: "#", label: "Facebook" },
+                    { Icon: Instagram, href: "#", label: "Instagram" },
+                  ].map(({ Icon, href, label }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      className="w-10 h-10 bg-[#1a1a1a] hover:bg-amber-500/10 border border-white/[0.05] hover:border-amber-500/20 rounded-lg flex items-center justify-center transition-all group"
+                      aria-label={label}
+                    >
+                      <Icon className="w-5 h-5 text-zinc-400 group-hover:text-amber-400 transition-colors" />
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 sm:p-8">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
-              <h2 className="text-2xl font-bold text-white mb-2">Send us a Message</h2>
-              <p className="text-zinc-400 mb-6">Fill out the form below and we'll get back to you soon.</p>
+            <div className="rounded-2xl border border-white/[0.08] p-3">
+              <div className="bg-[#0f0f0f] rounded-xl p-6 sm:p-8">
+                <h2 className="text-2xl font-bold text-white mb-2">Send us a Message</h2>
+                <p className="text-zinc-400 mb-6">Fill out the form below and we'll get back to you soon.</p>
 
-              {/* Quick Topic Selection */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-zinc-300 mb-3">What can we help you with?</label>
-                <div className="flex flex-wrap gap-2">
-                  {quickTopics.map((topic) => (
-                    <button
-                      key={topic.value}
-                      type="button"
-                      onClick={() => setSelectedTopic(topic.value)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        selectedTopic === topic.value
-                          ? "bg-amber-500 text-black"
-                          : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700"
-                      }`}
-                    >
-                      {topic.label}
-                    </button>
-                  ))}
+                {/* Quick Topic Selection */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-zinc-300 mb-3">What can we help you with?</label>
+                  <div className="flex flex-wrap gap-2">
+                    {quickTopics.map((topic) => (
+                      <button
+                        key={topic.value}
+                        type="button"
+                        onClick={() => setSelectedTopic(topic.value)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                          selectedTopic === topic.value
+                            ? "bg-amber-500 text-black"
+                            : "bg-[#1a1a1a] text-zinc-300 hover:bg-[#222222] border border-white/[0.05]"
+                        }`}
+                      >
+                        {topic.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-300 mb-2">Your Name</label>
+                      <Input
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="John Doe"
+                        required
+                        className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-amber-500 h-12"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-300 mb-2">Your Email</label>
+                      <Input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="john@example.com"
+                        required
+                        className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-amber-500 h-12"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-300 mb-2">Subject</label>
+                    <Input
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      placeholder="How can we help?"
+                      required
+                      className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-amber-500 h-12"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-300 mb-2">Message</label>
+                    <Textarea
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder="Tell us more about your inquiry..."
+                      required
+                      rows={6}
+                      className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-amber-500 resize-none"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold h-12 text-base"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Message
+                      </>
+                    )}
+                  </Button>
+                </form>
               </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-300 mb-2">Your Name</label>
-                    <Input
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="John Doe"
-                      required
-                      className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-amber-500 h-12"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-300 mb-2">Your Email</label>
-                    <Input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="john@example.com"
-                      required
-                      className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-amber-500 h-12"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-2">Subject</label>
-                  <Input
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="How can we help?"
-                    required
-                    className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-amber-500 h-12"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-2">Message</label>
-                  <Textarea
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Tell us more about your inquiry..."
-                    required
-                    rows={6}
-                    className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-amber-500 resize-none"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold h-12 text-base"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      Send Message
-                    </>
-                  )}
-                </Button>
-              </form>
             </div>
           </div>
         </div>

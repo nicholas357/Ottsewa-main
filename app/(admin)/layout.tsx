@@ -21,7 +21,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-transparent">
       <AdminSidebar />
       <div className="lg:pl-64">
         <main className="p-4 sm:p-6 lg:p-8">{children}</main>

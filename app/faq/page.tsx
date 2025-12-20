@@ -157,7 +157,7 @@ export default function FAQPage() {
     : faqs.filter((section) => section.id === activeCategory)
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-transparent">
       <PageHeader
         icon={HelpCircle}
         title="Frequently Asked Questions"
@@ -173,7 +173,7 @@ export default function FAQPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for questions..."
-              className="w-full bg-zinc-900/80 border border-zinc-800 rounded-xl pl-12 pr-4 py-4 text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="w-full bg-[#1a1a1a] border border-white/[0.08] rounded-xl pl-12 pr-4 py-4 text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors"
             />
           </div>
         </div>
@@ -191,7 +191,7 @@ export default function FAQPage() {
                   "flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all",
                   activeCategory === category.id
                     ? "bg-amber-500 text-black"
-                    : "bg-zinc-900/50 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700",
+                    : "bg-[#1a1a1a] text-zinc-400 hover:text-white border border-white/[0.08] hover:border-white/[0.15]",
                 )}
               >
                 <category.icon className="w-4 h-4" />
@@ -202,94 +202,96 @@ export default function FAQPage() {
         )}
 
         {/* FAQ Sections */}
-        <div className="space-y-6">
-          {filteredFaqs.map((section) => (
-            <div key={section.id} id={section.id} className="scroll-mt-24">
-              {searchQuery && (
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center">
-                    <section.icon className="w-4 h-4 text-amber-500" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-amber-400">{section.title}</h2>
-                </div>
-              )}
-
-              <div className="space-y-3">
-                {section.questions.map((faq, index) => {
-                  const itemId = `${section.id}-${index}`
-                  const isOpen = openItems.includes(itemId)
-
-                  return (
-                    <div
-                      key={index}
-                      className={cn(
-                        "relative bg-zinc-900/50 border rounded-xl overflow-hidden transition-all",
-                        isOpen ? "border-amber-500/30" : "border-zinc-800 hover:border-zinc-700",
-                      )}
-                    >
-                      {isOpen && (
-                        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-                      )}
-                      <button
-                        onClick={() => toggleItem(itemId)}
-                        className="w-full flex items-center justify-between p-5 text-left"
-                      >
-                        <span className={cn("font-medium pr-4", isOpen ? "text-amber-400" : "text-white")}>
-                          {faq.q}
-                        </span>
-                        <ChevronDown
-                          className={cn(
-                            "w-5 h-5 flex-shrink-0 transition-transform",
-                            isOpen ? "rotate-180 text-amber-500" : "text-zinc-500",
-                          )}
-                        />
-                      </button>
-                      {isOpen && (
-                        <div className="px-5 pb-5 pt-0">
-                          <p className="text-zinc-400 leading-relaxed">{faq.a}</p>
-                        </div>
-                      )}
+        <div className="rounded-2xl border border-white/[0.08] p-3">
+          <div className="bg-[#0f0f0f] rounded-xl p-4 sm:p-6">
+            <div className="space-y-6">
+              {filteredFaqs.map((section) => (
+                <div key={section.id} id={section.id} className="scroll-mt-24">
+                  {searchQuery && (
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center">
+                        <section.icon className="w-4 h-4 text-amber-500" />
+                      </div>
+                      <h2 className="text-lg font-semibold text-amber-400">{section.title}</h2>
                     </div>
-                  )
-                })}
-              </div>
+                  )}
+
+                  <div className="space-y-3">
+                    {section.questions.map((faq, index) => {
+                      const itemId = `${section.id}-${index}`
+                      const isOpen = openItems.includes(itemId)
+
+                      return (
+                        <div
+                          key={index}
+                          className={cn(
+                            "relative bg-[#1a1a1a] border rounded-xl overflow-hidden transition-all",
+                            isOpen ? "border-amber-500/30" : "border-white/[0.05] hover:border-white/[0.1]",
+                          )}
+                        >
+                          <button
+                            onClick={() => toggleItem(itemId)}
+                            className="w-full flex items-center justify-between p-5 text-left"
+                          >
+                            <span className={cn("font-medium pr-4", isOpen ? "text-amber-400" : "text-white")}>
+                              {faq.q}
+                            </span>
+                            <ChevronDown
+                              className={cn(
+                                "w-5 h-5 flex-shrink-0 transition-transform",
+                                isOpen ? "rotate-180 text-amber-500" : "text-zinc-500",
+                              )}
+                            />
+                          </button>
+                          {isOpen && (
+                            <div className="px-5 pb-5 pt-0">
+                              <p className="text-zinc-400 leading-relaxed">{faq.a}</p>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+
+            {/* No Results */}
+            {searchQuery && filteredFaqs.length === 0 && (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-[#1a1a1a] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-zinc-600" />
+                </div>
+                <h3 className="text-lg font-medium text-white mb-2">No results found</h3>
+                <p className="text-zinc-500 mb-6">Try a different search term or browse by category</p>
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="text-amber-400 hover:text-amber-300 font-medium inline-flex items-center gap-2"
+                >
+                  Clear search
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* No Results */}
-        {searchQuery && filteredFaqs.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-zinc-600" />
-            </div>
-            <h3 className="text-lg font-medium text-white mb-2">No results found</h3>
-            <p className="text-zinc-500 mb-6">Try a different search term or browse by category</p>
-            <button
-              onClick={() => setSearchQuery("")}
-              className="text-amber-400 hover:text-amber-300 font-medium inline-flex items-center gap-2"
-            >
-              Clear search
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
         {/* Contact CTA */}
-        <div className="mt-16 relative bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 text-center overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-          <MessageSquare className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">Still have questions?</h2>
-          <p className="text-zinc-400 mb-6 max-w-md mx-auto">
-            Can't find the answer you're looking for? Our support team is ready to help.
-          </p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold px-6 py-2.5 rounded-lg transition-all"
-          >
-            Contact Support
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+        <div className="mt-16 rounded-2xl border border-white/[0.08] p-3">
+          <div className="bg-[#0f0f0f] rounded-xl p-8 text-center">
+            <MessageSquare className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-white mb-2">Still have questions?</h2>
+            <p className="text-zinc-400 mb-6 max-w-md mx-auto">
+              Can't find the answer you're looking for? Our support team is ready to help.
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold px-6 py-2.5 rounded-lg transition-all"
+            >
+              Contact Support
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

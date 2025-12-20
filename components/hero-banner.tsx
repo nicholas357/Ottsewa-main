@@ -1,8 +1,8 @@
 "use client"
 
 import type React from "react"
-
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { createBrowserClient } from "@/lib/supabase/client"
@@ -30,46 +30,39 @@ interface CachedBanners {
 
 function BannerSkeleton() {
   return (
-    <section className="bg-black">
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Main banner skeleton */}
-            <div className="relative w-full lg:w-[70%]">
-              <div
-                className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900"
-                style={{ aspectRatio: "16/9" }}
-              >
+    <section className="relative px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Outer box - subtle border */}
+        <div className="rounded-3xl border border-white/[0.08] p-2 sm:p-3 bg-transparent">
+          {/* Inner box - darker background */}
+          <div className="rounded-2xl bg-[#0c0c0c] p-4 sm:p-5">
+            <div className="flex flex-col lg:flex-row gap-4 sm:gap-5">
+              {/* Main banner skeleton */}
+              <div className="relative w-full lg:w-[68%]">
                 <div
-                  className="absolute inset-0 animate-pulse bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 bg-[length:200%_100%]"
-                  style={{ animation: "shimmer 1.5s infinite" }}
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 space-y-3">
-                  <div className="h-5 w-24 bg-zinc-800 rounded-full animate-pulse" />
-                  <div className="h-8 w-48 bg-zinc-800 rounded animate-pulse" />
+                  className="rounded-xl overflow-hidden bg-[#151515] border border-white/[0.05]"
+                  style={{ aspectRatio: "16/9" }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-shimmer" />
+                </div>
+                {/* Dots skeleton */}
+                <div className="flex justify-center gap-2 mt-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className={`h-2 rounded-full bg-white/10 ${i === 1 ? "w-8" : "w-2"}`} />
+                  ))}
                 </div>
               </div>
-              {/* Indicator skeleton */}
-              <div className="flex justify-center gap-2 mt-3">
-                <div className="h-1.5 w-8 bg-zinc-800 rounded-full animate-pulse" />
-                <div className="h-1.5 w-2 bg-zinc-800 rounded-full animate-pulse" />
-                <div className="h-1.5 w-2 bg-zinc-800 rounded-full animate-pulse" />
-              </div>
-            </div>
-
-            {/* Side banners skeleton */}
-            <div className="w-full lg:w-[30%]">
-              <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
-                {[1, 2].map((i) => (
-                  <div key={i} className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
-                    <div className="relative aspect-[16/10] sm:aspect-[16/9]">
-                      <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900" />
-                      <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3">
-                        <div className="h-4 w-20 bg-zinc-800 rounded animate-pulse" />
+              {/* Side banners skeleton */}
+              <div className="w-full lg:w-[32%]">
+                <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4 h-full">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="rounded-xl overflow-hidden bg-[#151515] border border-white/[0.05]">
+                      <div className="relative aspect-[16/9]">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-shimmer" />
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -81,15 +74,20 @@ function BannerSkeleton() {
 
 function NoBannersState() {
   return (
-    <section className="bg-black">
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-        <div className="max-w-7xl mx-auto">
-          <div
-            className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/50 flex items-center justify-center"
-            style={{ aspectRatio: "21/9" }}
-          >
-            <div className="text-center p-6">
-              <p className="text-zinc-500 text-sm">No banners available</p>
+    <section className="relative px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="rounded-3xl border border-white/[0.08] p-2 sm:p-3 bg-transparent">
+          <div className="rounded-2xl bg-[#0c0c0c] p-4 sm:p-5">
+            <div
+              className="rounded-xl bg-[#151515] border border-white/[0.05] flex items-center justify-center"
+              style={{ aspectRatio: "21/9" }}
+            >
+              <div className="text-center p-8">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-7 h-7 text-amber-500/70" />
+                </div>
+                <p className="text-zinc-500 text-sm font-medium">No banners available</p>
+              </div>
             </div>
           </div>
         </div>
@@ -104,6 +102,11 @@ export default function HeroBanner() {
   const [mainIndex, setMainIndex] = useState(0)
   const [sideIndex, setSideIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     async function fetchBanners() {
@@ -225,23 +228,17 @@ export default function HeroBanner() {
 
   const MainBannerWrapper = ({ children, banner }: { children: React.ReactNode; banner: Banner }) => {
     const link = getBannerLink(banner)
+    const baseClasses = "relative block rounded-xl overflow-hidden group"
+
     if (link === "#") {
       return (
-        <div
-          className="relative block rounded-xl overflow-hidden border border-amber-500/[0.1]"
-          style={{ aspectRatio: "16/9" }}
-        >
+        <div className={baseClasses} style={{ aspectRatio: "16/9" }}>
           {children}
         </div>
       )
     }
     return (
-      <Link
-        href={link}
-        className="relative block rounded-xl overflow-hidden border border-amber-500/[0.1] hover:border-amber-500/20 transition-colors cursor-pointer"
-        style={{ aspectRatio: "16/9" }}
-        prefetch={true}
-      >
+      <Link href={link} className={`${baseClasses} cursor-pointer`} style={{ aspectRatio: "16/9" }} prefetch={true}>
         {children}
       </Link>
     )
@@ -249,19 +246,13 @@ export default function HeroBanner() {
 
   const SideBannerWrapper = ({ children, banner }: { children: React.ReactNode; banner: Banner }) => {
     const link = getBannerLink(banner)
+    const baseClasses = "relative rounded-xl overflow-hidden group"
+
     if (link === "#") {
-      return (
-        <div className="relative rounded-xl overflow-hidden border border-amber-500/[0.1] transition-all duration-300 group">
-          {children}
-        </div>
-      )
+      return <div className={baseClasses}>{children}</div>
     }
     return (
-      <Link
-        href={link}
-        className="relative rounded-xl overflow-hidden border border-amber-500/[0.1] hover:border-amber-500/20 transition-all duration-300 group cursor-pointer"
-        prefetch={true}
-      >
+      <Link href={link} className={`${baseClasses} cursor-pointer`} prefetch={true}>
         {children}
       </Link>
     )
@@ -269,125 +260,169 @@ export default function HeroBanner() {
 
   return (
     <section
-      className="bg-black"
       aria-label="Featured promotions and offers"
       itemScope
       itemType="https://schema.org/ItemList"
+      className="relative px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
     >
       <meta itemProp="name" content="Featured Products and Promotions" />
       <meta itemProp="description" content="Browse our featured streaming subscriptions and digital products" />
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="sr-only">OTTSewa - Buy Streaming Subscriptions in Nepal</h1>
-          <div className="flex flex-col lg:flex-row gap-4">
-            {currentMain && (
-              <div className={`relative w-full ${currentSide.length > 0 ? "lg:w-[70%]" : "lg:w-full"}`}>
-                <MainBannerWrapper banner={currentMain}>
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/25 to-transparent z-10" />
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={false}
+          animate={isMounted ? { opacity: 1, y: 0 } : undefined}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Outer box - clean subtle border with more rounded corners */}
+          <div className="rounded-3xl border border-white/[0.08] p-2 sm:p-3 bg-transparent">
+            {/* Inner box - darker background for depth */}
+            <div className="rounded-2xl bg-[#0c0c0c] overflow-hidden">
+              <div className="p-4 sm:p-5">
+                <h1 className="sr-only">OTTSewa - Buy Streaming Subscriptions in Nepal</h1>
 
-                  <div className="absolute inset-0" role="img" aria-label={currentMain.title}>
-                    {mainBanners.map((slide, idx) => (
-                      <img
-                        key={slide.id}
-                        src={slide.image_url || "/placeholder.svg"}
-                        alt={slide.title}
-                        loading={idx === 0 ? "eager" : "lazy"}
-                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
-                          idx === mainIndex ? "opacity-100" : "opacity-0"
-                        }`}
-                      />
-                    ))}
-                  </div>
+                <div className="flex flex-col lg:flex-row gap-4 sm:gap-5">
+                  {/* Main banner */}
+                  {currentMain && (
+                    <div className={`relative w-full ${currentSide.length > 0 ? "lg:w-[68%]" : "lg:w-full"}`}>
+                      {/* Banner container with subtle border */}
+                      <div className="rounded-xl border border-white/[0.05] overflow-hidden">
+                        <MainBannerWrapper banner={currentMain}>
+                          <div className="absolute inset-0" role="img" aria-label={currentMain.title}>
+                            <AnimatePresence mode="wait">
+                              {mainBanners.map(
+                                (slide, idx) =>
+                                  idx === mainIndex && (
+                                    <motion.img
+                                      key={slide.id}
+                                      src={slide.image_url || "/placeholder.svg"}
+                                      alt={slide.title}
+                                      loading={idx === 0 ? "eager" : "lazy"}
+                                      className="absolute inset-0 w-full h-full object-cover"
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      exit={{ opacity: 0 }}
+                                      transition={{ duration: 0.5 }}
+                                    />
+                                  ),
+                              )}
+                            </AnimatePresence>
+                          </div>
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+                          {/* Subtle gradient overlay for text readability */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 z-10">
-                    {currentMain.subtitle && (
-                      <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/[0.1] rounded-full text-[10px] sm:text-xs text-white/90 mb-2">
-                        {currentMain.subtitle}
-                      </span>
-                    )}
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">
-                      {currentMain.title}
-                    </h2>
-                  </div>
+                          {/* Content overlay */}
+                          <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 z-10">
+                            <div className="max-w-md space-y-1 sm:space-y-1.5">
+                              {currentMain.subtitle && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500 rounded text-[9px] sm:text-[10px] text-black font-semibold shadow-sm uppercase tracking-wide">
+                                  <Sparkles className="w-2.5 h-2.5" />
+                                  {currentMain.subtitle}
+                                </span>
+                              )}
+                              <h2 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-white tracking-tight leading-tight drop-shadow-md">
+                                {currentMain.title}
+                              </h2>
+                              {getBannerLink(currentMain) !== "#" && (
+                                <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-white/70 font-medium group-hover:text-amber-400 transition-colors">
+                                  Shop Now
+                                  <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                                </span>
+                              )}
+                            </div>
+                          </div>
 
-                  {mainBanners.length > 1 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          prevMain()
-                        }}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/[0.1] hover:border-white/[0.2] hover:bg-black/80 transition-all cursor-pointer"
-                        aria-label="Previous banner"
-                      >
-                        <ChevronLeft className="w-5 h-5 text-white" aria-hidden="true" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          nextMain()
-                        }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/[0.1] hover:border-white/[0.2] hover:bg-black/80 transition-all cursor-pointer"
-                        aria-label="Next banner"
-                      >
-                        <ChevronRight className="w-5 h-5 text-white" aria-hidden="true" />
-                      </button>
-                    </>
-                  )}
-                </MainBannerWrapper>
-
-                {mainBanners.length > 1 && (
-                  <div className="flex justify-center gap-2 mt-3" role="tablist" aria-label="Banner navigation">
-                    {mainBanners.map((banner, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setMainIndex(idx)}
-                        className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                          idx === mainIndex ? "w-8 bg-amber-500" : "w-2 bg-amber-500/25 hover:bg-amber-500/50"
-                        }`}
-                        role="tab"
-                        aria-selected={idx === mainIndex}
-                        aria-label={`View ${banner.title}`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {currentSide.length > 0 && (
-              <aside className="w-full lg:w-[30%]" aria-label="Additional offers">
-                <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
-                  {currentSide.map((banner, idx) => (
-                    <SideBannerWrapper key={`${banner.id}-${idx}`} banner={banner}>
-                      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent z-10" />
-
-                      <div className="relative aspect-[16/10] sm:aspect-[16/9]">
-                        <img
-                          src={banner.image_url || "/placeholder.svg"}
-                          alt={banner.title}
-                          loading="lazy"
-                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-
-                        <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3">
-                          <h3 className="text-xs sm:text-sm font-medium text-white line-clamp-1">{banner.title}</h3>
-                        </div>
+                          {/* Navigation arrows */}
+                          {mainBanners.length > 1 && (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  prevMain()
+                                }}
+                                className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-black/60 hover:border-amber-500/40 transition-all duration-200 flex items-center justify-center cursor-pointer"
+                                aria-label="Previous banner"
+                              >
+                                <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/80" aria-hidden="true" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  nextMain()
+                                }}
+                                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-black/60 hover:border-amber-500/40 transition-all duration-200 flex items-center justify-center cursor-pointer"
+                                aria-label="Next banner"
+                              >
+                                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/80" aria-hidden="true" />
+                              </button>
+                            </>
+                          )}
+                        </MainBannerWrapper>
                       </div>
-                    </SideBannerWrapper>
-                  ))}
+
+                      {/* Pagination dots */}
+                      {mainBanners.length > 1 && (
+                        <div className="flex justify-center gap-1.5 mt-3" role="tablist" aria-label="Banner navigation">
+                          {mainBanners.map((banner, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setMainIndex(idx)}
+                              className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
+                                idx === mainIndex ? "w-5 bg-amber-500" : "w-1 bg-white/20 hover:bg-white/40"
+                              }`}
+                              role="tab"
+                              aria-selected={idx === mainIndex}
+                              aria-label={`View ${banner.title}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Side banners */}
+                  {currentSide.length > 0 && (
+                    <aside className="w-full lg:w-[32%]" aria-label="Additional offers">
+                      <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4 h-full lg:content-stretch">
+                        {currentSide.map((banner, idx) => (
+                          <motion.div
+                            key={`${banner.id}-${idx}`}
+                            initial={false}
+                            animate={isMounted ? { opacity: 1, x: 0 } : undefined}
+                            transition={{ duration: 0.4, delay: idx * 0.1 }}
+                            className="lg:flex-1"
+                          >
+                            {/* Side banner container with subtle border */}
+                            <div className="rounded-xl border border-white/[0.05] overflow-hidden h-full">
+                              <SideBannerWrapper banner={banner}>
+                                <div className="relative aspect-[16/9] lg:h-full lg:min-h-[140px]">
+                                  <img
+                                    src={banner.image_url || "/placeholder.svg"}
+                                    alt={banner.title}
+                                    loading="lazy"
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                                  <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3">
+                                    <h3 className="text-xs sm:text-sm font-semibold text-white line-clamp-1 drop-shadow-sm">
+                                      {banner.title}
+                                    </h3>
+                                  </div>
+                                </div>
+                              </SideBannerWrapper>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </aside>
+                  )}
                 </div>
-              </aside>
-            )}
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

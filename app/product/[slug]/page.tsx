@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { Shield, Zap, Clock, ChevronRight, Star, Tag, HelpCircle, ChevronDown, Home } from "lucide-react"
+import { Shield, Zap, Clock, ChevronRight, Tag, ChevronDown, Home } from "lucide-react"
 import { getProductBySlug, type Product } from "@/lib/products"
 import { ProductDescription } from "@/components/product-description"
 import { ProductInteractions } from "@/components/product-interactions"
@@ -414,7 +414,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const breadcrumbSchema = generateBreadcrumbSchema(product, baseUrl)
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-transparent">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -428,13 +428,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         }}
       />
 
-      <nav className="bg-zinc-900/50 border-b border-zinc-800 sticky top-0 z-40 backdrop-blur-sm">
+      <nav className="bg-[#0f0f0f]/50 backdrop-blur-sm border-b border-white/[0.06] sticky top-0 z-40">
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <ol className="flex items-center gap-1 sm:gap-2 py-3 sm:py-4 text-xs sm:text-sm overflow-x-auto scrollbar-hide">
             <li className="flex items-center flex-shrink-0">
               <Link
                 href="/"
-                className="flex items-center gap-1 text-zinc-400 hover:text-amber-500 transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-zinc-500 hover:text-amber-400 transition-colors cursor-pointer"
                 aria-label="Home"
               >
                 <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -442,26 +442,26 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </Link>
             </li>
             <li className="flex items-center flex-shrink-0">
-              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-zinc-600 mx-1" />
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-zinc-700 mx-1" />
             </li>
             {product.category && (
               <>
                 <li className="flex items-center flex-shrink-0">
                   <Link
                     href={`/category/${product.category.slug}`}
-                    className="text-zinc-400 hover:text-amber-500 transition-colors cursor-pointer whitespace-nowrap"
+                    className="text-zinc-500 hover:text-amber-400 transition-colors cursor-pointer whitespace-nowrap"
                   >
                     {product.category.name}
                   </Link>
                 </li>
                 <li className="flex items-center flex-shrink-0">
-                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-zinc-600 mx-1" />
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-zinc-700 mx-1" />
                 </li>
               </>
             )}
             <li className="flex items-center min-w-0">
               <span
-                className="text-amber-500 font-medium truncate max-w-[150px] sm:max-w-[250px] md:max-w-none"
+                className="text-amber-400 font-medium truncate max-w-[150px] sm:max-w-[250px] md:max-w-none"
                 title={product.title}
               >
                 {product.title}
@@ -472,213 +472,198 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       </nav>
 
       <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 xl:gap-12">
-          {/* Product Image - SSR */}
-          <div className="space-y-3 sm:space-y-4">
-            <div className="relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
-              {product.image_url ? (
-                <img
-                  src={product.image_url || "/placeholder.svg"}
-                  alt={product.title}
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-zinc-600 text-base sm:text-lg">No Image</span>
-                </div>
-              )}
-              {product.discount_percent && product.discount_percent > 0 && (
-                <div className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-gradient-to-r from-amber-600 to-orange-500 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg font-bold text-xs sm:text-sm shadow-lg">
-                  -{product.discount_percent}%
-                </div>
-              )}
-            </div>
-
-            {product.gallery_images && product.gallery_images.length > 0 && (
-              <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                <button className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-md sm:rounded-lg overflow-hidden border-2 border-amber-500 flex-shrink-0 cursor-pointer">
-                  <img
-                    src={product.image_url || "/placeholder.svg"}
-                    alt="Main"
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-                {product.gallery_images.slice(0, 5).map((img, i) => (
-                  <button
-                    key={i}
-                    className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-md sm:rounded-lg overflow-hidden border-2 border-zinc-700 hover:border-amber-500/50 transition-colors flex-shrink-0 cursor-pointer"
-                  >
+        {/* Main product section with double-box design */}
+        <div className="rounded-2xl border border-white/[0.08] p-3 bg-transparent mb-6">
+          <div className="rounded-xl bg-[#0f0f0f] p-4 sm:p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+              {/* Product Image */}
+              <div className="space-y-3 sm:space-y-4">
+                <div className="relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] rounded-xl overflow-hidden bg-[#111111] border border-white/[0.06]">
+                  {product.image_url ? (
                     <img
-                      src={img || "/placeholder.svg"}
-                      alt={`Gallery ${i + 1}`}
+                      src={product.image_url || "/placeholder.svg"}
+                      alt={product.title}
                       className="w-full h-full object-cover"
+                      loading="eager"
                     />
-                  </button>
-                ))}
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-zinc-600 text-base sm:text-lg">No Image</span>
+                    </div>
+                  )}
+                  {product.discount_percent && product.discount_percent > 0 && (
+                    <div className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-gradient-to-r from-amber-400 to-amber-500 text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg font-bold text-xs sm:text-sm">
+                      -{product.discount_percent}%
+                    </div>
+                  )}
+                </div>
+
+                {product.gallery_images && product.gallery_images.length > 0 && (
+                  <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                    <button className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-md sm:rounded-lg overflow-hidden border-2 border-amber-500 flex-shrink-0 cursor-pointer">
+                      <img
+                        src={product.image_url || "/placeholder.svg"}
+                        alt="Main"
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                    {product.gallery_images.slice(0, 5).map((img, i) => (
+                      <button
+                        key={i}
+                        className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-md sm:rounded-lg overflow-hidden border-2 border-white/[0.06] hover:border-amber-500/50 transition-colors flex-shrink-0 cursor-pointer"
+                      >
+                        <img
+                          src={img || "/placeholder.svg"}
+                          alt={`Gallery ${i + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Product Info */}
+              <div className="space-y-4 sm:space-y-6">
+                {/* Title and Rating */}
+                <div>
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+                    {product.is_new && (
+                      <span className="bg-emerald-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
+                        NEW
+                      </span>
+                    )}
+                    {product.is_bestseller && (
+                      <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-black text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
+                        BESTSELLER
+                      </span>
+                    )}
+                    {product.is_preorder && (
+                      <span className="bg-purple-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
+                        PRE-ORDER
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
+                    {product.title}
+                  </h1>
+
+                  {/* Short Description */}
+                  {product.short_description && (
+                    <p className="text-zinc-500 text-xs sm:text-sm mb-3 line-clamp-2 sm:line-clamp-none">
+                      {product.short_description}
+                    </p>
+                  )}
+
+                  {hasTags(product) && (
+                    <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-3">
+                      {product.tags.slice(0, 4).map((tag, i) => (
+                        <Link
+                          key={i}
+                          href={`/search?q=${encodeURIComponent(tag)}`}
+                          className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 bg-[#1a1a1a] hover:bg-amber-500/20 text-zinc-500 hover:text-amber-400 text-[10px] sm:text-xs rounded transition-colors cursor-pointer border border-white/[0.04]"
+                        >
+                          <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                          {tag}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {(product.publisher || product.developer) && (
+                  <div className="flex flex-col xs:flex-row flex-wrap gap-2 xs:gap-4 text-xs sm:text-sm text-zinc-500 py-2 border-t border-white/[0.06]">
+                    {product.publisher && (
+                      <div>
+                        <span className="text-zinc-500">Publisher:</span>{" "}
+                        <span className="text-white">{product.publisher}</span>
+                      </div>
+                    )}
+                    {product.developer && (
+                      <div>
+                        <span className="text-zinc-500">Developer:</span>{" "}
+                        <span className="text-white">{product.developer}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Client-side interactions component */}
+                <Suspense fallback={<div className="h-48 sm:h-64 bg-zinc-900 rounded-xl animate-pulse" />}>
+                  <ProductInteractions product={product} initialPrice={initialPrice} />
+                </Suspense>
+
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-4 border-t border-white/[0.06]">
+                  <div className="flex flex-col items-center text-center p-2 sm:p-3 bg-[#1a1a1a] rounded-lg border border-white/[0.04]">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mb-0.5 sm:mb-1" />
+                    <span className="text-[10px] sm:text-xs text-zinc-500 leading-tight">Secure Payment</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center p-2 sm:p-3 bg-[#1a1a1a] rounded-lg border border-white/[0.04]">
+                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 mb-0.5 sm:mb-1" />
+                    <span className="text-[10px] sm:text-xs text-zinc-500 leading-tight">Instant Delivery</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center p-2 sm:p-3 bg-[#1a1a1a] rounded-lg border border-white/[0.04]">
+                    <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 mb-0.5 sm:mb-1" />
+                    <span className="text-[10px] sm:text-xs text-zinc-500 leading-tight">24/7 Support</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Product Info - SSR with client interactions */}
-          <div className="space-y-4 sm:space-y-6">
-            {/* Title and Rating - SSR */}
-            <div>
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-                {product.is_new && (
-                  <span className="bg-green-600 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
-                    NEW
-                  </span>
-                )}
-                {product.is_bestseller && (
-                  <span className="bg-amber-600 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
-                    BESTSELLER
-                  </span>
-                )}
-                {product.is_preorder && (
-                  <span className="bg-purple-600 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
-                    PRE-ORDER
-                  </span>
-                )}
+          {product.description && (
+            <div className="rounded-2xl border border-white/[0.08] p-3 bg-transparent mt-6">
+              <div className="rounded-xl bg-[#0f0f0f] p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Description</h2>
+                <ProductDescription content={product.description} />
               </div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
-                {product.title}
-              </h1>
+            </div>
+          )}
 
-              {/* Short Description - SSR */}
-              {product.short_description && (
-                <p className="text-zinc-400 text-xs sm:text-sm mb-3 line-clamp-2 sm:line-clamp-none">
-                  {product.short_description}
-                </p>
-              )}
+          {hasFaqs(product) && (
+            <div className="rounded-2xl border border-white/[0.08] p-3 bg-transparent mt-6">
+              <div className="rounded-xl bg-[#0f0f0f] p-4 sm:p-6">
+                <h2 className="text-lg font-bold text-white mb-3">Frequently Asked Questions</h2>
+                <div className="space-y-2">
+                  {product.faqs.map((faq, i) => (
+                    <details
+                      key={i}
+                      className="group bg-[#1a1a1a] border border-white/[0.06] rounded-lg sm:rounded-xl overflow-hidden"
+                    >
+                      <summary className="flex items-center justify-between p-3 sm:p-4 cursor-pointer list-none hover:bg-[#222222] transition-colors">
+                        <span className="font-medium text-white pr-4 text-sm sm:text-base">{faq.question}</span>
+                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-500 group-open:rotate-180 transition-transform flex-shrink-0" />
+                      </summary>
+                      <div className="px-3 sm:px-4 pb-3 sm:pb-4 text-zinc-500 border-t border-white/[0.06] pt-3 sm:pt-4 text-sm">
+                        {faq.answer}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
-              {hasTags(product) && (
-                <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-3">
-                  {product.tags.slice(0, 4).map((tag, i) => (
+          {hasTags(product) && (
+            <div className="rounded-2xl border border-white/[0.08] p-3 bg-transparent mt-6">
+              <div className="rounded-xl bg-[#0f0f0f] p-4 sm:p-6">
+                <h2 className="text-lg font-bold text-white mb-3">Related Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {product.tags.map((tag, i) => (
                     <Link
                       key={i}
                       href={`/search?q=${encodeURIComponent(tag)}`}
-                      className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 bg-zinc-800/80 hover:bg-amber-500/20 text-zinc-400 hover:text-amber-500 text-[10px] sm:text-xs rounded transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-[#1a1a1a] hover:bg-amber-500/20 text-zinc-400 hover:text-amber-400 rounded-md sm:rounded-lg transition-colors text-xs sm:text-sm cursor-pointer border border-white/[0.06]"
                     >
-                      <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                      <Tag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       {tag}
                     </Link>
                   ))}
-                  {product.tags.length > 4 && (
-                    <span className="text-zinc-500 text-[10px] sm:text-xs px-1">+{product.tags.length - 4} more</span>
-                  )}
-                </div>
-              )}
-
-              <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                <div className="flex items-center gap-0.5 sm:gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(product.average_rating || 4.5) ? "text-yellow-500 fill-yellow-500" : "text-zinc-600"}`}
-                    />
-                  ))}
-                  <span className="text-zinc-400 ml-1">
-                    {product.average_rating?.toFixed(1) || "4.5"}
-                    <span className="hidden xs:inline"> ({product.review_count || 0})</span>
-                  </span>
                 </div>
               </div>
             </div>
-
-            {(product.publisher || product.developer) && (
-              <div className="flex flex-col xs:flex-row flex-wrap gap-2 xs:gap-4 text-xs sm:text-sm text-zinc-400 py-2 border-y border-zinc-800/50">
-                {product.publisher && (
-                  <div>
-                    <span className="text-zinc-500">Publisher:</span>{" "}
-                    <span className="text-white">{product.publisher}</span>
-                  </div>
-                )}
-                {product.developer && (
-                  <div>
-                    <span className="text-zinc-500">Developer:</span>{" "}
-                    <span className="text-white">{product.developer}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Client-side interactions component */}
-            <Suspense fallback={<div className="h-48 sm:h-64 bg-zinc-900 rounded-xl animate-pulse" />}>
-              <ProductInteractions product={product} initialPrice={initialPrice} />
-            </Suspense>
-
-            <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-4 border-t border-zinc-800">
-              <div className="flex flex-col items-center text-center p-2 sm:p-3 bg-zinc-900/50 rounded-lg">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mb-0.5 sm:mb-1" />
-                <span className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Secure Payment</span>
-              </div>
-              <div className="flex flex-col items-center text-center p-2 sm:p-3 bg-zinc-900/50 rounded-lg">
-                <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 mb-0.5 sm:mb-1" />
-                <span className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Instant Delivery</span>
-              </div>
-              <div className="flex flex-col items-center text-center p-2 sm:p-3 bg-zinc-900/50 rounded-lg">
-                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mb-0.5 sm:mb-1" />
-                <span className="text-[10px] sm:text-xs text-zinc-400 leading-tight">24/7 Support</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-
-        {product.description && (
-          <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-zinc-800">
-            <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Description</h2>
-            <ProductDescription content={product.description} />
-          </div>
-        )}
-
-        {hasFaqs(product) && (
-          <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-zinc-800">
-            <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
-              <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-              Frequently Asked Questions
-            </h2>
-            <div className="space-y-2 sm:space-y-3">
-              {product.faqs
-                .filter((faq) => faq?.is_active)
-                .map((faq, index) => (
-                  <details
-                    key={faq.id || index}
-                    className="group bg-zinc-900 border border-zinc-800 rounded-lg sm:rounded-xl overflow-hidden"
-                  >
-                    <summary className="flex items-center justify-between p-3 sm:p-4 cursor-pointer list-none hover:bg-zinc-800/50 transition-colors">
-                      <span className="font-medium text-white pr-4 text-sm sm:text-base">{faq.question}</span>
-                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 group-open:rotate-180 transition-transform flex-shrink-0" />
-                    </summary>
-                    <div className="px-3 sm:px-4 pb-3 sm:pb-4 text-zinc-400 border-t border-zinc-800 pt-3 sm:pt-4 text-sm">
-                      {faq.answer}
-                    </div>
-                  </details>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {hasTags(product) && product.tags.length > 4 && (
-          <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-zinc-800">
-            <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
-              <Tag className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-              Tags
-            </h2>
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {product.tags.map((tag, i) => (
-                <Link
-                  key={i}
-                  href={`/search?q=${encodeURIComponent(tag)}`}
-                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-zinc-800 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-500 rounded-md sm:rounded-lg transition-colors text-xs sm:text-sm cursor-pointer"
-                >
-                  <Tag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                  {tag}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )

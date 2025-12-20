@@ -92,7 +92,7 @@ const quickLinks = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-transparent">
       <PageHeader
         title="How It Works"
         description="Getting your favorite digital subscriptions is easy. Follow these simple steps to get started with OTTSewa."
@@ -102,42 +102,43 @@ export default function HowItWorksPage() {
       {/* Steps Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-8 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-6">
-            {steps.map((step, index) => (
-              <div key={step.number} className="relative">
-                {/* Connector line for desktop */}
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-16 left-[60%] w-full h-0.5">
-                    <div className="w-full h-full bg-gradient-to-r from-amber-500/50 to-transparent" />
-                    <ArrowRight className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500/50" />
-                  </div>
-                )}
+          <div className="rounded-2xl border border-white/[0.08] p-3">
+            <div className="bg-[#0f0f0f] rounded-xl p-4 sm:p-6">
+              <div className="space-y-8 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-6">
+                {steps.map((step, index) => (
+                  <div key={step.number} className="relative">
+                    {/* Connector line for desktop */}
+                    {index < steps.length - 1 && (
+                      <div className="hidden lg:block absolute top-16 left-[60%] w-full h-0.5">
+                        <div className="w-full h-full bg-gradient-to-r from-amber-500/50 to-transparent" />
+                        <ArrowRight className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500/50" />
+                      </div>
+                    )}
 
-                <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 hover:border-amber-500/30 transition-all h-full group">
-                  {/* Shine effect */}
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-6 hover:border-amber-500/20 transition-all h-full group">
+                      <div className="flex items-center gap-4 mb-4">
+                        <span className="text-5xl font-bold text-amber-500/20">{step.number}</span>
+                        <div className="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
+                          <step.icon className="w-7 h-7 text-amber-500" />
+                        </div>
+                      </div>
 
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="text-5xl font-bold text-amber-500/20">{step.number}</span>
-                    <div className="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
-                      <step.icon className="w-7 h-7 text-amber-500" />
+                      <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
+                      <p className="text-zinc-400 mb-4">{step.description}</p>
+
+                      <ul className="space-y-2">
+                        {step.tips.map((tip, tipIndex) => (
+                          <li key={tipIndex} className="flex items-start gap-2 text-sm text-zinc-500">
+                            <CheckCircle className="w-4 h-4 text-amber-500/60 flex-shrink-0 mt-0.5" />
+                            <span>{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-
-                  <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
-                  <p className="text-zinc-400 mb-4">{step.description}</p>
-
-                  <ul className="space-y-2">
-                    {step.tips.map((tip, tipIndex) => (
-                      <li key={tipIndex} className="flex items-start gap-2 text-sm text-zinc-500">
-                        <CheckCircle className="w-4 h-4 text-amber-500/60 flex-shrink-0 mt-0.5" />
-                        <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
@@ -167,30 +168,29 @@ export default function HowItWorksPage() {
       {/* CTA Section */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 sm:p-12 text-center overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl" />
-
-            <div className="relative">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
-              <p className="text-zinc-400 mb-8 max-w-xl mx-auto">
-                Browse our collection of digital subscriptions and get instant access to your favorite platforms. Join
-                thousands of happy customers today!
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link
-                  href="/category"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold px-8 py-3 rounded-lg transition-all shadow-lg shadow-amber-500/20"
-                >
-                  Browse Products
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-8 py-3 rounded-lg transition-all border border-zinc-700"
-                >
-                  Contact Support
-                </Link>
+          <div className="rounded-2xl border border-white/[0.08] p-3">
+            <div className="bg-[#0f0f0f] rounded-xl p-4 sm:p-6">
+              <div className="relative">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
+                <p className="text-zinc-400 mb-8 max-w-xl mx-auto">
+                  Browse our collection of digital subscriptions and get instant access to your favorite platforms. Join
+                  thousands of happy customers today!
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Link
+                    href="/category"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold px-8 py-3 rounded-lg transition-all shadow-lg shadow-amber-500/20"
+                  >
+                    Browse Products
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-8 py-3 rounded-lg transition-all border border-zinc-700"
+                  >
+                    Contact Support
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
