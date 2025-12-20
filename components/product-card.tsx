@@ -3,7 +3,7 @@
 import type React from "react"
 import { Heart, Eye, Star, Flame, Sparkles, TrendingUp, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { useWishlist } from "@/contexts/wishlist-context"
 import type { Product } from "@/lib/products"
 
@@ -29,6 +29,12 @@ function getDaysRemaining(createdAt: string, totalDays = 7): number {
   return Math.max(0, Math.ceil(totalDays - diffDays))
 }
 
+function getPriceValidUntil(): string {
+  const date = new Date()
+  date.setDate(date.getDate() + 30)
+  return date.toISOString().split("T")[0]
+}
+
 export default function ProductCard({ product, index = 0, showTags = true }: ProductCardProps) {
   const { isInWishlist, addItem, removeItem } = useWishlist()
   const router = useRouter()
@@ -40,7 +46,53 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
   const showNewLabel = product.is_new && isNewProduct(product.created_at, 7)
   const daysRemaining = showNewLabel ? getDaysRemaining(product.created_at, 7) : 0
   const showBestsellerLabel = product.is_bestseller
-  const showFeaturedLabel = product.is_featured && !showBestsellerLabel // Don't show both
+  const showFeaturedLabel = product.is_featured && !showBestsellerLabel
+
+  const jsonLd = useMemo(() => {
+    const priceValue = Math.round(discountedPrice * 100) / 100
+    const hasRating = product.average_rating > 0
+    const hasReviews = product.review_count > 0
+
+    const structuredData: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.title,
+      image: product.image_url || product.thumbnail_url || "https://ottsewa.store/placeholder.svg",
+      description: product.short_description || `Buy ${product.title} at best price in Nepal`,
+      sku: product.id,
+      brand: {
+        "@type": "Brand",
+        name: product.platforms?.[0]?.name || "OTTSewa",
+      },
+      category: product.product_type,
+      offers: {
+        "@type": "Offer",
+        url: `https://ottsewa.store/product/${product.slug}`,
+        priceCurrency: "NPR",
+        price: priceValue.toFixed(2),
+        priceValidUntil: getPriceValidUntil(),
+        availability: product.is_active ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        itemCondition: "https://schema.org/NewCondition",
+        seller: {
+          "@type": "Organization",
+          name: "OTTSewa",
+          url: "https://ottsewa.store",
+        },
+      },
+    }
+
+    if (hasRating && hasReviews) {
+      structuredData.aggregateRating = {
+        "@type": "AggregateRating",
+        ratingValue: product.average_rating.toFixed(1),
+        reviewCount: product.review_count,
+        bestRating: "5",
+        worstRating: "1",
+      }
+    }
+
+    return structuredData
+  }, [product, discountedPrice])
 
   const handleProductHover = useCallback(() => {
     router.prefetch(`/product/${product.slug}`)
@@ -73,14 +125,14 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
   }
 
   return (
-    <li itemScope itemType="https://schema.org/Product" itemProp="itemListElement">
-      {index !== undefined && <meta itemProp="position" content={String(index + 1)} />}
+    <li>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
       <a
         href={`/product/${product.slug}`}
         onClick={handleProductClick}
         onMouseEnter={handleProductHover}
         className="group relative overflow-hidden rounded-xl bg-zinc-900/50 border border-amber-500/[0.08] transition-all duration-200 hover:border-amber-500/20 flex flex-col cursor-pointer h-full"
-        itemProp="url"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/15 to-transparent z-10" />
 
@@ -89,7 +141,6 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
             src={product.image_url || product.thumbnail_url || "/placeholder.svg"}
             alt={product.title}
             loading="lazy"
-            itemProp="image"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -154,24 +205,17 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
 
           {/* Platform/type banner */}
           <div className="absolute bottom-0 left-0 right-0 bg-zinc-900/90 backdrop-blur-sm text-white px-3 py-1.5 text-xs font-medium text-center border-t border-white/[0.06]">
-            <span itemProp="category">{product.platforms?.[0]?.name || product.product_type.toUpperCase()}</span>
+            <span>{product.platforms?.[0]?.name || product.product_type.toUpperCase()}</span>
           </div>
         </div>
 
         <div className="p-3 flex flex-col flex-grow bg-gradient-to-b from-amber-500/[0.02] to-transparent">
-          <h3
-            className="text-xs sm:text-sm font-medium text-white mb-1 line-clamp-2 leading-tight min-h-[2rem]"
-            itemProp="name"
-          >
+          <h3 className="text-xs sm:text-sm font-medium text-white mb-1 line-clamp-2 leading-tight min-h-[2rem]">
             {product.title}
           </h3>
 
           <div className="text-[10px] text-zinc-500 font-medium mb-2 uppercase tracking-wider">
-            <span itemProp="offers" itemScope itemType="https://schema.org/Offer">
-              <meta itemProp="availability" content="https://schema.org/InStock" />
-              <meta itemProp="priceCurrency" content="NPR" />
-              <span itemProp="eligibleRegion">{product.region || "GLOBAL"}</span>
-            </span>
+            {product.region || "GLOBAL"}
           </div>
 
           {/* Rating */}
@@ -199,7 +243,7 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
             </div>
           )}
 
-          <div className="space-y-1 mb-3" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+          <div className="space-y-1 mb-3">
             <div className="text-[10px] text-zinc-600 uppercase tracking-wide">From</div>
             {product.discount_percent > 0 && (
               <div className="flex items-center gap-2">
@@ -209,10 +253,7 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
                 </span>
               </div>
             )}
-            <div className="text-lg sm:text-xl font-semibold text-white" itemProp="price">
-              NPR {discountedPrice.toFixed(0)}
-            </div>
-            <meta itemProp="priceCurrency" content="NPR" />
+            <div className="text-lg sm:text-xl font-semibold text-white">NPR {discountedPrice.toFixed(0)}</div>
           </div>
 
           <div className="flex items-center gap-1 text-zinc-600 text-[10px] mb-3">

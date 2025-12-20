@@ -1,6 +1,6 @@
 "use client"
 import { Info, ChevronRight, AlertCircle, RefreshCw } from "lucide-react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { getProducts, type Product } from "@/lib/products"
 import { appCache, CACHE_TTL, STALE_TTL, CACHE_KEYS } from "@/lib/cache"
@@ -11,6 +11,23 @@ export default function RecommendedSection() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+
+  const itemListJsonLd = useMemo(() => {
+    if (products.length === 0) return null
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Recommended Products",
+      description: "Handpicked streaming subscriptions and digital products recommended for you",
+      numberOfItems: products.length,
+      itemListElement: products.map((product, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `https://ottsewa.store/product/${product.slug}`,
+      })),
+    }
+  }, [products])
 
   const fetchProducts = useCallback(async () => {
     const cacheKey = CACHE_KEYS.HOME_PRODUCTS
@@ -117,14 +134,10 @@ export default function RecommendedSection() {
     <section
       className="px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative overflow-hidden"
       aria-labelledby="recommended-heading"
-      itemScope
-      itemType="https://schema.org/ItemList"
     >
-      <meta itemProp="name" content="Recommended Products" />
-      <meta
-        itemProp="description"
-        content="Handpicked streaming subscriptions and digital products recommended for you"
-      />
+      {itemListJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      )}
 
       <div className="max-w-7xl mx-auto relative">
         <div className="flex items-center justify-between mb-8">
