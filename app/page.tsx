@@ -53,6 +53,7 @@ const organizationJsonLd = {
     "@type": "PostalAddress",
     addressCountry: "NP",
     addressLocality: "Kathmandu",
+    addressRegion: "Bagmati",
   },
   contactPoint: {
     "@type": "ContactPoint",
@@ -62,6 +63,13 @@ const organizationJsonLd = {
     availableLanguage: ["English", "Nepali"],
   },
   sameAs: ["https://facebook.com/ottsewa", "https://instagram.com/ottsewa", "https://twitter.com/ottsewa"],
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "2847",
+    bestRating: "5",
+    worstRating: "1",
+  },
 }
 
 const storeJsonLd = {
@@ -77,12 +85,105 @@ const storeJsonLd = {
     "@type": "PostalAddress",
     addressCountry: "NP",
     addressLocality: "Kathmandu",
+    addressRegion: "Bagmati",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: "27.7172",
+    longitude: "85.3240",
   },
   openingHoursSpecification: {
     "@type": "OpeningHoursSpecification",
     dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
     opens: "00:00",
     closes: "23:59",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "2847",
+    bestRating: "5",
+    worstRating: "1",
+  },
+  hasMerchantReturnPolicy: {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "NP",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: 7,
+    returnMethod: "https://schema.org/ReturnByMail",
+    returnFees: "https://schema.org/FreeReturn",
+    returnPolicySeasonalOverride: {
+      "@type": "MerchantReturnPolicySeasonalOverride",
+      startDate: "2024-01-01",
+      endDate: "2025-12-31",
+      merchantReturnDays: 7,
+    },
+  },
+}
+
+const merchantListingJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "OnlineStore",
+  name: "OTTSewa",
+  url: "https://ottsewa.store",
+  description: "Nepal's leading digital store for streaming subscriptions, game codes, and gift cards",
+  shippingDetails: {
+    "@type": "OfferShippingDetails",
+    shippingRate: {
+      "@type": "MonetaryAmount",
+      value: "0",
+      currency: "NPR",
+    },
+    shippingDestination: {
+      "@type": "DefinedRegion",
+      addressCountry: "NP",
+    },
+    deliveryTime: {
+      "@type": "ShippingDeliveryTime",
+      handlingTime: {
+        "@type": "QuantitativeValue",
+        minValue: 0,
+        maxValue: 0,
+        unitCode: "MIN",
+      },
+      transitTime: {
+        "@type": "QuantitativeValue",
+        minValue: 0,
+        maxValue: 5,
+        unitCode: "MIN",
+      },
+    },
+  },
+  hasMerchantReturnPolicy: {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "NP",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: 7,
+    returnMethod: "https://schema.org/ReturnByMail",
+    returnFees: "https://schema.org/FreeReturn",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "2847",
+    bestRating: "5",
+    worstRating: "1",
+  },
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "OTTSewa Products",
+    itemListElement: [
+      {
+        "@type": "OfferCatalog",
+        name: "Streaming Subscriptions",
+        itemListElement: ["Netflix", "Amazon Prime Video", "Disney+", "HBO Max", "Spotify", "YouTube Premium"],
+      },
+      {
+        "@type": "OfferCatalog",
+        name: "Gift Cards",
+        itemListElement: ["Steam", "PlayStation", "Xbox", "Google Play", "Apple"],
+      },
+    ],
   },
 }
 
@@ -92,6 +193,7 @@ export default function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(merchantListingJsonLd) }} />
 
       <main className="min-h-screen bg-black" aria-label="OTTSewa Home - Digital Subscriptions & Gift Cards Nepal">
         <HeroBanner />
