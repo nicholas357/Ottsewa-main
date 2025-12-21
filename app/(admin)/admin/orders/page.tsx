@@ -63,7 +63,7 @@ interface Order {
   license_duration: string | null
   platform_id: string | null
   product?: { id: string; title: string; slug: string; image_url: string; product_type: string } | null
-  user?: { id: string; email: string; full_name: string; phone: string } | null
+  user?: { id: string; email: string; full_name: string } | null
   edition_name?: string | null
   denomination_value?: number | null
   denomination_currency?: string | null
@@ -113,7 +113,7 @@ export default function AdminOrdersPage() {
             ? supabase.from("products").select("id, title, slug, image_url, product_type").in("id", productIds)
             : { data: [] },
           userIds.length > 0
-            ? supabase.from("profiles").select("id, email, full_name, phone").in("id", userIds)
+            ? supabase.from("profiles").select("id, email, full_name").in("id", userIds)
             : { data: [] },
           editionIds.length > 0 ? supabase.from("game_editions").select("id, name").in("id", editionIds) : { data: [] },
           denominationIds.length > 0
@@ -661,7 +661,7 @@ export default function AdminOrdersPage() {
                 </div>
 
                 {selectedOrder.notes && (
-                  <div className="p-3 bg-zinc-800/30 rounded-lg">
+                  <div className="p-3 bg-zinc-800/50 rounded-lg">
                     <p className="text-zinc-500 text-xs mb-1">Customer Notes</p>
                     <p className="text-white text-sm">{selectedOrder.notes}</p>
                   </div>
@@ -698,10 +698,6 @@ export default function AdminOrdersPage() {
                       <div className="p-3 bg-zinc-800/50 rounded-lg">
                         <p className="text-zinc-500 text-xs mb-1">Email Address</p>
                         <p className="text-white text-sm break-all">{selectedOrder.user?.email || "Not provided"}</p>
-                      </div>
-                      <div className="p-3 bg-zinc-800/50 rounded-lg">
-                        <p className="text-zinc-500 text-xs mb-1">Phone Number</p>
-                        <p className="text-white text-sm">{selectedOrder.user?.phone || "Not provided"}</p>
                       </div>
                       <div className="p-3 bg-zinc-800/50 rounded-lg">
                         <p className="text-zinc-500 text-xs mb-1">Customer ID</p>
