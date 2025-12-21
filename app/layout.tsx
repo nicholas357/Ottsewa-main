@@ -15,6 +15,7 @@ import { PageTransition } from "@/components/page-transition"
 import { RouteTransitionBar } from "@/components/route-transition"
 import { ScrollToTopButton } from "@/components/scroll-to-top-button"
 import { BlendBackground } from "@/components/blend-background"
+import { OfferBanner } from "@/components/offer-banner"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -144,6 +145,7 @@ export default function RootLayout({
               Skip to main content
             </a>
             <div className="relative flex flex-col min-h-screen">
+              <OfferBanner />
               <Header />
               <div id="main-content" className="flex-1 pb-20 lg:pb-0">
                 <PageTransition>{children}</PageTransition>
