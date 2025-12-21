@@ -5,7 +5,6 @@ import { Shield, Zap, Clock, ChevronRight, Tag, ChevronDown, Home } from "lucide
 import { getProductBySlug, type Product } from "@/lib/products"
 import { ProductDescription } from "@/components/product-description"
 import { ProductInteractions } from "@/components/product-interactions"
-import { createClient } from "@/lib/supabase/server"
 
 // Platform Icons
 const PCIcon = () => (
@@ -146,41 +145,7 @@ type ProductSchema = {
   additionalProperty?: Array<{ "@type": string; name: string; value: string }>
 }
 
-type FlashDeal = {
-  id: string
-  product_id: string
-  discount_percentage: number
-  start_time: string
-  end_time: string
-  is_active: boolean
-}
-
-async function getFlashDealForProduct(productId: string): Promise<FlashDeal | null> {
-  try {
-    const supabase = await createClient()
-    const now = new Date().toISOString()
-
-    const { data, error } = await supabase
-      .from("flash_deals")
-      .select("id, product_id, discount_percentage, start_time, end_time, is_active")
-      .eq("product_id", productId)
-      .eq("is_active", true)
-      .lte("start_time", now)
-      .gt("end_time", now)
-      .limit(1)
-
-    if (error || !data || data.length === 0) {
-      return null
-    }
-
-    return data[0] as FlashDeal
-  } catch (error) {
-    // Silently fail - flash deals are optional
-    return null
-  }
-}
-
-function generateProductSchema(product: Product, baseUrl: string, flashDeal?: FlashDeal | null): ProductSchema {
+function generateProductSchema(product: Product, baseUrl: string): ProductSchema {
   // Calculate price
   let price = product.base_price || 0
   if (product.product_type === "game" && product.editions?.length) {
@@ -192,15 +157,9 @@ function generateProductSchema(product: Product, baseUrl: string, flashDeal?: Fl
     price = firstDuration?.price || product.base_price || 0
   }
 
-  // Apply product discount if exists
+  // Apply discount if exists
   if (product.discount_percent && product.discount_percent > 0) {
     price = price * (1 - product.discount_percent / 100)
-  }
-
-  const originalPrice = Math.floor(price)
-
-  if (flashDeal && flashDeal.discount_percentage > 0) {
-    price = price * (1 - flashDeal.discount_percentage / 100)
   }
 
   const cleanPrice = Math.floor(price)
@@ -248,9 +207,7 @@ function generateProductSchema(product: Product, baseUrl: string, flashDeal?: Fl
         name: "OTTSewa",
       },
       url: `${baseUrl}/product/${product.slug}`,
-      priceValidUntil: flashDeal
-        ? new Date(flashDeal.end_time).toISOString().split("T")[0]
-        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",
         applicableCountry: "NP",
@@ -384,23 +341,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return { title: "Product Not Found" }
   }
 
-  const flashDeal = await getFlashDealForProduct(product.id)
-
-  let price = product.base_price || 0
-  if (product.discount_percent && product.discount_percent > 0) {
-    price = price * (1 - product.discount_percent / 100)
-  }
-  if (flashDeal && flashDeal.discount_percentage > 0) {
-    price = price * (1 - flashDeal.discount_percentage / 100)
-  }
-  const displayPrice = Math.floor(price)
-
-  const flashDealText = flashDeal ? ` FLASH DEAL: ${flashDeal.discount_percentage}% OFF!` : ""
   const title = product.meta_title || `${product.title} - Buy at Best Price in Nepal | OTTSewa`
   const description =
     product.meta_description ||
     product.short_description ||
-    `Buy ${product.title} at NPR ${displayPrice.toLocaleString()}.${flashDealText} Instant delivery, secure payment. ${product.category?.name || "Digital product"} available at OTTSewa.`
+    `Buy ${product.title} at best price in Nepal. Instant delivery, secure payment. ${product.category?.name || "Digital product"} available at OTTSewa.`
   const images = product.image_url ? [product.image_url] : []
 
   // Generate keywords from product data
@@ -465,8 +410,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.ottsewa.store"
-  const flashDeal = await getFlashDealForProduct(product.id)
-  const productSchema = generateProductSchema(product, baseUrl, flashDeal)
+  const productSchema = generateProductSchema(product, baseUrl)
   const breadcrumbSchema = generateBreadcrumbSchema(product, baseUrl)
 
   return (
@@ -550,11 +494,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   {product.discount_percent && product.discount_percent > 0 && (
                     <div className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-gradient-to-r from-amber-400 to-amber-500 text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg font-bold text-xs sm:text-sm">
                       -{product.discount_percent}%
-                    </div>
-                  )}
-                  {flashDeal && flashDeal.discount_percentage > 0 && (
-                    <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-gradient-to-r from-red-500 to-red-600 text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg font-bold text-xs sm:text-sm">
-                      -{flashDeal.discount_percentage}%
                     </div>
                   )}
                 </div>

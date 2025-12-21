@@ -10,7 +10,6 @@ import { Toaster } from "@/components/ui/toaster"
 import { NotificationProvider } from "@/components/notification-provider"
 import { CartProvider } from "@/contexts/cart-context"
 import { WishlistProvider } from "@/contexts/wishlist-context"
-import { FlashDealProvider } from "@/contexts/flash-deal-context"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { PageTransition } from "@/components/page-transition"
@@ -18,7 +17,6 @@ import { RouteTransitionBar } from "@/components/route-transition"
 import { ScrollToTopButton } from "@/components/scroll-to-top-button"
 import { BlendBackground } from "@/components/blend-background"
 import { OfferBanner } from "@/components/offer-banner"
-import { FlashDealBanner } from "@/components/flash-deal-banner"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -137,33 +135,30 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased bg-[#121212]`}>
         <BlendBackground />
-        <FlashDealProvider>
-          <WishlistProvider>
-            <CartProvider>
-              <RouteTransitionBar />
-              <ScrollToTop />
-              <a
-                href="#main-content"
-                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-black focus:rounded-lg"
-              >
-                Skip to main content
-              </a>
-              <div className="relative flex flex-col min-h-screen">
-                <OfferBanner />
-                <Header />
-                <div id="main-content" className="flex-1 pb-20 lg:pb-0">
-                  <PageTransition>{children}</PageTransition>
-                </div>
-                <Footer />
+        <WishlistProvider>
+          <CartProvider>
+            <RouteTransitionBar />
+            <ScrollToTop />
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-black focus:rounded-lg"
+            >
+              Skip to main content
+            </a>
+            <div className="relative flex flex-col min-h-screen">
+              <OfferBanner />
+              <Header />
+              <div id="main-content" className="flex-1 pb-20 lg:pb-0">
+                <PageTransition>{children}</PageTransition>
               </div>
-              <MobileBottomNav />
-              <FlashDealBanner />
-              <ScrollToTopButton />
-              <NotificationProvider />
-              <Toaster />
-            </CartProvider>
-          </WishlistProvider>
-        </FlashDealProvider>
+              <Footer />
+            </div>
+            <MobileBottomNav />
+            <ScrollToTopButton />
+            <NotificationProvider />
+            <Toaster />
+          </CartProvider>
+        </WishlistProvider>
         <Analytics />
         <SpeedInsights />
       </body>
