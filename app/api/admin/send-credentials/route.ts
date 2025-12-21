@@ -4,6 +4,13 @@ import { NextResponse } from "next/server"
 
 const resend = new Resend("re_Yfq7nnEB_H228tgtSSvDTFVJECH2iRcpL")
 
+interface ProductInfo {
+  name: string
+  planName?: string
+  durationMonths?: number
+  amount: number
+}
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
@@ -25,17 +32,40 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { orderId, customerEmail, customerName, productName, credentials, additionalNotes } = body
+    const { orderId, orderIds, customerEmail, customerName, productName, products, credentials, additionalNotes } = body
 
-    if (!orderId || !customerEmail || !productName || !credentials) {
+    // Support backwards compatibility
+    const allOrderIds: string[] = orderIds || (orderId ? [orderId] : [])
+    const allProducts: ProductInfo[] = products || (productName ? [{ name: productName, amount: 0 }] : [])
+
+    if (allOrderIds.length === 0 || !customerEmail || allProducts.length === 0 || !credentials) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
+
+    const totalAmount = allProducts.reduce((sum, p) => sum + (p.amount || 0), 0)
+
+    const productsHtml = allProducts
+      .map(
+        (p) => `
+        <tr>
+          <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <span style="color: #fff; font-weight: 500;">${p.name}</span>
+            ${p.planName ? `<br><span style="color: #a1a1aa; font-size: 13px;">Plan: ${p.planName}</span>` : ""}
+            ${p.durationMonths ? `<br><span style="color: #71717a; font-size: 12px;">${p.durationMonths} months</span>` : ""}
+          </td>
+          <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right;">
+            <span style="color: #f59e0b; font-weight: 600;">NPR ${p.amount?.toLocaleString() || "0"}</span>
+          </td>
+        </tr>
+      `,
+      )
+      .join("")
 
     // Send email via Resend
     const { data, error } = await resend.emails.send({
       from: "OTTSewa Support <support@ottsewa.store>",
       to: customerEmail,
-      subject: `Your Order Credentials - ${productName}`,
+      subject: `Your Order Credentials - ${allProducts.length > 1 ? `${allProducts.length} Products` : allProducts[0].name}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -61,8 +91,30 @@ export async function POST(request: Request) {
                     <td style="padding: 40px 32px;">
                       <h2 style="margin: 0 0 8px; color: #fff; font-size: 24px; font-weight: 600;">Hello ${customerName || "Valued Customer"}!</h2>
                       <p style="margin: 0 0 32px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">
-                        Thank you for your purchase. Your order credentials for <strong style="color: #f59e0b;">${productName}</strong> are ready.
+                        Thank you for your purchase. Your order credentials for <strong style="color: #f59e0b;">${allProducts.length > 1 ? `${allProducts.length} products` : allProducts[0].name}</strong> are ready.
                       </p>
+                      
+                      <!-- Order Summary -->
+                      <div style="background-color: #0f0f0f; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                        <h3 style="margin: 0 0 16px; color: #f59e0b; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Order Summary</h3>
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                          ${productsHtml}
+                          ${
+                            allProducts.length > 1
+                              ? `
+                          <tr>
+                            <td style="padding: 16px 0 0;">
+                              <span style="color: #a1a1aa; font-weight: 500;">Total</span>
+                            </td>
+                            <td style="padding: 16px 0 0; text-align: right;">
+                              <span style="color: #f59e0b; font-weight: 700; font-size: 18px;">NPR ${totalAmount.toLocaleString()}</span>
+                            </td>
+                          </tr>
+                          `
+                              : ""
+                          }
+                        </table>
+                      </div>
                       
                       <!-- Credentials Box -->
                       <div style="background-color: #0f0f0f; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
@@ -85,7 +137,7 @@ export async function POST(request: Request) {
                       <!-- Order Info -->
                       <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; margin-top: 24px;">
                         <p style="margin: 0; color: #71717a; font-size: 13px;">
-                          <strong style="color: #a1a1aa;">Order ID:</strong> ${orderId}
+                          <strong style="color: #a1a1aa;">Order ID${allOrderIds.length > 1 ? "s" : ""}:</strong> ${allOrderIds.map((id) => id.slice(0, 8)).join(", ")}
                         </p>
                       </div>
                     </td>
@@ -119,7 +171,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to send email" }, { status: 500 })
     }
 
-    // Update order status to completed and add note about credentials sent
     await supabase
       .from("orders")
       .update({
@@ -127,9 +178,9 @@ export async function POST(request: Request) {
         notes: `Credentials sent on ${new Date().toLocaleString()}`,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", orderId)
+      .in("id", allOrderIds)
 
-    return NextResponse.json({ success: true, messageId: data?.id })
+    return NextResponse.json({ success: true, messageId: data?.id, ordersUpdated: allOrderIds.length })
   } catch (error) {
     console.error("Send credentials error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

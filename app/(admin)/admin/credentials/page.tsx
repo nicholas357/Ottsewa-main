@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import Image from "next/image"
 import {
   Mail,
@@ -16,9 +16,7 @@ import {
   Check,
   Eye,
   X,
-  Calendar,
   CreditCard,
-  FileText,
   Filter,
   RefreshCw,
   ChevronDown,
@@ -26,6 +24,7 @@ import {
   AlertTriangle,
   Sparkles,
   ExternalLink,
+  Layers,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -54,6 +53,16 @@ interface Order {
   notes?: string | null
 }
 
+interface OrderGroup {
+  key: string
+  userId: string
+  userEmail: string
+  userName: string
+  timestamp: string
+  orders: Order[]
+  totalAmount: number
+}
+
 type StatusFilter = "all" | "pending" | "processing" | "completed" | "cancelled"
 type PaymentFilter = "all" | "approved" | "pending" | "rejected"
 
@@ -61,7 +70,7 @@ export default function AdminCredentialsPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [selectedOrders, setSelectedOrders] = useState<Order[]>([])
   const [credentials, setCredentials] = useState("")
   const [additionalNotes, setAdditionalNotes] = useState("")
   const [sending, setSending] = useState(false)
@@ -70,20 +79,17 @@ export default function AdminCredentialsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all")
   const [showFilters, setShowFilters] = useState(false)
-  const [lastSentOrder, setLastSentOrder] = useState<string | null>(null)
+  const [lastSentOrders, setLastSentOrders] = useState<string[]>([])
+  const [viewMode, setViewMode] = useState<"individual" | "grouped">("grouped")
 
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true)
-
       const response = await fetch("/api/admin/orders")
-
       if (!response.ok) {
         throw new Error("Failed to fetch orders")
       }
-
       const data = await response.json()
-
       setOrders(data.orders || [])
     } catch (error) {
       console.error("Error fetching orders:", error)
@@ -97,15 +103,42 @@ export default function AdminCredentialsPage() {
     fetchOrders()
   }, [fetchOrders])
 
+  const groupedOrders = useMemo(() => {
+    const groups: OrderGroup[] = []
+    const sortedOrders = [...orders].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+    sortedOrders.forEach((order) => {
+      const orderTime = new Date(order.created_at).getTime()
+
+      // Find existing group for this user within 60 seconds
+      const existingGroup = groups.find((g) => {
+        if (g.userId !== order.user_id) return false
+        const groupTime = new Date(g.timestamp).getTime()
+        return Math.abs(orderTime - groupTime) < 60000 // 60 seconds
+      })
+
+      if (existingGroup) {
+        existingGroup.orders.push(order)
+        existingGroup.totalAmount += order.amount
+      } else {
+        groups.push({
+          key: `${order.user_id}-${order.created_at}`,
+          userId: order.user_id,
+          userEmail: order.user?.email || "Unknown",
+          userName: order.user?.full_name || "Unknown",
+          timestamp: order.created_at,
+          orders: [order],
+          totalAmount: order.amount,
+        })
+      }
+    })
+
+    return groups
+  }, [orders])
+
   const filteredOrders = orders.filter((order) => {
-    if (statusFilter !== "all" && order.status !== statusFilter) {
-      return false
-    }
-
-    if (paymentFilter !== "all" && order.payment_proof_status !== paymentFilter) {
-      return false
-    }
-
+    if (statusFilter !== "all" && order.status !== statusFilter) return false
+    if (paymentFilter !== "all" && order.payment_proof_status !== paymentFilter) return false
     const searchLower = searchQuery.toLowerCase()
     if (searchLower) {
       return (
@@ -115,19 +148,52 @@ export default function AdminCredentialsPage() {
         order.user?.full_name?.toLowerCase().includes(searchLower)
       )
     }
-
     return true
   })
 
+  const filteredGroups = groupedOrders.filter((group) => {
+    // Check if any order in the group matches filters
+    const hasMatchingOrder = group.orders.some((order) => {
+      if (statusFilter !== "all" && order.status !== statusFilter) return false
+      if (paymentFilter !== "all" && order.payment_proof_status !== paymentFilter) return false
+      return true
+    })
+    if (!hasMatchingOrder) return false
+
+    const searchLower = searchQuery.toLowerCase()
+    if (searchLower) {
+      return (
+        group.orders.some((o) => o.id.toLowerCase().includes(searchLower)) ||
+        group.orders.some((o) => o.product?.title?.toLowerCase().includes(searchLower)) ||
+        group.userEmail.toLowerCase().includes(searchLower) ||
+        group.userName.toLowerCase().includes(searchLower)
+      )
+    }
+    return true
+  })
+
+  const handleSelectGroup = (group: OrderGroup) => {
+    setSelectedOrders(group.orders)
+    setCredentials("")
+    setAdditionalNotes("")
+  }
+
+  const handleSelectOrder = (order: Order) => {
+    setSelectedOrders([order])
+    setCredentials("")
+    setAdditionalNotes("")
+  }
+
   const handleSendCredentials = async () => {
-    if (!selectedOrder || !credentials.trim()) {
+    if (selectedOrders.length === 0 || !credentials.trim()) {
       toast.error("Please enter credentials")
       return
     }
 
-    if (selectedOrder.payment_proof_status !== "approved") {
-      toast.warning("Warning: This order's payment is not approved yet", {
-        description: "Are you sure you want to send credentials?",
+    const hasUnapproved = selectedOrders.some((o) => o.payment_proof_status !== "approved")
+    if (hasUnapproved) {
+      toast.warning("Warning: Some orders have unapproved payments", {
+        description: "Make sure to verify payment before sending credentials.",
         duration: 5000,
       })
     }
@@ -138,12 +204,15 @@ export default function AdminCredentialsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderId: selectedOrder.id,
-          customerEmail: selectedOrder.user?.email,
-          customerName: selectedOrder.user?.full_name,
-          productName: selectedOrder.product?.title,
-          planName: selectedOrder.plan_name,
-          durationMonths: selectedOrder.duration_months,
+          orderIds: selectedOrders.map((o) => o.id),
+          customerEmail: selectedOrders[0].user?.email,
+          customerName: selectedOrders[0].user?.full_name,
+          products: selectedOrders.map((o) => ({
+            name: o.product?.title,
+            planName: o.plan_name,
+            durationMonths: o.duration_months,
+            amount: o.amount,
+          })),
           credentials: credentials.trim(),
           additionalNotes: additionalNotes.trim() || undefined,
         }),
@@ -155,19 +224,18 @@ export default function AdminCredentialsPage() {
         throw new Error(data.error || "Failed to send credentials")
       }
 
-      setLastSentOrder(selectedOrder.id)
+      setLastSentOrders(selectedOrders.map((o) => o.id))
       toast.success("Credentials sent successfully!", {
-        description: `Email sent to ${selectedOrder.user?.email}`,
+        description: `Email sent to ${selectedOrders[0].user?.email} for ${selectedOrders.length} product(s)`,
         duration: 5000,
       })
-      setSelectedOrder(null)
+      setSelectedOrders([])
       setCredentials("")
       setAdditionalNotes("")
       setShowPreview(false)
       fetchOrders()
 
-      // Clear last sent indicator after 10 seconds
-      setTimeout(() => setLastSentOrder(null), 10000)
+      setTimeout(() => setLastSentOrders([]), 10000)
     } catch (error) {
       console.error("Error sending credentials:", error)
       toast.error(error instanceof Error ? error.message : "Failed to send credentials", {
@@ -230,6 +298,8 @@ export default function AdminCredentialsPage() {
     return o.status === "completed" && new Date(o.created_at).toDateString() === today
   }).length
 
+  const selectedTotalAmount = selectedOrders.reduce((sum, o) => sum + o.amount, 0)
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 bg-transparent min-h-screen">
       {/* Header */}
@@ -250,6 +320,7 @@ export default function AdminCredentialsPage() {
         </div>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="rounded-2xl border border-white/[0.08] p-3">
           <div className="bg-[#0f0f0f] rounded-xl p-4 flex items-center gap-4">
@@ -286,13 +357,14 @@ export default function AdminCredentialsPage() {
         </div>
       </div>
 
+      {/* Info Banner */}
       <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 mb-6 flex items-start gap-3">
         <Info className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
         <div>
           <p className="text-amber-500 font-medium text-sm">How to Send Credentials</p>
           <p className="text-zinc-400 text-sm mt-1">
-            1. Select an order from the list on the left. 2. Enter the login credentials for the product. 3. Add any
-            additional notes if needed. 4. Preview the email and send it to the customer.
+            Select orders from the list (grouped orders from same user are shown together). Enter credentials and
+            preview before sending. Multiple products ordered together will be sent in one email.
           </p>
         </div>
       </div>
@@ -307,9 +379,30 @@ export default function AdminCredentialsPage() {
                 Orders
               </h2>
               <div className="flex items-center gap-2">
-                <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20">
-                  {filteredOrders.length} orders
-                </Badge>
+                <div className="flex items-center rounded-lg border border-white/[0.08] overflow-hidden">
+                  <button
+                    onClick={() => setViewMode("grouped")}
+                    className={`px-3 py-1.5 text-xs transition-colors ${
+                      viewMode === "grouped"
+                        ? "bg-amber-500/20 text-amber-500"
+                        : "bg-[#1a1a1a] text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5 inline mr-1" />
+                    Grouped
+                  </button>
+                  <button
+                    onClick={() => setViewMode("individual")}
+                    className={`px-3 py-1.5 text-xs transition-colors ${
+                      viewMode === "individual"
+                        ? "bg-amber-500/20 text-amber-500"
+                        : "bg-[#1a1a1a] text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    <Package className="w-3.5 h-3.5 inline mr-1" />
+                    Individual
+                  </button>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -398,14 +491,132 @@ export default function AdminCredentialsPage() {
               />
             </div>
 
-            {/* Orders */}
+            {/* Orders List */}
             <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-3" />
                   <p className="text-zinc-400 text-sm">Loading orders...</p>
                 </div>
-              ) : filteredOrders.length === 0 ? (
+              ) : viewMode === "grouped" ? (
+                filteredGroups.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Package className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
+                    <p className="text-zinc-400">No orders found</p>
+                    <p className="text-zinc-500 text-sm mt-1">Try adjusting your filters</p>
+                  </div>
+                ) : (
+                  filteredGroups.map((group) => {
+                    const isSelected =
+                      selectedOrders.length > 0 &&
+                      selectedOrders[0].user_id === group.userId &&
+                      Math.abs(new Date(selectedOrders[0].created_at).getTime() - new Date(group.timestamp).getTime()) <
+                        60000
+                    const wasRecentlySent = group.orders.some((o) => lastSentOrders.includes(o.id))
+                    const allApproved = group.orders.every((o) => o.payment_proof_status === "approved")
+                    const allCompleted = group.orders.every((o) => o.status === "completed")
+
+                    return (
+                      <div
+                        key={group.key}
+                        onClick={() => handleSelectGroup(group)}
+                        className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                          wasRecentlySent
+                            ? "bg-green-500/10 border-green-500/30 ring-2 ring-green-500/20"
+                            : isSelected
+                              ? "bg-amber-500/10 border-amber-500/30"
+                              : "bg-[#1a1a1a] border-white/[0.05] hover:border-white/[0.1]"
+                        }`}
+                      >
+                        {wasRecentlySent && (
+                          <div className="flex items-center gap-2 text-green-500 text-xs mb-3 pb-2 border-b border-green-500/20">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Credentials sent successfully!
+                          </div>
+                        )}
+
+                        {/* User Info Header */}
+                        <div className="flex items-center gap-3 mb-3 pb-3 border-b border-white/[0.05]">
+                          <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
+                            <User className="w-5 h-5 text-amber-500" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white font-medium truncate">{group.userName}</p>
+                            <p className="text-zinc-400 text-sm truncate">{group.userEmail}</p>
+                          </div>
+                          {group.orders.length > 1 && (
+                            <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20">
+                              <Layers className="w-3 h-3 mr-1" />
+                              {group.orders.length} items
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Products */}
+                        <div className="space-y-2">
+                          {group.orders.map((order) => {
+                            const statusConfig = getStatusConfig(order.status)
+                            const StatusIcon = statusConfig.icon
+
+                            return (
+                              <div key={order.id} className="flex items-center gap-3 p-2 rounded-lg bg-[#222222]/50">
+                                <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-[#222222] shrink-0">
+                                  <Image
+                                    src={
+                                      order.product?.image_url || "/placeholder.svg?height=40&width=40&query=product"
+                                    }
+                                    alt={order.product?.title || "Product"}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-white text-sm truncate">{order.product?.title || "Unknown"}</p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Badge className={`${statusConfig.color} text-[10px] px-1.5 py-0 border`}>
+                                      <StatusIcon className="w-2.5 h-2.5 mr-0.5" />
+                                      {statusConfig.label}
+                                    </Badge>
+                                    <span className="text-amber-500 text-xs">NPR {order.amount.toLocaleString()}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.05]">
+                          <div className="flex items-center gap-2">
+                            {allApproved ? (
+                              <Badge className="bg-green-500/10 text-green-500 border-green-500/20 text-[10px]">
+                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                Payment Approved
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-[10px]">
+                                <AlertCircle className="w-3 h-3 mr-1" />
+                                Pending Verification
+                              </Badge>
+                            )}
+                            {allCompleted && (
+                              <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 text-[10px]">
+                                Completed
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-amber-500 font-semibold text-sm">
+                            NPR {group.totalAmount.toLocaleString()}
+                          </p>
+                        </div>
+
+                        <p className="text-zinc-500 text-xs mt-2">{formatDate(group.timestamp)}</p>
+                      </div>
+                    )
+                  })
+                )
+              ) : // Individual view
+              filteredOrders.length === 0 ? (
                 <div className="text-center py-12">
                   <Package className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
                   <p className="text-zinc-400">No orders found</p>
@@ -416,13 +627,13 @@ export default function AdminCredentialsPage() {
                   const statusConfig = getStatusConfig(order.status)
                   const paymentConfig = getPaymentStatusConfig(order.payment_proof_status)
                   const StatusIcon = statusConfig.icon
-                  const isSelected = selectedOrder?.id === order.id
-                  const wasRecentlySent = lastSentOrder === order.id
+                  const isSelected = selectedOrders.some((o) => o.id === order.id)
+                  const wasRecentlySent = lastSentOrders.includes(order.id)
 
                   return (
                     <div
                       key={order.id}
-                      onClick={() => setSelectedOrder(order)}
+                      onClick={() => handleSelectOrder(order)}
                       className={`p-4 rounded-xl border cursor-pointer transition-all ${
                         wasRecentlySent
                           ? "bg-green-500/10 border-green-500/30 ring-2 ring-green-500/20"
@@ -479,79 +690,51 @@ export default function AdminCredentialsPage() {
             <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
               <Mail className="w-5 h-5 text-amber-500" />
               Send Credentials
+              {selectedOrders.length > 1 && (
+                <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 ml-2">
+                  {selectedOrders.length} products
+                </Badge>
+              )}
             </h2>
 
-            {selectedOrder ? (
+            {selectedOrders.length > 0 ? (
               <div className="space-y-5">
-                {selectedOrder.payment_proof_status !== "approved" && (
+                {selectedOrders.some((o) => o.payment_proof_status !== "approved") && (
                   <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 flex items-start gap-3">
                     <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-amber-500 font-medium text-sm">Payment Not Approved</p>
                       <p className="text-zinc-400 text-xs mt-1">
-                        This order&apos;s payment is {selectedOrder.payment_proof_status || "not verified"}. Make sure
-                        to verify payment before sending credentials.
+                        Some orders have unapproved payments. Make sure to verify payment before sending credentials.
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* Selected Order Info */}
-                <div className="p-4 rounded-xl bg-[#1a1a1a] border border-white/[0.05]">
-                  <div className="flex items-start gap-4">
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-[#222222] shrink-0">
-                      <Image
-                        src={selectedOrder.product?.image_url || "/placeholder.svg?height=64&width=64&query=product"}
-                        alt={selectedOrder.product?.title || "Product"}
-                        fill
-                        className="object-cover"
-                      />
+                {/* Selected Orders Info */}
+                <div className="space-y-3">
+                  {selectedOrders.map((order) => (
+                    <div key={order.id} className="p-4 rounded-xl bg-[#1a1a1a] border border-white/[0.05]">
+                      <div className="flex items-start gap-4">
+                        <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#222222] shrink-0">
+                          <Image
+                            src={order.product?.image_url || "/placeholder.svg?height=56&width=56&query=product"}
+                            alt={order.product?.title || "Product"}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-semibold truncate">{order.product?.title}</p>
+                          {order.plan_name && <p className="text-amber-500 text-sm mt-1">Plan: {order.plan_name}</p>}
+                          {order.duration_months && (
+                            <p className="text-zinc-500 text-sm">Duration: {order.duration_months} months</p>
+                          )}
+                          <p className="text-amber-500 font-medium mt-1">NPR {order.amount.toLocaleString()}</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white font-semibold">{selectedOrder.product?.title}</p>
-                      <p className="text-zinc-400 text-sm mt-1">
-                        {selectedOrder.product?.product_type?.replace(/_/g, " ")}
-                      </p>
-                      {selectedOrder.plan_name && (
-                        <p className="text-amber-500 text-sm mt-1">Plan: {selectedOrder.plan_name}</p>
-                      )}
-                      {selectedOrder.duration_months && (
-                        <p className="text-zinc-500 text-sm">Duration: {selectedOrder.duration_months} months</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Order Details Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 rounded-lg bg-[#1a1a1a] border border-white/[0.05]">
-                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1">
-                      <FileText className="w-3.5 h-3.5" />
-                      Order ID
-                    </div>
-                    <p className="text-white text-sm font-mono truncate">{selectedOrder.id}</p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-[#1a1a1a] border border-white/[0.05]">
-                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1">
-                      <CreditCard className="w-3.5 h-3.5" />
-                      Amount
-                    </div>
-                    <p className="text-amber-500 text-sm font-semibold">NPR {selectedOrder.amount.toLocaleString()}</p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-[#1a1a1a] border border-white/[0.05]">
-                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      Order Date
-                    </div>
-                    <p className="text-white text-sm">{formatDate(selectedOrder.created_at)}</p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-[#1a1a1a] border border-white/[0.05]">
-                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1">
-                      <CreditCard className="w-3.5 h-3.5" />
-                      Payment
-                    </div>
-                    <p className="text-white text-sm capitalize">{selectedOrder.payment_method?.replace(/_/g, " ")}</p>
-                  </div>
+                  ))}
                 </div>
 
                 {/* Customer Info */}
@@ -561,20 +744,24 @@ export default function AdminCredentialsPage() {
                       <User className="w-5 h-5 text-amber-500" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-medium">{selectedOrder.user?.full_name || "Customer"}</p>
-                      <p className="text-zinc-400 text-sm truncate">{selectedOrder.user?.email}</p>
+                      <p className="text-white font-medium">{selectedOrders[0].user?.full_name || "Customer"}</p>
+                      <p className="text-zinc-400 text-sm truncate">{selectedOrders[0].user?.email}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-zinc-400 text-xs">Total Amount</p>
+                      <p className="text-amber-500 font-bold">NPR {selectedTotalAmount.toLocaleString()}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <button
-                      onClick={() => copyToClipboard(selectedOrder.user?.email || "")}
+                      onClick={() => copyToClipboard(selectedOrders[0].user?.email || "")}
                       className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-amber-500 transition-colors px-3 py-1.5 rounded-lg bg-[#222222] border border-white/[0.05]"
                     >
                       {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                       Copy Email
                     </button>
                     <a
-                      href={`mailto:${selectedOrder.user?.email}`}
+                      href={`mailto:${selectedOrders[0].user?.email}`}
                       className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-amber-500 transition-colors px-3 py-1.5 rounded-lg bg-[#222222] border border-white/[0.05]"
                     >
                       <ExternalLink className="w-3 h-3" />
@@ -590,10 +777,18 @@ export default function AdminCredentialsPage() {
                   </Label>
                   <Textarea
                     id="credentials"
-                    placeholder="Enter login credentials...&#10;&#10;Email: example@email.com&#10;Password: xxxxxxxx"
+                    placeholder={`Enter login credentials for all ${selectedOrders.length} product(s)...
+
+Example:
+--- Product 1: Netflix ---
+Email: example@email.com
+Password: xxxxxxxx
+
+--- Product 2: YouTube Premium ---
+Family Link: https://...`}
                     value={credentials}
                     onChange={(e) => setCredentials(e.target.value)}
-                    rows={5}
+                    rows={8}
                     className="bg-[#1a1a1a] border-white/[0.08] text-white placeholder:text-zinc-500 font-mono text-sm resize-none focus:border-amber-500/50"
                   />
                   <p className="text-zinc-500 text-xs">Enter the login details that will be sent to the customer</p>
@@ -657,7 +852,8 @@ export default function AdminCredentialsPage() {
         </div>
       </div>
 
-      {showPreview && selectedOrder && (
+      {/* Email Preview Modal */}
+      {showPreview && selectedOrders.length > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0a0a0a]">
             {/* Modal Header */}
@@ -668,7 +864,10 @@ export default function AdminCredentialsPage() {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold">Email Preview</h3>
-                  <p className="text-zinc-500 text-sm">Review before sending to {selectedOrder.user?.email}</p>
+                  <p className="text-zinc-500 text-sm">
+                    Review before sending to {selectedOrders[0].user?.email}
+                    {selectedOrders.length > 1 && ` (${selectedOrders.length} products)`}
+                  </p>
                 </div>
               </div>
               <button
@@ -683,106 +882,92 @@ export default function AdminCredentialsPage() {
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
               <div className="rounded-2xl border border-white/[0.08] overflow-hidden shadow-2xl">
                 {/* Email Header */}
-                <div className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 p-8 text-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNDB2NDBIMHoiLz48cGF0aCBkPSJNMjAgMjBjMC0xMS4wNDYgOC45NTQtMjAgMjAtMjB2NDBoLTQwYzExLjA0NiAwIDIwLTguOTU0IDIwLTIweiIgZmlsbD0icmdiYSgwLDAsMCwwLjA1KSIvPjwvZz48L3N2Zz4=')] opacity-30"></div>
-                  <div className="relative">
-                    <h1 className="text-3xl font-bold text-black tracking-tight">OTTSewa</h1>
-                    <p className="text-black/60 text-sm mt-1 font-medium">Your Premium Subscription Partner</p>
-                  </div>
+                <div className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 p-8 text-center">
+                  <h1 className="text-3xl font-bold text-black tracking-tight">OTTSewa</h1>
+                  <p className="text-black/60 text-sm mt-1 font-medium">Your Premium Subscription Partner</p>
                 </div>
 
                 {/* Email Body */}
                 <div className="bg-[#0f0f0f] p-8">
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <h2 className="text-2xl font-bold text-white mb-3">
-                      Hello {selectedOrder.user?.full_name || "Valued Customer"}!
+                      Hello {selectedOrders[0].user?.full_name || "Valued Customer"}!
                     </h2>
                     <p className="text-zinc-400 leading-relaxed">
-                      Thank you for your purchase. Your order credentials for{" "}
-                      <span className="text-amber-500 font-semibold">{selectedOrder.product?.title}</span> are ready.
+                      Thank you for your purchase. Your order credentials are ready. Below are the login details for
+                      your {selectedOrders.length > 1 ? `${selectedOrders.length} products` : "product"}.
                     </p>
                   </div>
 
-                  {/* Credentials Box */}
-                  <div className="rounded-xl border border-amber-500/30 bg-gradient-to-b from-amber-500/10 to-transparent p-6 mb-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center">
-                        <FileText className="w-4 h-4 text-black" />
-                      </div>
-                      <h3 className="text-amber-500 font-semibold uppercase tracking-wide text-sm">Your Credentials</h3>
+                  {/* Products Summary */}
+                  <div className="mb-6 p-4 rounded-xl bg-[#1a1a1a] border border-white/[0.05]">
+                    <h3 className="text-amber-500 font-semibold text-sm mb-3">Order Summary</h3>
+                    <div className="space-y-2">
+                      {selectedOrders.map((order) => (
+                        <div key={order.id} className="flex items-center justify-between text-sm">
+                          <span className="text-white">{order.product?.title}</span>
+                          <span className="text-amber-500 font-medium">NPR {order.amount.toLocaleString()}</span>
+                        </div>
+                      ))}
+                      {selectedOrders.length > 1 && (
+                        <div className="flex items-center justify-between text-sm pt-2 mt-2 border-t border-white/[0.05]">
+                          <span className="text-zinc-400 font-medium">Total</span>
+                          <span className="text-amber-500 font-bold">NPR {selectedTotalAmount.toLocaleString()}</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="bg-[#0a0a0a] rounded-lg p-4 border border-white/[0.05]">
-                      <pre className="text-white text-sm whitespace-pre-wrap font-mono leading-relaxed">
-                        {credentials || "No credentials entered"}
-                      </pre>
+                  </div>
+
+                  {/* Credentials Box */}
+                  <div className="rounded-xl bg-[#1a1a1a] border border-white/[0.05] p-6 mb-6">
+                    <h3 className="text-amber-500 font-semibold text-sm mb-4 flex items-center gap-2">
+                      <CreditCard className="w-4 h-4" />
+                      YOUR CREDENTIALS
+                    </h3>
+                    <div className="bg-[#0a0a0a] rounded-lg p-4 font-mono text-sm text-white whitespace-pre-wrap border border-white/[0.05]">
+                      {credentials}
                     </div>
                   </div>
 
                   {/* Additional Notes */}
                   {additionalNotes && (
-                    <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-5 mb-6">
-                      <div className="flex items-start gap-3">
-                        <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
-                        <div>
-                          <h4 className="text-blue-400 font-semibold text-sm mb-2">Important Notes</h4>
-                          <p className="text-zinc-300 text-sm leading-relaxed">{additionalNotes}</p>
-                        </div>
-                      </div>
+                    <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-5 mb-6">
+                      <h4 className="text-amber-500 font-semibold text-sm mb-2 flex items-center gap-2">
+                        <Info className="w-4 h-4" />
+                        Important Notes
+                      </h4>
+                      <p className="text-zinc-300 text-sm">{additionalNotes}</p>
                     </div>
                   )}
 
-                  {/* Order Summary */}
-                  <div className="rounded-xl bg-[#1a1a1a] p-5 border border-white/[0.05]">
-                    <h4 className="text-zinc-400 text-xs font-semibold uppercase tracking-wide mb-3">Order Summary</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-zinc-500">Order ID</p>
-                        <p className="text-white font-mono">{selectedOrder.id.slice(0, 8)}...</p>
-                      </div>
-                      <div>
-                        <p className="text-zinc-500">Amount Paid</p>
-                        <p className="text-amber-500 font-semibold">NPR {selectedOrder.amount.toLocaleString()}</p>
-                      </div>
-                      {selectedOrder.plan_name && (
-                        <div>
-                          <p className="text-zinc-500">Plan</p>
-                          <p className="text-white">{selectedOrder.plan_name}</p>
-                        </div>
-                      )}
-                      {selectedOrder.duration_months && (
-                        <div>
-                          <p className="text-zinc-500">Duration</p>
-                          <p className="text-white">{selectedOrder.duration_months} months</p>
-                        </div>
-                      )}
-                    </div>
+                  {/* Order IDs */}
+                  <div className="pt-4 border-t border-white/[0.05]">
+                    <p className="text-zinc-500 text-xs">
+                      Order ID{selectedOrders.length > 1 ? "s" : ""}:{" "}
+                      {selectedOrders.map((o) => o.id.slice(0, 8)).join(", ")}
+                    </p>
                   </div>
                 </div>
 
                 {/* Email Footer */}
-                <div className="bg-[#080808] px-8 py-6 border-t border-white/[0.05]">
-                  <div className="text-center">
-                    <p className="text-zinc-500 text-sm mb-2">Need help? Contact us on WhatsApp</p>
-                    <p className="text-amber-500 font-bold text-lg">+977 9869671451</p>
-                    <div className="mt-4 pt-4 border-t border-white/[0.05]">
-                      <p className="text-zinc-600 text-xs">
-                        © {new Date().getFullYear()} OTTSewa. All rights reserved.
-                      </p>
-                    </div>
-                  </div>
+                <div className="bg-[#0a0a0a] p-6 border-t border-white/[0.05] text-center">
+                  <p className="text-zinc-500 text-sm mb-2">Need help? Contact us on WhatsApp</p>
+                  <p className="text-amber-500 font-semibold">+977 9869671451</p>
+                  <p className="text-zinc-600 text-xs mt-4">
+                    © {new Date().getFullYear()} OTTSewa. All rights reserved.
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-[#0f0f0f] px-6 py-4 border-t border-white/[0.08] flex gap-3">
+            <div className="bg-[#0f0f0f] px-6 py-4 border-t border-white/[0.08] flex items-center justify-end gap-3">
               <Button
                 onClick={() => setShowPreview(false)}
                 variant="outline"
-                className="flex-1 border-white/[0.08] bg-[#1a1a1a] hover:bg-[#222222] text-white h-12"
+                className="border-white/[0.08] bg-[#1a1a1a] hover:bg-[#222222] text-white"
               >
-                <X className="w-4 h-4 mr-2" />
-                Close & Edit
+                Edit
               </Button>
               <Button
                 onClick={() => {
@@ -790,7 +975,7 @@ export default function AdminCredentialsPage() {
                   handleSendCredentials()
                 }}
                 disabled={sending}
-                className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold h-12"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold"
               >
                 {sending ? (
                   <>
@@ -800,7 +985,7 @@ export default function AdminCredentialsPage() {
                 ) : (
                   <>
                     <Send className="w-4 h-4 mr-2" />
-                    Confirm & Send
+                    Send Email Now
                   </>
                 )}
               </Button>
