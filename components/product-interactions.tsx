@@ -2,10 +2,11 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { ShoppingCart, Heart, Share2, Loader2, Minus, Plus } from "lucide-react"
+import { ShoppingCart, Heart, Share2, Loader2, Minus, Plus, Zap, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/contexts/wishlist-context"
+import { useFlashDeals } from "@/contexts/flash-deal-context"
 import { useToast } from "@/hooks/use-toast"
 import type { Product } from "@/lib/products"
 
@@ -60,7 +61,7 @@ interface ProductInteractionsProps {
   initialPrice?: number
 }
 
-export function ProductInteractions({ product, initialPrice }: ProductInteractionsProps) {
+export function ProductInteractions({ product }: ProductInteractionsProps) {
   const editions = useMemo(() => product.editions?.filter(Boolean) || [], [product.editions])
   const platforms = useMemo(() => product.platforms?.filter(Boolean) || [], [product.platforms])
   const plans = useMemo(() => product.subscription_plans?.filter(Boolean) || [], [product.subscription_plans])
@@ -78,20 +79,49 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
 
   const [quantity, setQuantity] = useState(1)
   const [addingToCart, setAddingToCart] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const { addItem } = useCart()
   const { toast } = useToast()
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist()
+  const { getFlashDealForProduct } = useFlashDeals()
+  const flashDeal = getFlashDealForProduct(product.id)
+
+  const [flashDealTimeLeft, setFlashDealTimeLeft] = useState<{
+    hours: number
+    minutes: number
+    seconds: number
+  } | null>(null)
+
+  useEffect(() => {
+    if (!flashDeal) {
+      setFlashDealTimeLeft(null)
+      return
+    }
+
+    const updateTimer = () => {
+      const now = new Date().getTime()
+      const endTime = new Date(flashDeal.end_time).getTime()
+      const diff = endTime - now
+
+      if (diff <= 0) {
+        setFlashDealTimeLeft(null)
+        return
+      }
+
+      setFlashDealTimeLeft({
+        hours: Math.floor(diff / (1000 * 60 * 60)),
+        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((diff % (1000 * 60)) / 1000),
+      })
+    }
+
+    updateTimer()
+    const interval = setInterval(updateTimer, 1000)
+    return () => clearInterval(interval)
+  }, [flashDeal])
 
   const isFavorite = isInWishlist(product.id)
-
-  // Helper functions
-  const hasEditions = editions.length > 0
-  const hasPlatforms = platforms.length > 0
-  const hasPlans = plans.length > 0
-  const hasDenominations = denominations.length > 0
-  const hasLicenseTypes = licenseTypes.length > 0
-  const hasLicenseDurations = product.license_durations && product.license_durations.length > 0
 
   useEffect(() => {
     if (product.product_type === "subscription" && plans.length > 0 && !selectedPlan) {
@@ -131,7 +161,6 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
     }
   }, [licenseTypes, product.product_type, selectedLicenseType])
 
-  // Debug logging for subscription plans
   useEffect(() => {
     if (product.product_type === "subscription") {
       console.log("[v0] Product type:", product.product_type)
@@ -145,13 +174,12 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
     }
   }, [product, plans])
 
-  // Calculate current price
   const calculatePrice = useCallback(() => {
     try {
       const productType = product.product_type
 
       if (productType === "game") {
-        if (hasEditions && selectedEdition) {
+        if (editions.length > 0 && selectedEdition) {
           const edition = editions.find((e) => e?.id === selectedEdition)
           return edition?.price || product.base_price || 0
         }
@@ -159,7 +187,7 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
       }
 
       if (productType === "giftcard") {
-        if (hasDenominations && selectedDenomination) {
+        if (denominations.length > 0 && selectedDenomination) {
           const denom = denominations.find((d) => d?.id === selectedDenomination)
           return denom?.price || product.base_price || 0
         }
@@ -167,7 +195,7 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
       }
 
       if (productType === "subscription") {
-        if (hasPlans && selectedPlan && selectedDuration) {
+        if (plans.length > 0 && selectedPlan && selectedDuration) {
           const plan = plans.find((p) => p?.id === selectedPlan)
           const duration = plan?.durations?.find((d: any) => d?.id === selectedDuration)
           return duration?.price || product.base_price || 0
@@ -177,11 +205,11 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
 
       if (productType === "software") {
         let price = product.base_price || 0
-        if (hasLicenseTypes && selectedLicenseType) {
+        if (licenseTypes.length > 0 && selectedLicenseType) {
           const licenseType = licenseTypes.find((l) => l?.id === selectedLicenseType)
           price = licenseType?.price || price
         }
-        if (hasLicenseDurations && selectedLicenseDuration) {
+        if (product.license_durations && product.license_durations.length > 0 && selectedLicenseDuration) {
           const duration = product.license_durations?.find((d) => d?.id === selectedLicenseDuration)
           const multiplier = duration?.price_multiplier || 1
           price = price * multiplier
@@ -201,16 +229,15 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
     selectedDuration,
     selectedLicenseType,
     selectedLicenseDuration,
-    hasEditions,
-    hasDenominations,
-    hasPlans,
-    hasLicenseTypes,
-    hasLicenseDurations,
+    editions.length,
+    denominations.length,
+    plans.length,
+    licenseTypes.length,
+    product.license_durations,
   ])
 
   const currentPrice = calculatePrice()
 
-  // Handle plan change - reset duration
   const handlePlanChange = (planId: string) => {
     setSelectedPlan(planId)
     const plan = plans.find((p) => p?.id === planId)
@@ -221,99 +248,101 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
     }
   }
 
-  // Get current plan's durations
   const currentPlanDurations = selectedPlan ? plans.find((p) => p?.id === selectedPlan)?.durations || [] : []
 
-  // Add to cart handler
-  const handleAddToCart = async () => {
-    try {
-      setAddingToCart(true)
+  const flashDealPrice = flashDeal ? Math.floor(currentPrice * (1 - flashDeal.discount_percentage / 100)) : null
+  const displayPrice = flashDealPrice ?? currentPrice
 
+  const handleAddToCart = useCallback(async () => {
+    setAddingToCart(true)
+    try {
       await new Promise((resolve) => setTimeout(resolve, 400))
 
-      const cartItem: any = {
+      const selectedEditionObj = selectedEdition ? editions.find((e) => e?.id === selectedEdition) : null
+      const selectedPlatformObj = selectedPlatform ? platforms.find((p) => p?.id === selectedPlatform) : null
+      const selectedPlanObj = selectedPlan ? plans.find((p) => p?.id === selectedPlan) : null
+      const selectedDurationObj = selectedDuration
+        ? currentPlanDurations.find((d: any) => d?.id === selectedDuration)
+        : null
+      const selectedDenominationObj = selectedDenomination
+        ? denominations.find((d) => d?.id === selectedDenomination)
+        : null
+      const selectedLicenseTypeObj = selectedLicenseType
+        ? licenseTypes.find((l) => l?.id === selectedLicenseType)
+        : null
+      const selectedLicenseDurationObj = selectedLicenseDuration
+        ? product.license_durations?.find((d) => d?.id === selectedLicenseDuration)
+        : null
+
+      addItem({
         productId: product.id,
         productTitle: product.title,
-        productImage: product.image_url || product.thumbnail_url || "",
+        productImage: product.image_url || "",
         productSlug: product.slug,
-        productType: product.product_type,
-        price: currentPrice,
+        productType: product.product_type || "subscription",
+        price: displayPrice,
         quantity,
-      }
-
-      // Add type-specific data
-      if (product.product_type === "game") {
-        if (selectedEdition) {
-          const edition = editions.find((e) => e?.id === selectedEdition)
-          cartItem.editionId = selectedEdition
-          cartItem.editionName = edition?.name
-        }
-        if (selectedPlatform) {
-          const platform = platforms.find((p) => p?.id === selectedPlatform)
-          cartItem.platformId = selectedPlatform
-          cartItem.platformName = platform?.name
-        }
-      } else if (product.product_type === "giftcard" && selectedDenomination) {
-        const denom = denominations.find((d) => d?.id === selectedDenomination)
-        cartItem.denominationId = selectedDenomination
-        cartItem.denominationValue = denom?.value
-      } else if (product.product_type === "subscription") {
-        if (selectedPlan) {
-          const plan = plans.find((p) => p?.id === selectedPlan)
-          cartItem.planId = selectedPlan
-          cartItem.planName = plan?.name
-        }
-        if (selectedDuration) {
-          const plan = plans.find((p) => p?.id === selectedPlan)
-          const duration = plan?.durations?.find((d: any) => d?.id === selectedDuration)
-          cartItem.durationId = selectedDuration
-          cartItem.durationLabel = duration?.label
-          cartItem.durationMonths = duration?.months
-        }
-      } else if (product.product_type === "software") {
-        if (selectedLicenseType) {
-          const license = licenseTypes.find((l) => l?.id === selectedLicenseType)
-          cartItem.licenseTypeId = selectedLicenseType
-          cartItem.licenseTypeName = license?.name
-        }
-        if (selectedLicenseDuration) {
-          const duration = product.license_durations?.find((d) => d?.id === selectedLicenseDuration)
-          cartItem.licenseDurationId = selectedLicenseDuration
-          cartItem.licenseDurationLabel = duration?.label
-        }
-        if (selectedPlatform) {
-          const platform = platforms.find((p) => p?.id === selectedPlatform)
-          cartItem.platformId = selectedPlatform
-          cartItem.platformName = platform?.name
-        }
-      }
-
-      addItem(cartItem)
+        // Edition
+        editionId: selectedEditionObj?.id,
+        editionName: selectedEditionObj?.name,
+        // Platform
+        platformId: selectedPlatformObj?.id,
+        platformName: selectedPlatformObj?.name,
+        // Plan
+        planId: selectedPlanObj?.id,
+        planName: selectedPlanObj?.name,
+        // Duration
+        durationId: selectedDurationObj?.id,
+        durationLabel: selectedDurationObj?.label,
+        durationMonths: selectedDurationObj?.months,
+        // Denomination
+        denominationId: selectedDenominationObj?.id,
+        denominationValue: selectedDenominationObj?.value,
+        // License Type
+        licenseTypeId: selectedLicenseTypeObj?.id,
+        licenseTypeName: selectedLicenseTypeObj?.name,
+        // License Duration
+        licenseDurationId: selectedLicenseDurationObj?.id,
+        licenseDurationLabel: selectedLicenseDurationObj?.label,
+      })
 
       toast({
         title: "Added to cart",
-        description: product.title,
-        variant: "success",
-        action: (
-          <Link href="/cart">
-            <button className="inline-flex h-6 items-center justify-center rounded-md bg-amber-500/20 px-2.5 text-[11px] font-medium text-amber-500 transition-colors hover:bg-amber-500/30">
-              View Cart
-            </button>
-          </Link>
-        ),
+        description: flashDeal
+          ? `${product.title} added with ${flashDeal.discount_percentage}% flash deal discount!`
+          : `${product.title} has been added to your cart`,
       })
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add item to cart",
+        description: "Failed to add to cart",
         variant: "destructive",
       })
     } finally {
       setAddingToCart(false)
     }
-  }
+  }, [
+    product,
+    selectedEdition,
+    selectedPlatform,
+    selectedPlan,
+    selectedDuration,
+    selectedDenomination,
+    selectedLicenseType,
+    selectedLicenseDuration,
+    editions,
+    platforms,
+    plans,
+    currentPlanDurations,
+    denominations,
+    licenseTypes,
+    quantity,
+    addItem,
+    toast,
+    displayPrice,
+    flashDeal,
+  ])
 
-  // Toggle wishlist handler
   const handleToggleWishlist = () => {
     if (isFavorite) {
       removeFromWishlist(product.id)
@@ -346,10 +375,89 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
     }
   }
 
+  const handleShare = async () => {
+    const url = window.location.href
+    const title = product.title
+
+    // Try native share API first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: title,
+          text: `Check out ${title} on OTTSewa`,
+          url: url,
+        })
+        toast({
+          title: "Shared Successfully",
+          description: "Thanks for sharing!",
+          variant: "success",
+        })
+      } catch (err) {
+        // User cancelled or share failed, fall back to copy
+        if ((err as Error).name !== "AbortError") {
+          await copyToClipboard(url)
+        }
+      }
+    } else {
+      // Fallback to clipboard
+      await copyToClipboard(url)
+    }
+  }
+
+  const copyToClipboard = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      toast({
+        title: "Link Copied",
+        description: "Product link copied to clipboard",
+        variant: "success",
+      })
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      toast({
+        title: "Failed to Copy",
+        description: "Please copy the URL manually",
+        variant: "destructive",
+      })
+    }
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Game Editions */}
-      {product.product_type === "game" && hasEditions && (
+      {flashDeal && flashDealTimeLeft && (
+        <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-xl p-3 sm:p-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-black" />
+              </div>
+              <div>
+                <div className="text-amber-400 font-bold text-sm">FLASH DEAL</div>
+                <div className="text-white/70 text-xs">Save {flashDeal.discount_percentage}% off</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-amber-400" />
+              <div className="flex items-center gap-1 text-xs font-mono">
+                <span className="bg-black/40 px-1.5 py-0.5 rounded text-white">
+                  {String(flashDealTimeLeft.hours).padStart(2, "0")}
+                </span>
+                <span className="text-amber-400">:</span>
+                <span className="bg-black/40 px-1.5 py-0.5 rounded text-white">
+                  {String(flashDealTimeLeft.minutes).padStart(2, "0")}
+                </span>
+                <span className="text-amber-400">:</span>
+                <span className="bg-black/40 px-1.5 py-0.5 rounded text-white">
+                  {String(flashDealTimeLeft.seconds).padStart(2, "0")}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {product.product_type === "game" && editions.length > 0 && (
         <div>
           <h3 className="text-xs sm:text-sm font-medium text-zinc-400 mb-2 sm:mb-3">Select Edition</h3>
           <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3">
@@ -376,8 +484,7 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
         </div>
       )}
 
-      {/* Platforms for Games and Software */}
-      {(product.product_type === "game" || product.product_type === "software") && hasPlatforms && (
+      {(product.product_type === "game" || product.product_type === "software") && platforms.length > 0 && (
         <div>
           <h3 className="text-xs sm:text-sm font-medium text-zinc-400 mb-2 sm:mb-3">Select Platform</h3>
           <div className="flex flex-wrap gap-1.5 sm:gap-2">
@@ -399,8 +506,7 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
         </div>
       )}
 
-      {/* Gift Card Denominations */}
-      {product.product_type === "giftcard" && hasDenominations && (
+      {product.product_type === "giftcard" && denominations.length > 0 && (
         <div>
           <h3 className="text-xs sm:text-sm font-medium text-zinc-400 mb-2 sm:mb-3">Select Value</h3>
           <div className="grid grid-cols-2 xs:grid-cols-3 gap-2 sm:gap-3">
@@ -431,8 +537,7 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
         </div>
       )}
 
-      {/* Subscription Plans */}
-      {product.product_type === "subscription" && hasPlans && (
+      {product.product_type === "subscription" && plans.length > 0 && (
         <div className="space-y-3 sm:space-y-4">
           <div>
             <h3 className="text-xs sm:text-sm font-medium text-zinc-400 mb-2 sm:mb-3">Select Plan</h3>
@@ -472,7 +577,6 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
             </div>
           </div>
 
-          {/* Duration selection based on selected plan */}
           {selectedPlan && currentPlanDurations.length > 0 && (
             <div>
               <h3 className="text-xs sm:text-sm font-medium text-zinc-400 mb-2 sm:mb-3">Select Duration</h3>
@@ -504,8 +608,7 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
         </div>
       )}
 
-      {/* Software License Types */}
-      {product.product_type === "software" && hasLicenseTypes && (
+      {product.product_type === "software" && licenseTypes.length > 0 && (
         <div>
           <h3 className="text-xs sm:text-sm font-medium text-zinc-400 mb-2 sm:mb-3">Select License Type</h3>
           <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3">
@@ -537,8 +640,7 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
         </div>
       )}
 
-      {/* Software License Durations */}
-      {product.product_type === "software" && hasLicenseDurations && (
+      {product.product_type === "software" && product.license_durations && product.license_durations.length > 0 && (
         <div>
           <h3 className="text-xs sm:text-sm font-medium text-zinc-400 mb-2 sm:mb-3">Select Duration</h3>
           <div className="grid grid-cols-2 xs:grid-cols-3 gap-2 sm:gap-3">
@@ -566,19 +668,22 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
       )}
 
       <div className="bg-zinc-900 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-zinc-800">
-        {/* Price Display */}
         <div className="flex items-baseline gap-2 sm:gap-3 mb-3 sm:mb-4">
           <span className="text-2xl sm:text-3xl font-bold text-white">
-            {product.currency} {currentPrice.toLocaleString()}
+            {product.currency} {displayPrice.toLocaleString()}
           </span>
-          {product.original_price && product.original_price > currentPrice && (
+          {(flashDeal || (product.original_price && product.original_price > displayPrice)) && (
             <span className="text-base sm:text-lg text-zinc-500 line-through">
-              {product.currency} {product.original_price.toLocaleString()}
+              {product.currency} {(flashDeal ? currentPrice : product.original_price)?.toLocaleString()}
+            </span>
+          )}
+          {flashDeal && (
+            <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-black text-xs font-bold px-2 py-0.5 rounded">
+              -{flashDeal.discount_percentage}%
             </span>
           )}
         </div>
 
-        {/* Quantity */}
         <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
           <span className="text-xs sm:text-sm text-zinc-400">Quantity:</span>
           <div className="flex items-center gap-1 sm:gap-2">
@@ -600,7 +705,6 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
           <Button
             onClick={handleAddToCart}
@@ -627,6 +731,7 @@ export function ProductInteractions({ product, initialPrice }: ProductInteractio
           <Button
             variant="outline"
             className="border-zinc-700 text-zinc-400 hover:bg-zinc-800 rounded-lg px-4 py-2.5 transition-colors bg-transparent cursor-pointer"
+            onClick={handleShare}
           >
             <Share2 className="w-4 h-4" />
             Share

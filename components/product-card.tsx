@@ -1,10 +1,11 @@
 "use client"
 
 import type React from "react"
-import { Heart, Eye, Star, Flame, Sparkles, TrendingUp, Clock } from "lucide-react"
+import { Heart, Eye, Star, Flame, Sparkles, TrendingUp, Clock, Zap } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useCallback, useMemo } from "react"
 import { useWishlist } from "@/contexts/wishlist-context"
+import { useFlashDeals } from "@/contexts/flash-deal-context"
 import type { Product } from "@/lib/products"
 
 interface ProductCardProps {
@@ -37,10 +38,15 @@ function getPriceValidUntil(): string {
 
 export default function ProductCard({ product, index = 0, showTags = true }: ProductCardProps) {
   const { isInWishlist, addItem, removeItem } = useWishlist()
+  const { getFlashDealForProduct } = useFlashDeals()
   const router = useRouter()
 
+  const flashDeal = getFlashDealForProduct(product.id)
+  const effectiveDiscount = flashDeal ? flashDeal.discount_percentage : product.discount_percentage
+  const isFlashDeal = !!flashDeal
+
   const discountedPrice =
-    product.discount_percent > 0 ? product.base_price * (1 - product.discount_percent / 100) : product.base_price
+    effectiveDiscount > 0 ? product.base_price * (1 - effectiveDiscount / 100) : product.base_price
   const isFavorite = isInWishlist(product.id)
 
   const showNewLabel = product.is_new && isNewProduct(product.created_at, 7)
@@ -180,6 +186,10 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
         onMouseEnter={handleProductHover}
         className="group relative overflow-hidden rounded-xl bg-zinc-900/50 border border-amber-500/[0.08] transition-all duration-200 hover:border-amber-500/20 flex flex-col cursor-pointer h-full"
       >
+        {isFlashDeal && (
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 z-20" />
+        )}
+
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/15 to-transparent z-10" />
 
         <div className="relative w-full aspect-[3/4] overflow-hidden">
@@ -204,6 +214,13 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
           </button>
 
           <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+            {isFlashDeal && (
+              <div className="flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 text-black px-1.5 py-0.5 rounded text-[10px] font-bold shadow-lg animate-pulse">
+                <Zap className="w-3 h-3" />
+                <span>FLASH DEAL</span>
+              </div>
+            )}
+
             {/* New label with days remaining indicator */}
             {showNewLabel && (
               <div className="flex items-center gap-1 bg-emerald-500 text-white px-1.5 py-0.5 rounded text-[10px] font-bold shadow-lg">
@@ -235,9 +252,9 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
             )}
 
             {/* Discount label */}
-            {product.discount_percent > 0 && (
+            {effectiveDiscount > 0 && !isFlashDeal && (
               <div className="bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px] font-bold shadow-lg">
-                -{product.discount_percent}%
+                -{effectiveDiscount}%
               </div>
             )}
           </div>
@@ -291,11 +308,17 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
 
           <div className="space-y-1 mb-3">
             <div className="text-[10px] text-zinc-600 uppercase tracking-wide">From</div>
-            {product.discount_percent > 0 && (
+            {effectiveDiscount > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-zinc-600 line-through">NPR {product.base_price.toFixed(0)}</span>
-                <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-md border border-emerald-500/20">
-                  -{product.discount_percent}%
+                <span
+                  className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md border ${
+                    isFlashDeal
+                      ? "text-amber-400 bg-amber-500/10 border-amber-500/20"
+                      : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                  }`}
+                >
+                  -{effectiveDiscount}%
                 </span>
               </div>
             )}
