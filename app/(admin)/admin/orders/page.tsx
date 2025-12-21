@@ -99,6 +99,12 @@ export default function AdminOrdersPage() {
         return
       }
 
+      console.log("[v0] Fetched orders count:", ordersData.length)
+      console.log(
+        "[v0] Orders product_ids:",
+        ordersData.map((o) => ({ id: o.id, product_id: o.product_id })),
+      )
+
       const productIds = [...new Set(ordersData.map((o) => o.product_id).filter(Boolean))]
       const userIds = [...new Set(ordersData.map((o) => o.user_id).filter(Boolean))]
       const editionIds = [...new Set(ordersData.map((o) => o.edition_id).filter(Boolean))]
@@ -106,6 +112,8 @@ export default function AdminOrdersPage() {
       const planIds = [...new Set(ordersData.map((o) => o.plan_id).filter(Boolean))]
       const licenseTypeIds = [...new Set(ordersData.map((o) => o.license_type_id).filter(Boolean))]
       const platformIds = [...new Set(ordersData.map((o) => o.platform_id).filter(Boolean))]
+
+      console.log("[v0] Unique product IDs to fetch:", productIds)
 
       const [productsRes, usersRes, editionsRes, denominationsRes, plansRes, licenseTypesRes, platformsRes] =
         await Promise.all([
@@ -126,6 +134,11 @@ export default function AdminOrdersPage() {
           platformIds.length > 0 ? supabase.from("platforms").select("id, name").in("id", platformIds) : { data: [] },
         ])
 
+      console.log(
+        "[v0] Fetched products:",
+        productsRes.data?.map((p) => ({ id: p.id, title: p.title })),
+      )
+
       const productsMap = new Map((productsRes.data || []).map((p) => [p.id, p]))
       const usersMap = new Map((usersRes.data || []).map((u) => [u.id, u]))
       const editionsMap = new Map((editionsRes.data || []).map((e) => [e.id, e]))
@@ -134,17 +147,23 @@ export default function AdminOrdersPage() {
       const licenseTypesMap = new Map((licenseTypesRes.data || []).map((l) => [l.id, l]))
       const platformsMap = new Map((platformsRes.data || []).map((p) => [p.id, p]))
 
-      const enrichedOrders: Order[] = ordersData.map((order) => ({
-        ...order,
-        product: productsMap.get(order.product_id) || null,
-        user: usersMap.get(order.user_id) || null,
-        edition_name: editionsMap.get(order.edition_id)?.name || null,
-        denomination_value: denominationsMap.get(order.denomination_id)?.value || null,
-        denomination_currency: denominationsMap.get(order.denomination_id)?.currency || null,
-        plan_name: plansMap.get(order.plan_id)?.name || null,
-        license_type_name: licenseTypesMap.get(order.license_type_id)?.name || null,
-        platform_name: platformsMap.get(order.platform_id)?.name || null,
-      }))
+      const enrichedOrders: Order[] = ordersData.map((order) => {
+        const product = productsMap.get(order.product_id) || null
+        if (!product && order.product_id) {
+          console.log("[v0] Missing product for order:", order.id, "product_id:", order.product_id)
+        }
+        return {
+          ...order,
+          product,
+          user: usersMap.get(order.user_id) || null,
+          edition_name: editionsMap.get(order.edition_id)?.name || null,
+          denomination_value: denominationsMap.get(order.denomination_id)?.value || null,
+          denomination_currency: denominationsMap.get(order.denomination_id)?.currency || null,
+          plan_name: plansMap.get(order.plan_id)?.name || null,
+          license_type_name: licenseTypesMap.get(order.license_type_id)?.name || null,
+          platform_name: platformsMap.get(order.platform_id)?.name || null,
+        }
+      })
 
       setOrders(enrichedOrders)
     } catch (err: any) {

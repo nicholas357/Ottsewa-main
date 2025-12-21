@@ -22,6 +22,15 @@ export async function POST(request: Request) {
     const items = JSON.parse(itemsJson)
     const contact = contactInfo ? JSON.parse(contactInfo) : {}
 
+    console.log(
+      "[v0] Creating orders for items:",
+      items.map((item: any) => ({
+        productId: item.productId,
+        productTitle: item.productTitle,
+        quantity: item.quantity,
+      })),
+    )
+
     // Upload payment proof if provided
     let paymentProofUrl = null
     if (paymentProof && paymentProof.size > 0) {
@@ -33,6 +42,8 @@ export async function POST(request: Request) {
 
     // Create orders for each cart item
     const orderPromises = items.map(async (item: any) => {
+      console.log("[v0] Creating order for product:", item.productId, "Title:", item.productTitle)
+
       const orderData: any = {
         user_id: userId,
         product_id: item.productId,
@@ -58,11 +69,18 @@ export async function POST(request: Request) {
 
       const { data, error } = await supabaseAdmin.from("orders").insert(orderData).select().single()
 
-      if (error) throw error
+      if (error) {
+        console.log("[v0] Error creating order:", error)
+        throw error
+      }
+
+      console.log("[v0] Order created successfully:", data.id, "for product:", data.product_id)
       return data
     })
 
     const orders = await Promise.all(orderPromises)
+
+    console.log("[v0] All orders created:", orders.length)
 
     return NextResponse.json({
       success: true,
