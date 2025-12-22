@@ -5,7 +5,8 @@ import { Shield, Zap, Clock, ChevronRight, Tag, ChevronDown, Home } from "lucide
 import { getProductBySlug, type Product } from "@/lib/products"
 import { ProductDescription } from "@/components/product-description"
 import { ProductInteractions } from "@/components/product-interactions"
-import { ProductReviews, generateReviewSchema } from "@/components/product-reviews"
+import { ProductReviews } from "@/components/product-reviews"
+import { generateReviewSchema } from "@/lib/review-schema"
 
 // Platform Icons
 const PCIcon = () => (

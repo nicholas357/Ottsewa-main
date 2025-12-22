@@ -26,25 +26,32 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Calculate rating stats
-    const { data: statsData } = await supabase
-      .from("reviews")
-      .select("rating")
-      .eq("product_id", productId || "")
-
     const stats = {
       total: count || 0,
       average: 0,
       distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } as Record<number, number>,
     }
 
-    if (statsData && statsData.length > 0) {
+    // Only query for stats if we have a valid productId
+    if (productId) {
+      const { data: statsData } = await supabase.from("reviews").select("rating").eq("product_id", productId)
+
+      if (statsData && statsData.length > 0) {
+        let sum = 0
+        statsData.forEach((r) => {
+          sum += r.rating
+          stats.distribution[r.rating as keyof typeof stats.distribution]++
+        })
+        stats.average = Math.round((sum / statsData.length) * 10) / 10
+      }
+    } else if (reviews && reviews.length > 0) {
+      // Calculate stats from fetched reviews if no productId
       let sum = 0
-      statsData.forEach((r) => {
+      reviews.forEach((r) => {
         sum += r.rating
         stats.distribution[r.rating as keyof typeof stats.distribution]++
       })
-      stats.average = Math.round((sum / statsData.length) * 10) / 10
+      stats.average = Math.round((sum / reviews.length) * 10) / 10
     }
 
     return NextResponse.json({ reviews, stats, total: count })
