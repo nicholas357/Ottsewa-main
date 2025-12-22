@@ -34,54 +34,40 @@ export function useSmartPrefetch() {
   return { prefetch, prefetchOnHover }
 }
 
+// Route transition loading bar
 export function RouteTransitionBar() {
   const pathname = usePathname()
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    // Start transition
     setIsTransitioning(true)
-    setVisible(true)
-    setProgress(0)
+    setProgress(30)
 
-    // Animate progress
-    const timer0 = setTimeout(() => setProgress(30), 50)
-    const timer1 = setTimeout(() => setProgress(60), 150)
-    const timer2 = setTimeout(() => setProgress(80), 300)
-    const timer3 = setTimeout(() => setProgress(100), 400)
-
-    // Hide after completion
-    const timer4 = setTimeout(() => {
-      setIsTransitioning(false)
+    const timer1 = setTimeout(() => setProgress(60), 100)
+    const timer2 = setTimeout(() => setProgress(80), 200)
+    const timer3 = setTimeout(() => {
+      setProgress(100)
       setTimeout(() => {
-        setVisible(false)
+        setIsTransitioning(false)
         setProgress(0)
-      }, 300)
-    }, 500)
+      }, 200)
+    }, 300)
 
     return () => {
-      clearTimeout(timer0)
       clearTimeout(timer1)
       clearTimeout(timer2)
       clearTimeout(timer3)
-      clearTimeout(timer4)
     }
   }, [pathname])
 
-  if (!visible) return null
+  if (!isTransitioning) return null
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] h-1 bg-black/20 pointer-events-none">
+    <div className="fixed top-0 left-0 right-0 z-[100] h-0.5">
       <div
-        className={`h-full bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 shadow-lg shadow-amber-500/50 transition-all ease-out ${
-          isTransitioning ? "duration-200" : "duration-300"
-        }`}
-        style={{
-          width: `${progress}%`,
-          opacity: isTransitioning ? 1 : 0,
-        }}
+        className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-200 ease-out"
+        style={{ width: `${progress}%` }}
       />
     </div>
   )
