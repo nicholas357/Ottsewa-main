@@ -164,8 +164,8 @@ function generateProductSchema(product: Product, baseUrl: string): ProductSchema
 
   const cleanPrice = Math.floor(price)
 
-  const ratingValue = product.average_rating && product.average_rating > 0 ? product.average_rating : 4.8
-  const reviewCount = product.review_count && product.review_count > 0 ? product.review_count : 156
+  const hasRealReviews = product.review_count && product.review_count > 0
+  const hasRealRating = product.average_rating && product.average_rating > 0
 
   const schema: ProductSchema = {
     "@context": "https://schema.org",
@@ -176,27 +176,17 @@ function generateProductSchema(product: Product, baseUrl: string): ProductSchema
       ? [product.image_url, ...product.gallery_images].filter(Boolean)
       : product.image_url,
     sku: product.id,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: Number(ratingValue.toFixed(1)),
-      reviewCount: reviewCount,
-      bestRating: 5,
-      worstRating: 1,
-    },
-    review: [
-      {
-        "@type": "Review",
-        reviewRating: {
-          "@type": "Rating",
-          ratingValue: 5,
-          bestRating: 5,
-        },
-        author: {
-          "@type": "Person",
-          name: "Verified Buyer",
-        },
-      },
-    ],
+    ...(hasRealReviews && hasRealRating
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: Number(product.average_rating!.toFixed(1)),
+            reviewCount: product.review_count,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
     offers: {
       "@type": "Offer",
       price: cleanPrice,

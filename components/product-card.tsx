@@ -66,26 +66,17 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
         name: product.platforms?.[0]?.name || "OTTSewa",
       },
       category: product.product_type,
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: (product.average_rating > 0 ? product.average_rating : 4.8).toFixed(1),
-        reviewCount: product.review_count > 0 ? product.review_count : 127,
-        bestRating: "5",
-        worstRating: "1",
-      },
-      review: {
-        "@type": "Review",
-        reviewRating: {
-          "@type": "Rating",
-          ratingValue: "5",
-          bestRating: "5",
-        },
-        author: {
-          "@type": "Person",
-          name: "OTTSewa Customer",
-        },
-        reviewBody: `Great product! ${product.title} delivered instantly.`,
-      },
+      ...(hasRating && hasReviews
+        ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: product.average_rating.toFixed(1),
+              reviewCount: product.review_count,
+              bestRating: "5",
+              worstRating: "1",
+            },
+          }
+        : {}),
       offers: {
         "@type": "Offer",
         url: `https://www.ottsewa.store/product/${product.slug}`,

@@ -63,13 +63,6 @@ const organizationJsonLd = {
     availableLanguage: ["English", "Nepali"],
   },
   sameAs: ["https://facebook.com/ottsewa", "https://instagram.com/ottsewa", "https://twitter.com/ottsewa"],
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "2847",
-    bestRating: "5",
-    worstRating: "1",
-  },
 }
 
 const storeJsonLd = {
@@ -97,13 +90,6 @@ const storeJsonLd = {
     dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
     opens: "00:00",
     closes: "23:59",
-  },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "2847",
-    bestRating: "5",
-    worstRating: "1",
   },
   hasMerchantReturnPolicy: {
     "@type": "MerchantReturnPolicy",
@@ -161,13 +147,6 @@ const merchantListingJsonLd = {
     merchantReturnDays: 7,
     returnMethod: "https://schema.org/ReturnByMail",
     returnFees: "https://schema.org/FreeReturn",
-  },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "2847",
-    bestRating: "5",
-    worstRating: "1",
   },
   hasOfferCatalog: {
     "@type": "OfferCatalog",
