@@ -1,4 +1,7 @@
+"use client"
+
 import type React from "react"
+import { useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 
 interface ProductDescriptionProps {
@@ -6,12 +9,29 @@ interface ProductDescriptionProps {
   className?: string
 }
 
-// Table scroll enhancement moved to CSS-only solution
 export function ProductDescription({ content, className }: ProductDescriptionProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const tables = containerRef.current.querySelectorAll("table")
+    tables.forEach((table) => {
+      // Skip if already wrapped
+      if (table.parentElement?.classList.contains("table-scroll-wrapper")) return
+
+      const wrapper = document.createElement("div")
+      wrapper.className = "table-scroll-wrapper"
+      table.parentNode?.insertBefore(wrapper, table)
+      wrapper.appendChild(table)
+    })
+  }, [content])
+
   if (!content) return null
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         "product-description",
         "prose prose-invert prose-zinc max-w-none",
@@ -45,12 +65,6 @@ export function ProductDescription({ content, className }: ProductDescriptionPro
         "[&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg",
         // Pre/code blocks
         "[&_pre]:overflow-x-auto [&_pre]:text-xs sm:[&_pre]:text-sm [&_pre]:p-3 sm:[&_pre]:p-4 [&_pre]:bg-zinc-900 [&_pre]:rounded-lg [&_pre]:my-3 sm:[&_pre]:my-4",
-        // Tables - CSS-only scroll (no JS needed)
-        "[&_table]:block [&_table]:overflow-x-auto [&_table]:w-full [&_table]:border-collapse",
-        "[&_table]:my-3 sm:[&_table]:my-4 [&_table]:text-sm",
-        "[&_th]:bg-zinc-800 [&_th]:text-white [&_th]:font-semibold [&_th]:p-2 sm:[&_th]:p-3 [&_th]:text-left [&_th]:border [&_th]:border-zinc-700",
-        "[&_td]:p-2 sm:[&_td]:p-3 [&_td]:border [&_td]:border-zinc-700 [&_td]:text-zinc-300",
-        "[&_tr:nth-child(even)]:bg-zinc-800/30",
         // Embedded content
         "[&_iframe]:max-w-full [&_iframe]:rounded-lg",
         "[&_video]:max-w-full [&_video]:rounded-lg",
