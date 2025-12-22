@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
     const { searchParams } = new URL(request.url)
-    const productId = searchParams.get("productId")
+    const productId = searchParams.get("product_id") || searchParams.get("productId")
     const limit = Number.parseInt(searchParams.get("limit") || "10")
     const offset = Number.parseInt(searchParams.get("offset") || "0")
 

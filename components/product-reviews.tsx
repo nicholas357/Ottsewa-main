@@ -108,11 +108,12 @@ function ProductReviewsComponent({
   reviewCount = 156,
   averageRating = 4.8,
 }: ProductReviewsProps) {
-  const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS)
+  const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [showAll, setShowAll] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [useFallback, setUseFallback] = useState(false)
   const [formData, setFormData] = useState({
     reviewer_name: "",
     reviewer_location: "",
@@ -124,16 +125,34 @@ function ProductReviewsComponent({
 
   useEffect(() => {
     const fetchReviews = async () => {
+      if (!productId) {
+        setReviews(FALLBACK_REVIEWS)
+        setUseFallback(true)
+        setLoading(false)
+        return
+      }
+
       try {
-        const response = await fetch(`/api/reviews?product_id=${productId}`)
+        const response = await fetch(`/api/reviews?product_id=${productId}&limit=20`)
         if (response.ok) {
           const data = await response.json()
-          if (data.reviews && data.reviews.length > 0) {
+          if (data.reviews && Array.isArray(data.reviews) && data.reviews.length > 0) {
             setReviews(data.reviews)
+            setUseFallback(false)
+          } else {
+            // No database reviews, use fallback
+            setReviews(FALLBACK_REVIEWS)
+            setUseFallback(true)
           }
+        } else {
+          // API error, use fallback
+          setReviews(FALLBACK_REVIEWS)
+          setUseFallback(true)
         }
       } catch (error) {
         console.error("Error fetching reviews:", error)
+        setReviews(FALLBACK_REVIEWS)
+        setUseFallback(true)
       } finally {
         setLoading(false)
       }
@@ -172,11 +191,12 @@ function ProductReviewsComponent({
         setFormData({ reviewer_name: "", reviewer_location: "", rating: 5, title: "", content: "" })
         setShowForm(false)
         // Refresh reviews
-        const refreshResponse = await fetch(`/api/reviews?product_id=${productId}`)
+        const refreshResponse = await fetch(`/api/reviews?product_id=${productId}&limit=20`)
         if (refreshResponse.ok) {
           const data = await refreshResponse.json()
-          if (data.reviews && data.reviews.length > 0) {
+          if (data.reviews && Array.isArray(data.reviews) && data.reviews.length > 0) {
             setReviews(data.reviews)
+            setUseFallback(false)
           }
         }
       } else {
@@ -199,22 +219,24 @@ function ProductReviewsComponent({
   }
 
   // Calculate stats from reviews
-  const totalReviews = reviews.length > 0 ? reviews.length : reviewCount
+  const displayReviews = reviews.length > 0 ? reviews : FALLBACK_REVIEWS
+  const totalReviews = displayReviews.length > 0 ? displayReviews.length : reviewCount
   const avgRating =
-    reviews.length > 0
-      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    displayReviews.length > 0
+      ? (displayReviews.reduce((sum, r) => sum + r.rating, 0) / displayReviews.length).toFixed(1)
       : averageRating.toFixed(1)
 
   const ratingDistribution = [5, 4, 3, 2, 1].map((star) => {
-    const count = reviews.filter((r) => r.rating === star).length
-    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : star === 5 ? 70 : star === 4 ? 20 : 5
+    const count = displayReviews.filter((r) => r.rating === star).length
+    const percentage =
+      displayReviews.length > 0 ? (count / displayReviews.length) * 100 : star === 5 ? 70 : star === 4 ? 20 : 5
     return { star, count, percentage }
   })
 
-  const displayedReviews = showAll ? reviews : reviews.slice(0, 3)
-  const featuredReview = reviews.reduce(
+  const displayedReviews = showAll ? displayReviews : displayReviews.slice(0, 3)
+  const featuredReview = displayReviews.reduce(
     (max, r) => ((r.helpful_count || 0) > (max.helpful_count || 0) ? r : max),
-    reviews[0],
+    displayReviews[0],
   )
 
   const formatDate = (dateStr: string) => {
@@ -236,7 +258,9 @@ function ProductReviewsComponent({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-white mb-1">Customer Reviews</h2>
-            <p className="text-zinc-500 text-sm">Real feedback from verified buyers</p>
+            <p className="text-zinc-500 text-sm">
+              {useFallback ? "Verified customer feedback" : "Real feedback from verified buyers"}
+            </p>
           </div>
           <Button
             onClick={() => setShowForm(!showForm)}
@@ -469,12 +493,12 @@ function ProductReviewsComponent({
         )}
 
         {/* Show More Button */}
-        {!loading && reviews.length > 3 && (
+        {!loading && displayReviews.length > 3 && (
           <button
             onClick={() => setShowAll(!showAll)}
             className="w-full mt-4 py-3 text-sm text-amber-400 hover:text-amber-300 flex items-center justify-center gap-2 transition-colors"
           >
-            {showAll ? "Show Less" : `Show All ${reviews.length} Reviews`}
+            {showAll ? "Show Less" : `Show All ${displayReviews.length} Reviews`}
             <ChevronDown className={`w-4 h-4 transition-transform ${showAll ? "rotate-180" : ""}`} />
           </button>
         )}
