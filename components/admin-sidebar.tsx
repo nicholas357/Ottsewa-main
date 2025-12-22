@@ -2,7 +2,18 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Package, ShoppingCart, Users, ImageIcon, Menu, X, Home, Mail } from "lucide-react"
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Users,
+  ImageIcon,
+  Menu,
+  X,
+  Home,
+  Mail,
+  MessageSquare,
+} from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -12,6 +23,7 @@ const navItems = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/credentials", label: "Send Credentials", icon: Mail },
+  { href: "/admin/reviews", label: "Reviews", icon: MessageSquare },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/banners", label: "Banners", icon: ImageIcon },
 ]

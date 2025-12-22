@@ -66,7 +66,7 @@ export function RouteTransitionBar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[9999] h-1">
       <div
-        className="h-full bg-gradient-to-r from-red-500 to-red-400 transition-all duration-200 ease-out shadow-lg shadow-red-500/50"
+        className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-200 ease-out shadow-lg shadow-amber-500/50"
         style={{ width: `${progress}%` }}
       />
     </div>
