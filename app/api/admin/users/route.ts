@@ -52,11 +52,21 @@ export async function GET() {
 
       // Determine auth provider from auth user data
       let authProvider = "email"
+      let avatarUrl = profile.avatar_url
+
       if (authUser) {
         // Check identities array for provider info
         if (authUser.identities && authUser.identities.length > 0) {
           const identity = authUser.identities[0]
           authProvider = identity.provider || "email"
+
+          // Get avatar from identity data (Google profile picture)
+          if (identity.identity_data?.avatar_url) {
+            avatarUrl = identity.identity_data.avatar_url
+          }
+          if (identity.identity_data?.picture) {
+            avatarUrl = identity.identity_data.picture
+          }
         }
         // Also check app_metadata.provider
         if (authUser.app_metadata?.provider) {
@@ -66,12 +76,20 @@ export async function GET() {
         if (authUser.app_metadata?.providers?.includes("google")) {
           authProvider = "google"
         }
+        // Also check user_metadata for avatar
+        if (authUser.user_metadata?.avatar_url) {
+          avatarUrl = authUser.user_metadata.avatar_url
+        }
+        if (authUser.user_metadata?.picture) {
+          avatarUrl = authUser.user_metadata.picture
+        }
       }
 
       return {
         ...profile,
         email: authUser?.email || profile.email,
         auth_provider: authProvider,
+        avatar_url: avatarUrl,
         last_sign_in_at: authUser?.last_sign_in_at,
         email_confirmed_at: authUser?.email_confirmed_at,
         created_at: authUser?.created_at || profile.created_at,
