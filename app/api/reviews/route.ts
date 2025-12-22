@@ -123,6 +123,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Rating must be between 1 and 5" }, { status: 400 })
     }
 
+    const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", user.id).single()
+
+    const reviewerName = profile?.full_name || user.email?.split("@")[0] || "Anonymous"
+
     // Check if user already reviewed this product
     const { data: existingReview } = await supabase
       .from("reviews")
@@ -135,29 +139,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "You have already reviewed this product" }, { status: 400 })
     }
 
-    // Check if user has purchased this product (verified purchase)
     const { data: order } = await supabase
       .from("orders")
       .select("id")
       .eq("product_id", productId)
       .eq("user_id", user.id)
-      .eq("payment_status", "approved")
+      .eq("payment_proof_status", "verified")
       .limit(1)
       .single()
 
     const isVerifiedPurchase = !!order
 
-    // Insert review
     const { data: review, error } = await supabase
       .from("reviews")
       .insert({
         product_id: productId,
         user_id: user.id,
+        reviewer_name: reviewerName,
         rating,
         title: title || null,
         content: content || null,
         is_verified_purchase: isVerifiedPurchase,
-        is_approved: false, // Reviews need admin approval
+        is_approved: false,
         is_featured: false,
         helpful_count: 0,
         order_id: order?.id || null,
