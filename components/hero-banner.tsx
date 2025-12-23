@@ -5,8 +5,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { createBrowserClient } from "@/lib/supabase/client"
-import { appCache, CACHE_KEYS, CACHE_TTL, STALE_TTL } from "@/lib/cache"
 
 interface Banner {
   id: string
@@ -26,6 +24,13 @@ interface Banner {
 interface CachedBanners {
   main: Banner[]
   side: Banner[]
+}
+
+interface HeroBannerProps {
+  initialBanners?: {
+    main: Banner[]
+    side: Banner[]
+  }
 }
 
 function BannerSkeleton() {
@@ -96,85 +101,16 @@ function NoBannersState() {
   )
 }
 
-export default function HeroBanner() {
-  const [mainBanners, setMainBanners] = useState<Banner[]>([])
-  const [sideBanners, setSideBanners] = useState<Banner[]>([])
+export default function HeroBanner({ initialBanners }: HeroBannerProps) {
+  const [mainBanners, setMainBanners] = useState<Banner[]>(initialBanners?.main || [])
+  const [sideBanners, setSideBanners] = useState<Banner[]>(initialBanners?.side || [])
   const [mainIndex, setMainIndex] = useState(0)
   const [sideIndex, setSideIndex] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(!initialBanners)
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
-  }, [])
-
-  useEffect(() => {
-    async function fetchBanners() {
-      const cacheKey = CACHE_KEYS.BANNERS
-      const cached = appCache.getWithStatus<CachedBanners>(cacheKey)
-
-      if (cached.data) {
-        setMainBanners(cached.data.main)
-        setSideBanners(cached.data.side)
-        setIsLoading(false)
-
-        if (!cached.needsRevalidation) {
-          return
-        }
-
-        appCache.markRevalidating(cacheKey)
-      }
-
-      try {
-        const supabase = createBrowserClient()
-        const { data, error } = await supabase
-          .from("hero_banners")
-          .select("*")
-          .eq("is_active", true)
-          .order("sort_order")
-
-        if (error) throw error
-
-        if (data && data.length > 0) {
-          const bannersWithLinks = await Promise.all(
-            data.map(async (banner) => {
-              let product = null
-              let category = null
-              if (banner.product_id) {
-                const { data: p } = await supabase.from("products").select("slug").eq("id", banner.product_id).single()
-                product = p
-              }
-              if (banner.category_id) {
-                const { data: c } = await supabase
-                  .from("categories")
-                  .select("slug")
-                  .eq("id", banner.category_id)
-                  .single()
-                category = c
-              }
-              return { ...banner, product, category }
-            }),
-          )
-
-          const main = bannersWithLinks.filter((b) => b.banner_type === "main")
-          const side = bannersWithLinks.filter((b) => b.banner_type === "side")
-
-          appCache.set<CachedBanners>(cacheKey, { main, side }, CACHE_TTL.BANNERS, STALE_TTL.BANNERS)
-
-          setMainBanners(main)
-          setSideBanners(side)
-        } else {
-          appCache.set<CachedBanners>(cacheKey, { main: [], side: [] }, CACHE_TTL.BANNERS, STALE_TTL.BANNERS)
-        }
-      } catch (error) {
-        console.error("Error fetching banners:", error)
-      } finally {
-        setIsLoading(false)
-        appCache.clearRevalidating(cacheKey)
-      }
-    }
-
-    fetchBanners()
   }, [])
 
   const nextMain = useCallback(() => {
@@ -198,14 +134,6 @@ export default function HeroBanner() {
     }, 4000)
     return () => clearInterval(sideTimer)
   }, [sideBanners.length])
-
-  if (isLoading) {
-    return <BannerSkeleton />
-  }
-
-  if (mainBanners.length === 0 && sideBanners.length === 0) {
-    return <NoBannersState />
-  }
 
   function getBannerLink(banner: Banner): string {
     if (banner.link_type === "product" && banner.product?.slug) {

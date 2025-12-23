@@ -3,6 +3,39 @@ import CategoryIcons from "@/components/category-icons"
 import RecommendedSection from "@/components/recommended-section"
 import TrustSection from "@/components/trust-section"
 import ProductTagsSEO from "@/components/product-tags-seo"
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+
+export const revalidate = 60
+
+async function getBanners() {
+  try {
+    const { data: banners, error } = await supabase
+      .from("hero_banners")
+      .select("*, products:product_id(slug), categories:category_id(slug)")
+      .eq("is_active", true)
+      .order("sort_order")
+
+    if (error) throw error
+
+    const formatted = (banners || []).map((b) => ({
+      ...b,
+      product: b.products,
+      category: b.categories,
+      products: undefined,
+      categories: undefined,
+    }))
+
+    return {
+      main: formatted.filter((b) => b.banner_type === "main"),
+      side: formatted.filter((b) => b.banner_type === "side"),
+    }
+  } catch (error) {
+    console.error("Error fetching banners:", error)
+    return { main: [], side: [] }
+  }
+}
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -166,7 +199,9 @@ const merchantListingJsonLd = {
   },
 }
 
-export default function Home() {
+export default async function Home() {
+  const banners = await getBanners()
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -178,7 +213,7 @@ export default function Home() {
         className="min-h-screen bg-transparent"
         aria-label="OTTSewa Home - Digital Subscriptions & Gift Cards Nepal"
       >
-        <HeroBanner />
+        <HeroBanner initialBanners={banners} />
         <CategoryIcons />
         <RecommendedSection />
         <ProductTagsSEO />
