@@ -20,13 +20,13 @@ async function verifyAdmin() {
 }
 
 // GET - Fetch single product with all related data
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   const auth = await verifyAdmin()
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status })
   }
 
-  const { id } = await params
+  const { id } = params
 
   const { data, error } = await supabaseAdmin
     .from("products")
@@ -58,13 +58,13 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 }
 
 // PUT - Update product
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   const auth = await verifyAdmin()
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status })
   }
 
-  const { id } = await params
+  const { id } = params
 
   try {
     const body = await request.json()
@@ -103,7 +103,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       editions,
       denominations,
       plans,
-      durations,
       license_types,
       license_durations,
       faqs,
@@ -207,38 +206,67 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     // Update subscription plans
     if (product_type === "subscription") {
-      await supabaseAdmin.from("subscription_plans").delete().eq("product_id", id)
-      if (plans?.length > 0) {
-        const planData = plans.map((p: any, i: number) => ({
-          product_id: id,
-          name: p.name,
-          slug: p.slug || p.name.toLowerCase().replace(/\s+/g, "-"),
-          description: p.description,
-          monthly_price: Number.parseFloat(p.monthly_price) || 0,
-          features: p.features || [],
-          max_devices: Number.parseInt(p.max_devices) || 1,
-          max_users: Number.parseInt(p.max_users) || 1,
-          quality: p.quality,
-          is_popular: p.is_popular ?? false,
-          is_available: p.is_available ?? true,
-          color: p.color,
-          sort_order: i,
-        }))
-        await supabaseAdmin.from("subscription_plans").insert(planData)
+      // First delete existing durations (they cascade from plans, but delete explicitly to be safe)
+      const { data: existingPlans } = await supabaseAdmin.from("subscription_plans").select("id").eq("product_id", id)
+
+      if (existingPlans && existingPlans.length > 0) {
+        const planIds = existingPlans.map((p) => p.id)
+        await supabaseAdmin.from("subscription_durations").delete().in("plan_id", planIds)
       }
 
-      await supabaseAdmin.from("subscription_durations").delete().eq("product_id", id)
-      if (durations?.length > 0) {
-        const durationData = durations.map((d: any, i: number) => ({
-          product_id: id,
-          months: Number.parseInt(d.months) || 1,
-          label: d.label,
-          discount_percent: Number.parseInt(d.discount_percent) || 0,
-          is_popular: d.is_popular ?? false,
-          is_available: d.is_available ?? true,
-          sort_order: i,
-        }))
-        await supabaseAdmin.from("subscription_durations").insert(durationData)
+      // Delete existing plans
+      await supabaseAdmin.from("subscription_plans").delete().eq("product_id", id)
+
+      // Insert new plans and their durations
+      if (plans?.length > 0) {
+        for (let i = 0; i < plans.length; i++) {
+          const p = plans[i]
+
+          // Insert plan and get its ID
+          const { data: insertedPlan, error: planError } = await supabaseAdmin
+            .from("subscription_plans")
+            .insert({
+              product_id: id,
+              name: p.name,
+              slug: p.slug || p.name.toLowerCase().replace(/\s+/g, "-"),
+              description: p.description,
+              features: p.features || [],
+              max_devices: Number.parseInt(p.max_devices) || 1,
+              max_users: Number.parseInt(p.max_users) || 1,
+              quality: p.quality,
+              is_popular: p.is_popular ?? false,
+              is_available: p.is_available ?? true,
+              color: p.color,
+              sort_order: i,
+            })
+            .select("id")
+            .single()
+
+          if (planError) {
+            console.error("Error inserting plan:", planError)
+            continue
+          }
+
+          // Insert durations for this plan
+          if (p.durations?.length > 0 && insertedPlan?.id) {
+            const durationData = p.durations.map((d: any, j: number) => ({
+              plan_id: insertedPlan.id,
+              months: Number.parseInt(d.months) || 1,
+              label: d.label,
+              price: Number.parseFloat(d.price) || 0,
+              discount_percent: Number.parseInt(d.discount_percent) || 0,
+              is_popular: d.is_popular ?? false,
+              is_available: d.is_available ?? true,
+              sort_order: j,
+            }))
+
+            const { error: durError } = await supabaseAdmin.from("subscription_durations").insert(durationData)
+
+            if (durError) {
+              console.error("Error inserting durations:", durError)
+            }
+          }
+        }
       }
     }
 
@@ -298,13 +326,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 // DELETE - Delete product
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   const auth = await verifyAdmin()
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status })
   }
 
-  const { id } = await params
+  const { id } = params
 
   // Delete product (cascades to related tables)
   const { error } = await supabaseAdmin.from("products").delete().eq("id", id)
