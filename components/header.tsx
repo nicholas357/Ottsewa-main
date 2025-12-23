@@ -223,6 +223,7 @@ export default function Header() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [loadingProducts, setLoadingProducts] = useState<string | null>(null)
   const [expandedMobileCategory, setExpandedMobileCategory] = useState<string | null>(null)
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
 
   const router = useRouter()
   const supabase = createClient()
@@ -243,27 +244,32 @@ export default function Header() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const { data: allCategories } = await supabase
-        .from("categories")
-        .select("id, name, slug, icon, description")
-        .eq("is_active", true)
-        .order("sort_order")
+      try {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000)
 
-      if (allCategories) {
-        const categoriesWithCounts = await Promise.all(
-          allCategories.map(async (cat) => {
-            const { count } = await supabase
-              .from("products")
-              .select("*", { count: "exact", head: true })
-              .eq("category_id", cat.id)
-              .eq("is_active", true)
-            return { ...cat, productCount: count || 0 }
-          }),
-        )
+        const { data: allCategories, error } = await supabase
+          .from("categories")
+          .select("id, name, slug, icon, description")
+          .eq("is_active", true)
+          .order("sort_order")
+          .limit(6)
+          .abortSignal(controller.signal)
 
-        const topCategories = categoriesWithCounts.sort((a, b) => b.productCount - a.productCount).slice(0, 3)
+        clearTimeout(timeoutId)
 
-        setCategories(topCategories)
+        if (error) throw error
+
+        if (allCategories) {
+          setCategories(allCategories.slice(0, 3).map((cat) => ({ ...cat, productCount: 0 })))
+        }
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          console.error("Error fetching categories:", error)
+        }
+        setCategories([])
+      } finally {
+        setCategoriesLoading(false)
       }
     }
     fetchCategories()

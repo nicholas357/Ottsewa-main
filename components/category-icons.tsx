@@ -87,7 +87,7 @@ export default function CategoryIcons() {
   useEffect(() => {
     async function fetchCategories() {
       const cacheKey = CACHE_KEYS.CATEGORY_WITH_COUNT
-      const { data: cached, isStale, needsRevalidation } = appCache.getWithStatus<CategoryWithCount[]>(cacheKey)
+      const { data: cached, needsRevalidation } = appCache.getWithStatus<CategoryWithCount[]>(cacheKey)
 
       if (cached) {
         setCategories(cached)
@@ -104,35 +104,54 @@ export default function CategoryIcons() {
     }
 
     async function fetchFreshData() {
-      const supabase = createBrowserClient()
-      const { data, error } = await supabase
-        .from("categories")
-        .select("id, name, slug, icon, is_active, sort_order")
-        .eq("is_active", true)
-        .order("sort_order", { ascending: true })
+      try {
+        const supabase = createBrowserClient()
 
-      if (!error && data) {
-        const categoriesWithCounts = await Promise.all(
-          data.map(async (category) => {
-            const { count } = await supabase
-              .from("products")
-              .select("*", { count: "exact", head: true })
-              .eq("category_id", category.id)
-              .eq("is_active", true)
+        // First get categories
+        const { data: categoriesData, error: catError } = await supabase
+          .from("categories")
+          .select("id, name, slug, icon, is_active, sort_order")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .limit(6)
 
-            return {
-              ...category,
-              productCount: count || 0,
-            }
-          }),
-        )
+        if (catError || !categoriesData) {
+          setLoading(false)
+          return
+        }
+
+        // Get all product counts in a single query
+        const { data: productCounts, error: countError } = await supabase
+          .from("products")
+          .select("category_id")
+          .eq("is_active", true)
+          .in(
+            "category_id",
+            categoriesData.map((c) => c.id),
+          )
+
+        // Count products per category
+        const countMap: Record<string, number> = {}
+        if (productCounts && !countError) {
+          productCounts.forEach((p) => {
+            countMap[p.category_id] = (countMap[p.category_id] || 0) + 1
+          })
+        }
+
+        const categoriesWithCounts = categoriesData.map((category) => ({
+          ...category,
+          productCount: countMap[category.id] || 0,
+        }))
 
         const cacheKey = CACHE_KEYS.CATEGORY_WITH_COUNT
         appCache.set(cacheKey, categoriesWithCounts, CACHE_TTL.CATEGORIES, STALE_TTL.CATEGORIES)
         appCache.clearRevalidating(cacheKey)
         setCategories(categoriesWithCounts)
+      } catch (err) {
+        console.error("Error fetching categories:", err)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
     fetchCategories()

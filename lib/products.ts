@@ -170,7 +170,7 @@ function getSupabase() {
   return supabaseInstance
 }
 
-async function withTimeout<T>(promise: Promise<T>, timeoutMs = 10000): Promise<T> {
+async function withTimeout<T>(promise: Promise<T>, timeoutMs = 12000): Promise<T> {
   const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Request timeout")), timeoutMs))
   return Promise.race([promise, timeout])
 }
@@ -183,7 +183,7 @@ async function safeQuery<T>(
 
   for (let i = 0; i <= retries; i++) {
     try {
-      const result = await withTimeout(queryFn(), 8000)
+      const result = await withTimeout(queryFn(), 10000)
       if (!result.error) {
         return result
       }
@@ -192,7 +192,7 @@ async function safeQuery<T>(
       lastError = err
       // Wait before retry with exponential backoff
       if (i < retries) {
-        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 500))
+        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 300))
       }
     }
   }
