@@ -61,10 +61,13 @@ export default function RecommendedSection() {
       const { products: fetchedProducts } = await getProducts({
         is_featured: true,
         limit: 10,
+        minimal: true,
       })
 
       const finalProducts =
-        fetchedProducts.length === 0 ? (await getProducts({ limit: 10, sort_by: "newest" })).products : fetchedProducts
+        fetchedProducts.length === 0
+          ? (await getProducts({ limit: 10, sort_by: "newest", minimal: true })).products
+          : fetchedProducts
 
       const cacheKey = CACHE_KEYS.HOME_PRODUCTS
       appCache.set(cacheKey, finalProducts, CACHE_TTL.HOME, STALE_TTL.HOME)

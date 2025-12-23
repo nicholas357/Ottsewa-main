@@ -212,6 +212,7 @@ export async function getProducts(options?: {
   search?: string
   platform?: string
   sort_by?: "price_asc" | "price_desc" | "newest" | "popular" | "rating"
+  minimal?: boolean
 }): Promise<{ products: Product[]; count: number }> {
   // Create cache key from options
   const cacheKey = `products_${JSON.stringify(options || {})}`
@@ -222,11 +223,12 @@ export async function getProducts(options?: {
 
   const supabase = getSupabase()
 
-  const executeQuery = async () => {
-    let query = supabase
-      .from("products")
-      .select(
-        `
+  const selectQuery = options?.minimal
+    ? `
+        *,
+        category:categories(id,name,slug)
+      `
+    : `
         *,
         category:categories(id,name,slug),
         platforms:product_platforms(platform:platforms(id,name,slug,icon)),
@@ -236,10 +238,10 @@ export async function getProducts(options?: {
         license_types:software_license_types(*),
         license_durations:software_license_durations(*),
         faqs:product_faqs(*)
-      `,
-        { count: "exact" },
-      )
-      .eq("is_active", true)
+      `
+
+  const executeQuery = async () => {
+    let query = supabase.from("products").select(selectQuery, { count: "exact" }).eq("is_active", true)
 
     if (options?.category) {
       query = query.eq("category.slug", options.category)
@@ -297,6 +299,19 @@ export async function getProducts(options?: {
   }
 
   const products = (data || []).map((product: any) => {
+    if (options?.minimal) {
+      return {
+        ...product,
+        platforms: [],
+        subscription_plans: [],
+        editions: [],
+        denominations: [],
+        license_types: [],
+        license_durations: [],
+        faqs: [],
+      }
+    }
+
     const platforms = product.platforms?.map((pp: any) => pp.platform).filter(Boolean) || []
     const subscription_plans = (product.subscription_plans || []).map((plan: any) => ({
       ...plan,
@@ -315,10 +330,7 @@ export async function getProducts(options?: {
     }
   })
 
-  const response = await executeQuery()
-  const count = (response as any).count || products.length
-
-  const result = { products, count }
+  const result = { products, count: products.length }
 
   // Cache for 2 minutes
   appCache.set(cacheKey, result, CACHE_TTL.PRODUCTS)
@@ -390,31 +402,31 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
 // Fetch featured products
 export async function getFeaturedProducts(limit = 5): Promise<Product[]> {
-  const { products } = await getProducts({ is_featured: true, limit })
+  const { products } = await getProducts({ is_featured: true, limit, minimal: true })
   return products
 }
 
 // Fetch bestseller products
 export async function getBestsellerProducts(limit = 10): Promise<Product[]> {
-  const { products } = await getProducts({ is_bestseller: true, limit })
+  const { products } = await getProducts({ is_bestseller: true, limit, minimal: true })
   return products
 }
 
 // Fetch new products
 export async function getNewProducts(limit = 10): Promise<Product[]> {
-  const { products } = await getProducts({ is_new: true, limit, sort_by: "newest" })
+  const { products } = await getProducts({ is_new: true, limit, sort_by: "newest", minimal: true })
   return products
 }
 
 // Fetch products by category
 export async function getProductsByCategory(categorySlug: string, limit = 20): Promise<Product[]> {
-  const { products } = await getProducts({ category: categorySlug, limit })
+  const { products } = await getProducts({ category: categorySlug, limit, minimal: true })
   return products
 }
 
 // Fetch products by type
 export async function getProductsByType(type: string, limit = 20): Promise<Product[]> {
-  const { products } = await getProducts({ product_type: type, limit })
+  const { products } = await getProducts({ product_type: type, limit, minimal: true })
   return products
 }
 
