@@ -19,8 +19,8 @@ let globalPollingInterval: ReturnType<typeof setInterval> | null = null
 let subscriberCount = 0
 let lastFetchTime = 0
 let lastVisibilityFetchTime = 0
-const MIN_FETCH_INTERVAL = 2000 // Prevent rapid refetching
-const VISIBILITY_FETCH_INTERVAL = 5000 // Min time between visibility refetches
+const MIN_FETCH_INTERVAL = 5000 // Increased from 2000 to 5000
+const VISIBILITY_FETCH_INTERVAL = 10000 // Increased from 5000 to 10000
 const AUTH_TIMEOUT = 3000 // 3 second timeout for auth calls
 
 function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
@@ -210,19 +210,17 @@ export function useAuth(): UseAuthReturn {
     }
   }, [fetchUser])
 
-  // Setup 8-second polling interval (shared across all useAuth instances)
+  // Setup 30-second polling interval (shared across all useAuth instances)
   useEffect(() => {
     subscriberCount++
 
     if (!globalPollingInterval) {
       globalPollingInterval = setInterval(() => {
-        // Background refresh every 8 seconds
         const cachedUser = appCache.get<AuthUser>(CACHE_KEYS.USER_PROFILE)
         if (cachedUser) {
-          // Only refetch if there are active subscribers
           fetchUser(true)
         }
-      }, 8000) // 8 second polling
+      }, 30000) // 30 second polling instead of 8
     }
 
     return () => {

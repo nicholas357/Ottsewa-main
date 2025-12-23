@@ -123,7 +123,7 @@ export const CACHE_TTL = {
   NAVBAR: 600, // 10 minutes fresh
   HOME: 180, // 3 minutes fresh
   SEARCH: 60, // 1 minute fresh for search results
-  USER_PROFILE: 8, // 8 seconds fresh - triggers background revalidation after this
+  USER_PROFILE: 30, // 30 seconds fresh
 }
 
 // Stale times (data usable while revalidating)
@@ -133,7 +133,7 @@ export const STALE_TTL = {
   BANNERS: 600, // 10 minutes stale
   NAVBAR: 1200, // 20 minutes stale
   HOME: 600, // 10 minutes stale
-  USER_PROFILE: 24, // 24 seconds stale - still usable while background refresh happens
+  USER_PROFILE: 60, // 60 seconds stale
 }
 
 // Cleanup interval (run every 5 minutes)
