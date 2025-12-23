@@ -196,7 +196,7 @@ export default function AdminUsersPage() {
   const stats = {
     total: users.length,
     admins: users.filter((u) => u.role === "admin").length,
-    customers: users.filter((u) => u.role !== "admin").length,
+    customers: users.filter((u) => u.role === "user").length,
     googleUsers: users.filter((u) => u.auth_provider?.toLowerCase() === "google").length,
     emailUsers: users.filter((u) => !u.auth_provider || u.auth_provider?.toLowerCase() === "email").length,
     newThisWeek: users.filter((u) => new Date(u.created_at) >= thisWeek).length,
@@ -208,18 +208,24 @@ export default function AdminUsersPage() {
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
       setActionLoading(true)
+      console.log("[v0] Updating user role:", { userId, newRole })
+
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: newRole }),
       })
 
+      console.log("[v0] Response status:", response.status)
+      const data = await response.json()
+      console.log("[v0] Response data:", data)
+
       if (!response.ok) {
-        const data = await response.json()
         throw new Error(data.error || "Failed to update role")
       }
 
-      toast.success(`User role updated to ${newRole}`, {
+      const roleLabel = newRole === "admin" ? "Admin" : "User"
+      toast.success(`User role updated to ${roleLabel}`, {
         description: "The user's permissions have been updated successfully.",
       })
       setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)))
@@ -228,6 +234,7 @@ export default function AdminUsersPage() {
         setSelectedUser((prev) => (prev ? { ...prev, role: newRole } : null))
       }
     } catch (error: any) {
+      console.log("[v0] Error updating role:", error)
       toast.error(error.message || "Failed to update role", {
         description: "Please try again or contact support.",
       })
@@ -437,7 +444,7 @@ export default function AdminUsersPage() {
               <SelectContent className="bg-[#1a1a1a] border-white/[0.08]">
                 <SelectItem value="all">All Roles</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="customer">Customer</SelectItem>
+                <SelectItem value="user">User</SelectItem>
               </SelectContent>
             </Select>
             <Select value={providerFilter} onValueChange={setProviderFilter}>
@@ -599,7 +606,7 @@ export default function AdminUsersPage() {
                           ) : (
                             <User className="w-3 h-3 mr-1" />
                           )}
-                          {user.role === "admin" ? "Admin" : "Customer"}
+                          {user.role === "admin" ? "Admin" : "User"}
                         </Badge>
                       </td>
                       <td className="p-3 sm:p-4 hidden sm:table-cell">
@@ -632,7 +639,7 @@ export default function AdminUsersPage() {
                                 setRoleUpdateUser({
                                   id: user.id,
                                   currentRole: user.role,
-                                  newRole: user.role === "admin" ? "customer" : "admin",
+                                  newRole: user.role === "admin" ? "user" : "admin",
                                 })
                               }
                               className="text-zinc-300 hover:text-white hover:bg-white/[0.05] cursor-pointer"
@@ -733,7 +740,7 @@ export default function AdminUsersPage() {
                     </div>
                     <div>
                       <p className="text-xs text-zinc-500">Role</p>
-                      <p className="text-sm text-white capitalize">{selectedUser.role || "customer"}</p>
+                      <p className="text-sm text-white capitalize">{selectedUser.role || "user"}</p>
                     </div>
                   </div>
 
@@ -777,7 +784,7 @@ export default function AdminUsersPage() {
                       setRoleUpdateUser({
                         id: selectedUser.id,
                         currentRole: selectedUser.role,
-                        newRole: selectedUser.role === "admin" ? "customer" : "admin",
+                        newRole: selectedUser.role === "admin" ? "user" : "admin",
                       })
                     }}
                     className="flex-1 bg-[#1a1a1a] border-white/[0.08] text-zinc-300 hover:text-white"
@@ -824,7 +831,7 @@ export default function AdminUsersPage() {
             <AlertDialogDescription className="text-zinc-400">
               {roleUpdateUser?.newRole === "admin"
                 ? "This user will have full admin access to manage products, orders, users, and all site settings. This is a powerful permission."
-                : "This user will lose admin privileges and become a regular customer. They will no longer have access to the admin panel."}
+                : "This user will lose admin privileges and become a regular user. They will no longer have access to the admin panel."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4">

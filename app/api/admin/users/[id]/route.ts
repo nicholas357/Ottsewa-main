@@ -21,13 +21,13 @@ async function checkAdmin() {
 }
 
 // GET - Fetch single user
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   const admin = await checkAdmin()
   if (!admin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { id } = await params
+  const { id } = params
 
   try {
     // Get auth user data
@@ -78,13 +78,15 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 }
 
 // PATCH - Update user role
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   const admin = await checkAdmin()
   if (!admin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { id } = await params
+  const { id } = params
+
+  console.log("[v0] PATCH request - userId:", id, "adminId:", admin.id)
 
   // Prevent admin from demoting themselves
   if (admin.id === id) {
@@ -95,10 +97,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = await request.json()
     const { role } = body
 
+    console.log("[v0] Updating role to:", role)
+
     // Validate role
-    const validRoles = ["customer", "admin"]
+    const validRoles = ["user", "admin"]
     if (!validRoles.includes(role)) {
-      return NextResponse.json({ error: "Invalid role" }, { status: 400 })
+      return NextResponse.json({ error: "Invalid role. Must be 'user' or 'admin'" }, { status: 400 })
     }
 
     const { data: profile, error } = await supabaseAdmin
@@ -111,25 +115,27 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       .select()
       .single()
 
+    console.log("[v0] Update result:", { profile, error })
+
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ user: profile })
   } catch (error) {
-    console.error("Error updating user role:", error)
+    console.error("[v0] Error updating user role:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 // DELETE - Delete a user (use with caution!)
-export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
   const admin = await checkAdmin()
   if (!admin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { id } = await params
+  const { id } = params
 
   // Prevent admin from deleting themselves
   if (admin.id === id) {

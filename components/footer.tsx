@@ -260,8 +260,8 @@ export default function Footer() {
         </motion.div>
       </div>
 
-      <meta itemProp="url" content="https://ottsewa.store" />
-      <link itemProp="logo" href="https://ottsewa.store/logo.png" />
+      <meta itemProp="url" content="https://www.ottsewa.store" />
+      <link itemProp="logo" href="https://www.ottsewa.store/logo.png" />
     </footer>
   )
 }
