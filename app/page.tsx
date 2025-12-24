@@ -3,21 +3,36 @@ import CategoryIcons from "@/components/category-icons"
 import RecommendedSection from "@/components/recommended-section"
 import TrustSection from "@/components/trust-section"
 import ProductTagsSEO from "@/components/product-tags-seo"
-import { createClient } from "@supabase/supabase-js"
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 export const revalidate = 60
 
 async function getBanners() {
+  const emptyBanners = { main: [], side: [] }
+
   try {
+    // Dynamic import to prevent build-time initialization errors
+    const { createClient } = await import("@supabase/supabase-js")
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn("[SSG] Missing Supabase env vars, returning empty banners")
+      return emptyBanners
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
     const { data: banners, error } = await supabase
       .from("hero_banners")
       .select("*, products:product_id(slug), categories:category_id(slug)")
       .eq("is_active", true)
       .order("sort_order")
 
-    if (error) throw error
+    if (error) {
+      console.error("[SSG] Error fetching banners:", error.message)
+      return emptyBanners
+    }
 
     const formatted = (banners || []).map((b) => ({
       ...b,
@@ -32,8 +47,8 @@ async function getBanners() {
       side: formatted.filter((b) => b.banner_type === "side"),
     }
   } catch (error) {
-    console.error("Error fetching banners:", error)
-    return { main: [], side: [] }
+    console.error("[SSG] Unexpected error in getBanners:", error)
+    return emptyBanners
   }
 }
 
@@ -200,14 +215,36 @@ const merchantListingJsonLd = {
 }
 
 export default async function Home() {
-  const banners = await getBanners()
+  let banners = { main: [], side: [] }
+  try {
+    banners = await getBanners()
+  } catch {
+    // Silently fail - banners are not critical for SEO
+    console.error("[SSG] Failed to load banners, using empty state")
+  }
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(merchantListingJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        suppressHydrationWarning
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        suppressHydrationWarning
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}
+        suppressHydrationWarning
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(merchantListingJsonLd) }}
+        suppressHydrationWarning
+      />
 
       <main
         className="min-h-screen bg-transparent"
