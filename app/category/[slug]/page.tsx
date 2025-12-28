@@ -4,8 +4,6 @@ import { ChevronRight, Home, Grid } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import ProductCard from "@/components/product-card"
 
-export const revalidate = 60
-
 interface Category {
   id: string
   name: string

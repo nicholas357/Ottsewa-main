@@ -1,7 +1,9 @@
 "use client"
-import Link from "next/link"
+
+import type React from "react"
 import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import {
   Gamepad2,
   CreditCard,
@@ -76,6 +78,7 @@ export default function CategoryIcons() {
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
   const [loading, setLoading] = useState(true)
   const [isMounted, setIsMounted] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     setIsMounted(true)
@@ -154,6 +157,21 @@ export default function CategoryIcons() {
     fetchCategories()
   }, [])
 
+  const handleCategoryHover = useCallback(
+    (slug: string) => {
+      router.prefetch(`/category/${slug}`)
+    },
+    [router],
+  )
+
+  const handleCategoryClick = useCallback(
+    (e: React.MouseEvent, slug: string) => {
+      e.preventDefault()
+      router.push(`/category/${slug}`)
+    },
+    [router],
+  )
+
   if (loading) {
     return (
       <section
@@ -220,14 +238,13 @@ export default function CategoryIcons() {
                     <p className="text-xs sm:text-sm text-zinc-500 hidden sm:block">Find what you're looking for</p>
                   </div>
                 </div>
-                <Link
+                <a
                   href="/category"
-                  prefetch={true}
                   className="flex items-center gap-1 text-xs sm:text-sm text-amber-400 hover:text-amber-300 transition-colors group"
                 >
                   View All
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
+                </a>
               </div>
 
               {/* Categories grid */}
@@ -248,9 +265,10 @@ export default function CategoryIcons() {
                       transition={{ duration: 0.4, delay: index * 0.05 }}
                       whileHover={{ y: -2, transition: { duration: 0.2 } }}
                     >
-                      <Link
+                      <a
                         href={`/category/${category.slug}`}
-                        prefetch={true}
+                        onClick={(e) => handleCategoryClick(e, category.slug)}
+                        onMouseEnter={() => handleCategoryHover(category.slug)}
                         className="group relative flex flex-col p-3 sm:p-4 rounded-xl bg-[#1a1a1a] border border-white/[0.04] hover:border-amber-500/30 hover:bg-[#1e1e1e] transition-all duration-300 cursor-pointer"
                         itemProp="url"
                         title={`Browse ${category.name} - ${category.productCount} products available`}
@@ -270,7 +288,7 @@ export default function CategoryIcons() {
                         <span className="text-xs text-zinc-500 group-hover:text-zinc-400 transition-colors">
                           {category.productCount} {category.productCount === 1 ? "item" : "items"}
                         </span>
-                      </Link>
+                      </a>
                     </motion.li>
                   )
                 })}
