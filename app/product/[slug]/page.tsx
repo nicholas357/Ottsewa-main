@@ -66,7 +66,7 @@ const hasLicenseDurations = (p: Product | null) =>
 const hasFaqs = (p: Product | null) => p?.faqs && Array.isArray(p.faqs) && p.faqs.filter((f) => f?.is_active).length > 0
 const hasTags = (p: Product | null) => p?.tags && Array.isArray(p.tags) && p.tags.length > 0
 
-// SSR: Fetch product data on server
+// SSR: Fetch product data on server with caching
 async function getProduct(slug: string): Promise<Product | null> {
   try {
     return await getProductBySlug(slug)
@@ -323,8 +323,8 @@ function generateBreadcrumbSchema(product: Product, baseUrl: string) {
 }
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const { slug } = params
   const product = await getProduct(slug)
 
   if (!product) {
@@ -384,8 +384,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+export const revalidate = 60 // Revalidate every 60 seconds
+
+export default async function ProductPage({ params }: { params: { slug: string } }) {
+  const { slug } = params
   const product = await getProduct(slug)
 
   if (!product) {

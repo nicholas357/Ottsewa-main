@@ -44,15 +44,15 @@ export function RouteTransitionBar() {
     setIsTransitioning(true)
     setProgress(30)
 
-    const timer1 = setTimeout(() => setProgress(60), 100)
-    const timer2 = setTimeout(() => setProgress(80), 200)
+    const timer1 = setTimeout(() => setProgress(70), 50)
+    const timer2 = setTimeout(() => setProgress(90), 100)
     const timer3 = setTimeout(() => {
       setProgress(100)
       setTimeout(() => {
         setIsTransitioning(false)
         setProgress(0)
-      }, 200)
-    }, 300)
+      }, 150)
+    }, 200)
 
     return () => {
       clearTimeout(timer1)
@@ -66,7 +66,7 @@ export function RouteTransitionBar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[9999] h-1">
       <div
-        className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-200 ease-out shadow-lg shadow-amber-500/50"
+        className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-150 ease-out shadow-lg shadow-amber-500/50"
         style={{ width: `${progress}%` }}
       />
     </div>
