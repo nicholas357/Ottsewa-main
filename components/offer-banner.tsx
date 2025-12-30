@@ -4,13 +4,15 @@ import { useState } from "react"
 import { X, Phone } from "lucide-react"
 import Link from "next/link"
 
+export const OFFER_BANNER_HEIGHT = 40 // approximate height in pixels
+
 export function OfferBanner() {
   const [isVisible, setIsVisible] = useState(true)
 
   if (!isVisible) return null
 
   return (
-    <div className="relative bg-amber-500 overflow-hidden">
+    <div className="relative bg-amber-500 overflow-hidden border-b-2 border-amber-600 shadow-sm" id="offer-banner">
       {/* Striped pattern background */}
       <div
         className="absolute inset-0 opacity-10"

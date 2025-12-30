@@ -39,6 +39,26 @@ export function RouteTransitionBar() {
   const pathname = usePathname()
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [bannerOffset, setBannerOffset] = useState(0)
+
+  useEffect(() => {
+    // Check if offer banner exists and get its height
+    const checkBanner = () => {
+      const banner = document.getElementById("offer-banner")
+      if (banner) {
+        setBannerOffset(banner.offsetHeight)
+      } else {
+        setBannerOffset(0)
+      }
+    }
+
+    checkBanner()
+    // Re-check when DOM might change
+    const observer = new MutationObserver(checkBanner)
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     setIsTransitioning(true)
@@ -64,9 +84,9 @@ export function RouteTransitionBar() {
   if (!isTransitioning) return null
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] h-1">
+    <div className="fixed left-0 right-0 z-[9999] h-1" style={{ top: bannerOffset }}>
       <div
-        className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-200 ease-out shadow-lg shadow-amber-500/50"
+        className="h-full bg-gradient-to-r from-red-500 to-orange-500 transition-all duration-200 ease-out shadow-lg shadow-red-500/50"
         style={{ width: `${progress}%` }}
       />
     </div>
