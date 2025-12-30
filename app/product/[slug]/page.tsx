@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Shield, Zap, Clock, ChevronRight, Tag, ChevronDown, Home } from "lucide-react"
-import { getProductBySlug, type Product } from "@/lib/products"
+import { getProductBySlug, getProducts, type Product } from "@/lib/products"
 import { ProductDescription } from "@/components/product-description"
 import { ProductInteractions } from "@/components/product-interactions"
 
@@ -322,9 +322,21 @@ function generateBreadcrumbSchema(product: Product, baseUrl: string) {
   }
 }
 
+export async function generateStaticParams() {
+  try {
+    const { products } = await getProducts({ limit: 50, sort_by: "popular" })
+    return products.map((product) => ({
+      slug: product.slug,
+    }))
+  } catch (error) {
+    console.error("Error generating static params:", error)
+    return []
+  }
+}
+
 // Generate metadata for SEO
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const { slug } = params
   const product = await getProduct(slug)
 
   if (!product) {
@@ -384,8 +396,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+export const revalidate = 60 // Revalidate every 60 seconds
+
+export default async function ProductPage({ params }: { params: { slug: string } }) {
+  const { slug } = params
   const product = await getProduct(slug)
 
   if (!product) {

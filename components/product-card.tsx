@@ -2,9 +2,9 @@
 
 import type React from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { Heart, Eye, Star, Flame, Sparkles, TrendingUp, Clock } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useCallback, useMemo } from "react"
+import { useMemo } from "react"
 import { useWishlist } from "@/contexts/wishlist-context"
 import type { Product } from "@/lib/products"
 
@@ -38,7 +38,6 @@ function getPriceValidUntil(): string {
 
 export default function ProductCard({ product, index = 0, showTags = true }: ProductCardProps) {
   const { isInWishlist, addItem, removeItem } = useWishlist()
-  const router = useRouter()
 
   const discountedPrice =
     product.discount_percent > 0 ? product.base_price * (1 - product.discount_percent / 100) : product.base_price
@@ -132,18 +131,6 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
     return structuredData
   }, [product, discountedPrice])
 
-  const handleProductHover = useCallback(() => {
-    router.prefetch(`/product/${product.slug}`)
-  }, [router, product.slug])
-
-  const handleProductClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault()
-      router.push(`/product/${product.slug}`)
-    },
-    [router, product.slug],
-  )
-
   const toggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -166,10 +153,9 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
     <li>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <a
+      <Link
         href={`/product/${product.slug}`}
-        onClick={handleProductClick}
-        onMouseEnter={handleProductHover}
+        prefetch={true}
         className="group relative overflow-hidden rounded-xl bg-zinc-900/50 border border-amber-500/[0.08] transition-all duration-200 hover:border-amber-500/20 flex flex-col cursor-pointer h-full"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/15 to-transparent z-10" />
@@ -313,7 +299,7 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
             </div>
           </div>
         </div>
-      </a>
+      </Link>
     </li>
   )
 }
