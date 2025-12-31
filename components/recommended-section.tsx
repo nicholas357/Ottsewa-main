@@ -61,6 +61,7 @@ export default function RecommendedSection() {
       const { products: fetchedProducts } = await getProducts({
         is_featured: true,
         limit: 10,
+        sort_by: "recommended", // Use new sort option
       })
 
       const finalProducts =

@@ -211,7 +211,7 @@ export async function getProducts(options?: {
   is_new?: boolean
   search?: string
   platform?: string
-  sort_by?: "price_asc" | "price_desc" | "newest" | "popular" | "rating"
+  sort_by?: "price_asc" | "price_desc" | "newest" | "popular" | "rating" | "recommended"
 }): Promise<{ products: Product[]; count: number }> {
   // Create cache key from options
   const cacheKey = `products_${JSON.stringify(options || {})}`
@@ -277,6 +277,11 @@ export async function getProducts(options?: {
         break
       case "rating":
         query = query.order("average_rating", { ascending: false })
+        break
+      case "recommended":
+        query = query
+          .order("recommended_order", { ascending: true, nullsFirst: false })
+          .order("created_at", { ascending: false })
         break
       default:
         query = query.order("created_at", { ascending: false })
