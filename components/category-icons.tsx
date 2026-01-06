@@ -29,42 +29,6 @@ import {
 import { createBrowserClient } from "@/lib/supabase/client"
 import { appCache, CACHE_TTL, STALE_TTL, CACHE_KEYS } from "@/lib/cache"
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.1,
-    },
-  },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.35,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-}
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-}
-
 const iconMap: Record<string, LucideIcon> = {
   gamepad2: Gamepad2,
   gamepad: Gamepad2,
@@ -113,7 +77,12 @@ interface CategoryWithCount extends Category {
 export default function CategoryIcons() {
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
   const [loading, setLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     async function fetchCategories() {
@@ -138,6 +107,7 @@ export default function CategoryIcons() {
       try {
         const supabase = createBrowserClient()
 
+        // First get categories
         const { data: categoriesData, error: catError } = await supabase
           .from("categories")
           .select("id, name, slug, icon, is_active, sort_order")
@@ -150,6 +120,7 @@ export default function CategoryIcons() {
           return
         }
 
+        // Get all product counts in a single query
         const { data: productCounts, error: countError } = await supabase
           .from("products")
           .select("category_id")
@@ -159,6 +130,7 @@ export default function CategoryIcons() {
             categoriesData.map((c) => c.id),
           )
 
+        // Count products per category
         const countMap: Record<string, number> = {}
         if (productCounts && !countError) {
           productCounts.forEach((p) => {
@@ -248,9 +220,14 @@ export default function CategoryIcons() {
       itemType="https://schema.org/SiteNavigationElement"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <motion.div
+          initial={false}
+          animate={isMounted ? { opacity: 1, y: 0 } : undefined}
+          transition={{ duration: 0.5 }}
+        >
           <div className="relative rounded-2xl border border-white/[0.08] p-3">
             <div className="relative rounded-xl bg-[#0f0f0f] overflow-hidden p-4 sm:p-6 lg:p-8">
+              {/* Header */}
               <div className="flex items-center justify-between mb-6 sm:mb-8">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/20">
@@ -270,6 +247,7 @@ export default function CategoryIcons() {
                 </a>
               </div>
 
+              {/* Categories grid */}
               <ul
                 className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 list-none"
                 role="list"
@@ -283,9 +261,9 @@ export default function CategoryIcons() {
                       key={category.id}
                       itemProp="name"
                       initial={false}
-                      whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                      className="animate-in fade-in slide-in-from-bottom-2 duration-300"
-                      style={{ animationDelay: `${index * 60}ms`, animationFillMode: "both" }}
+                      animate={isMounted ? { opacity: 1, y: 0 } : undefined}
+                      transition={{ duration: 0.4, delay: index * 0.05 }}
+                      whileHover={{ y: -2, transition: { duration: 0.2 } }}
                     >
                       <a
                         href={`/category/${category.slug}`}
@@ -295,6 +273,7 @@ export default function CategoryIcons() {
                         itemProp="url"
                         title={`Browse ${category.name} - ${category.productCount} products available`}
                       >
+                        {/* Icon */}
                         <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#222222] border border-white/[0.04] flex items-center justify-center mb-2.5 sm:mb-3 group-hover:border-amber-500/20 transition-colors">
                           <IconComponent
                             className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 group-hover:text-amber-400 transition-colors"
@@ -302,6 +281,7 @@ export default function CategoryIcons() {
                           />
                         </div>
 
+                        {/* Text */}
                         <span className="text-sm sm:text-base font-medium text-zinc-200 group-hover:text-white transition-colors line-clamp-1 mb-0.5">
                           {category.name}
                         </span>
@@ -315,7 +295,7 @@ export default function CategoryIcons() {
               </ul>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

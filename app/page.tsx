@@ -3,7 +3,6 @@ import CategoryIcons from "@/components/category-icons"
 import RecommendedSection from "@/components/recommended-section"
 import TrustSection from "@/components/trust-section"
 import ProductTagsSEO from "@/components/product-tags-seo"
-import HomeSection from "@/components/home-section"
 
 export const revalidate = 60
 
@@ -254,8 +253,6 @@ export default async function Home() {
         <HeroBanner initialBanners={banners} />
         <CategoryIcons />
         <RecommendedSection />
-        <HomeSection sectionType="games" title="Games" viewAllLink="/category/games" />
-        <HomeSection sectionType="game_currency" title="Game Currency" viewAllLink="/category/game-currency" />
         <ProductTagsSEO />
         <TrustSection />
       </main>

@@ -7,47 +7,16 @@ import { getProducts, type Product } from "@/lib/products"
 import { appCache, CACHE_TTL, STALE_TTL, CACHE_KEYS } from "@/lib/cache"
 import ProductCard from "@/components/product-card"
 
-const containerVariants = {
-  hidden: { opacity: 1 }, // Start visible for SEO
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
-    },
-  },
-}
-
-const itemVariants = {
-  hidden: { opacity: 1, y: 0 }, // Start visible for SEO
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-}
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-}
-
 export default function RecommendedSection() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [hasMounted, setHasMounted] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const itemListJsonLd = useMemo(() => {
     if (products.length === 0) return null
@@ -68,7 +37,7 @@ export default function RecommendedSection() {
 
   const fetchProducts = useCallback(async () => {
     const cacheKey = CACHE_KEYS.HOME_PRODUCTS
-    const { data: cached, needsRevalidation } = appCache.getWithStatus<Product[]>(cacheKey)
+    const { data: cached, isStale, needsRevalidation } = appCache.getWithStatus<Product[]>(cacheKey)
 
     if (cached) {
       setProducts(cached)
@@ -92,7 +61,7 @@ export default function RecommendedSection() {
       const { products: fetchedProducts } = await getProducts({
         is_featured: true,
         limit: 10,
-        sort_by: "recommended",
+        sort_by: "recommended", // Use new sort option
       })
 
       const finalProducts =
@@ -112,7 +81,6 @@ export default function RecommendedSection() {
 
   useEffect(() => {
     fetchProducts()
-    setHasMounted(true)
   }, [fetchProducts])
 
   if (loading) {
@@ -179,7 +147,11 @@ export default function RecommendedSection() {
       )}
 
       <div className="max-w-7xl mx-auto">
-        <motion.div initial="hidden" animate={hasMounted ? "visible" : "hidden"} variants={sectionVariants}>
+        <motion.div
+          initial={false}
+          animate={isMounted ? { opacity: 1, y: 0 } : undefined}
+          transition={{ duration: 0.5 }}
+        >
           <div className="relative rounded-2xl border border-white/[0.08] p-3">
             <div className="relative rounded-xl bg-[#0f0f0f] overflow-hidden">
               <div className="relative p-4 sm:p-6">
@@ -207,31 +179,31 @@ export default function RecommendedSection() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" role="list">
+                <ul
+                  className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 list-none"
+                  role="list"
+                >
                   {products.map((product, index) => (
                     <motion.div
                       key={product.id}
                       initial={false}
-                      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                      className="animate-in fade-in slide-in-from-bottom-2 duration-300"
-                      style={{ animationDelay: `${index * 50}ms`, animationFillMode: "both" }}
+                      animate={isMounted ? { opacity: 1, y: 0 } : undefined}
+                      transition={{ duration: 0.4, delay: index * 0.03 }}
+                      whileHover={{ y: -2, transition: { duration: 0.2 } }}
                     >
                       <ProductCard product={product} index={index} />
                     </motion.div>
                   ))}
-                </div>
+                </ul>
 
-                <motion.div
-                  className="flex justify-center mt-8 animate-in fade-in duration-500"
-                  style={{ animationDelay: "400ms" }}
-                >
+                <div className="flex justify-center mt-8">
                   <button
                     onClick={() => router.push("/category")}
                     className="px-6 py-2.5 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400 transition-all text-sm cursor-pointer"
                   >
                     See all products
                   </button>
-                </motion.div>
+                </div>
               </div>
             </div>
           </div>
