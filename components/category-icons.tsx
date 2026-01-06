@@ -248,7 +248,7 @@ export default function CategoryIcons() {
       itemType="https://schema.org/SiteNavigationElement"
     >
       <div className="max-w-7xl mx-auto">
-        <motion.div initial="hidden" animate="visible" variants={sectionVariants}>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="relative rounded-2xl border border-white/[0.08] p-3">
             <div className="relative rounded-xl bg-[#0f0f0f] overflow-hidden p-4 sm:p-6 lg:p-8">
               <div className="flex items-center justify-between mb-6 sm:mb-8">
@@ -270,14 +270,11 @@ export default function CategoryIcons() {
                 </a>
               </div>
 
-              <motion.ul
+              <ul
                 className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 list-none"
                 role="list"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
               >
-                {categories.map((category) => {
+                {categories.map((category, index) => {
                   const iconKey = (category.icon || category.slug || "package").toLowerCase()
                   const IconComponent = iconMap[iconKey] || Package
 
@@ -285,8 +282,10 @@ export default function CategoryIcons() {
                     <motion.li
                       key={category.id}
                       itemProp="name"
-                      variants={itemVariants}
+                      initial={false}
                       whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                      className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+                      style={{ animationDelay: `${index * 60}ms`, animationFillMode: "both" }}
                     >
                       <a
                         href={`/category/${category.slug}`}
@@ -313,10 +312,10 @@ export default function CategoryIcons() {
                     </motion.li>
                   )
                 })}
-              </motion.ul>
+              </ul>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

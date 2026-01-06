@@ -243,9 +243,10 @@ export default function Header() {
   const isLoading = authLoading && !getCachedUser()
 
   useEffect(() => {
+    const controller = new AbortController()
+
     const fetchCategories = async () => {
       try {
-        const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 5000)
 
         const { data: allCategories, error } = await supabase
@@ -264,15 +265,22 @@ export default function Header() {
           setCategories(allCategories.slice(0, 3).map((cat) => ({ ...cat, productCount: 0 })))
         }
       } catch (error: any) {
-        if (error.name !== "AbortError") {
-          console.error("Error fetching categories:", error)
+        if (error?.name === "AbortError" || controller.signal.aborted) {
+          return // Silently ignore abort errors
         }
+        console.error("Error fetching categories:", error)
         setCategories([])
       } finally {
-        setCategoriesLoading(false)
+        if (!controller.signal.aborted) {
+          setCategoriesLoading(false)
+        }
       }
     }
     fetchCategories()
+
+    return () => {
+      controller.abort()
+    }
   }, [])
 
   const fetchCategoryProducts = async (categoryId: string) => {
