@@ -2,8 +2,42 @@
 
 import { motion } from "framer-motion"
 import { Shield, Clock, CreditCard, Headphones, CheckCircle, Users, TrendingUp, Sparkles, Star } from "lucide-react"
-import { useEffect, useState } from "react"
 import AnimatedCounter from "./AnimatedCounter"
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+}
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.15,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+}
 
 const trustBadges = [
   { icon: Shield, title: "Secure Transactions", description: "Your data is protected with encryption." },
@@ -20,20 +54,10 @@ const stats = [
 ]
 
 export default function TrustSection() {
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
   return (
     <section className="px-4 sm:px-6 lg:px-8 py-12 md:py-16" itemScope itemType="https://schema.org/Organization">
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={false}
-          animate={isMounted ? { opacity: 1, y: 0 } : undefined}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div initial="hidden" animate="visible" variants={sectionVariants}>
           <div className="relative rounded-2xl border border-white/[0.08] p-3">
             <div className="relative rounded-xl bg-[#0f0f0f] overflow-hidden p-6 sm:p-8 lg:p-10">
               {/* Header */}
@@ -50,16 +74,19 @@ export default function TrustSection() {
                 </p>
               </div>
 
-              {/* Trust badges grid - Updated card backgrounds */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+              {/* Trust badges grid */}
+              <motion.div
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
                 {trustBadges.map((badge, index) => (
                   <motion.article
                     key={index}
                     className="p-4 rounded-xl bg-[#1a1a1a] border border-white/[0.04] hover:border-amber-500/20 transition-colors"
-                    initial={false}
-                    animate={isMounted ? { opacity: 1, y: 0 } : undefined}
-                    transition={{ duration: 0.4, delay: index * 0.05 }}
-                    whileHover={{ y: -2, transition: { duration: 0.2 } }}
+                    variants={itemVariants}
+                    whileHover={{ y: -3, transition: { duration: 0.2 } }}
                   >
                     <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3">
                       <badge.icon className="w-5 h-5 text-amber-500" aria-hidden="true" />
@@ -68,19 +95,23 @@ export default function TrustSection() {
                     <p className="text-zinc-500 text-xs leading-relaxed">{badge.description}</p>
                   </motion.article>
                 ))}
-              </div>
+              </motion.div>
 
-              {/* Stats section - Updated background */}
-              <div className="rounded-xl bg-[#1a1a1a] border border-white/[0.04] p-5 sm:p-6 mb-8">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Stats section */}
+              <motion.div
+                className="rounded-xl bg-[#1a1a1a] border border-white/[0.04] p-5 sm:p-6 mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                <motion.div
+                  className="grid grid-cols-2 lg:grid-cols-4 gap-6"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
                   {stats.map((stat, index) => (
-                    <motion.div
-                      key={index}
-                      className="text-center"
-                      initial={false}
-                      animate={isMounted ? { opacity: 1, y: 0 } : undefined}
-                      transition={{ duration: 0.4, delay: index * 0.05 }}
-                    >
+                    <motion.div key={index} className="text-center" variants={itemVariants}>
                       <div className="flex flex-col items-center">
                         <div className="w-9 h-9 rounded-full bg-amber-500/10 flex items-center justify-center mb-2">
                           <stat.icon className="w-4 h-4 text-amber-500" aria-hidden="true" />
@@ -90,24 +121,27 @@ export default function TrustSection() {
                       </div>
                     </motion.div>
                   ))}
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
 
-              {/* Trust signals - Updated background */}
-              <div className="flex flex-wrap items-center justify-center gap-2">
+              {/* Trust signals */}
+              <motion.div
+                className="flex flex-wrap items-center justify-center gap-2"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
                 {["Verified Seller", "SSL Secured", "Nepal Based Support"].map((signal, index) => (
                   <motion.div
                     key={index}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1a1a1a] border border-white/[0.04] rounded-full"
-                    initial={false}
-                    animate={isMounted ? { opacity: 1, y: 0 } : undefined}
-                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    variants={itemVariants}
                   >
                     <CheckCircle className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
                     <span className="text-zinc-400 text-xs">{signal}</span>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           </div>
         </motion.div>

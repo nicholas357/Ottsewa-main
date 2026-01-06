@@ -7,16 +7,46 @@ import { getProducts, type Product } from "@/lib/products"
 import { appCache, CACHE_TTL, STALE_TTL, CACHE_KEYS } from "@/lib/cache"
 import ProductCard from "@/components/product-card"
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+}
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+}
+
 export default function RecommendedSection() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isMounted, setIsMounted] = useState(false)
   const router = useRouter()
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   const itemListJsonLd = useMemo(() => {
     if (products.length === 0) return null
@@ -37,7 +67,7 @@ export default function RecommendedSection() {
 
   const fetchProducts = useCallback(async () => {
     const cacheKey = CACHE_KEYS.HOME_PRODUCTS
-    const { data: cached, isStale, needsRevalidation } = appCache.getWithStatus<Product[]>(cacheKey)
+    const { data: cached, needsRevalidation } = appCache.getWithStatus<Product[]>(cacheKey)
 
     if (cached) {
       setProducts(cached)
@@ -61,7 +91,7 @@ export default function RecommendedSection() {
       const { products: fetchedProducts } = await getProducts({
         is_featured: true,
         limit: 10,
-        sort_by: "recommended", // Use new sort option
+        sort_by: "recommended",
       })
 
       const finalProducts =
@@ -147,11 +177,7 @@ export default function RecommendedSection() {
       )}
 
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={false}
-          animate={isMounted ? { opacity: 1, y: 0 } : undefined}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div initial="hidden" animate="visible" variants={sectionVariants}>
           <div className="relative rounded-2xl border border-white/[0.08] p-3">
             <div className="relative rounded-xl bg-[#0f0f0f] overflow-hidden">
               <div className="relative p-4 sm:p-6">
@@ -179,31 +205,37 @@ export default function RecommendedSection() {
                   </button>
                 </div>
 
-                <ul
-                  className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 list-none"
+                <motion.div
+                  className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
                   role="list"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
                 >
                   {products.map((product, index) => (
                     <motion.div
                       key={product.id}
-                      initial={false}
-                      animate={isMounted ? { opacity: 1, y: 0 } : undefined}
-                      transition={{ duration: 0.4, delay: index * 0.03 }}
-                      whileHover={{ y: -2, transition: { duration: 0.2 } }}
+                      variants={itemVariants}
+                      whileHover={{ y: -4, transition: { duration: 0.2 } }}
                     >
                       <ProductCard product={product} index={index} />
                     </motion.div>
                   ))}
-                </ul>
+                </motion.div>
 
-                <div className="flex justify-center mt-8">
+                <motion.div
+                  className="flex justify-center mt-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.4 }}
+                >
                   <button
                     onClick={() => router.push("/category")}
                     className="px-6 py-2.5 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400 transition-all text-sm cursor-pointer"
                   >
                     See all products
                   </button>
-                </div>
+                </motion.div>
               </div>
             </div>
           </div>
