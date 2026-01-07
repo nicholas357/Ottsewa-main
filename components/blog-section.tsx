@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { FileText, Calendar, ChevronRight, Newspaper, Clock } from "lucide-react"
+import { FileText, Calendar, ChevronRight, Newspaper, Clock, User } from "lucide-react"
 
 interface Blog {
   id: string
@@ -12,6 +12,8 @@ interface Blog {
   published_at: string | null
   created_at?: string
 }
+
+const AUTHOR_NAME = "OTTSewa"
 
 function calculateReadingTime(content: string | null | undefined): number {
   if (!content) return 1
@@ -66,13 +68,13 @@ export function BlogSection({ blogs }: { blogs: Blog[] }) {
                     <Link key={blog.id} href={`/blog/${blog.slug}`}>
                       <article className="group h-full">
                         <div className="relative h-full rounded-xl overflow-hidden bg-[#1a1a1a] border border-white/[0.04] hover:border-amber-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/5">
-                          <div className="relative aspect-[16/10] bg-zinc-800 overflow-hidden">
+                          <div className="relative aspect-[16/10] bg-zinc-900 overflow-hidden">
                             {blog.cover_image ? (
                               <Image
                                 src={blog.cover_image || "/placeholder.svg"}
                                 alt={blog.title}
                                 fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                 loading={index === 0 ? "eager" : "lazy"}
                                 sizes="(max-width: 768px) 100vw, 33vw"
                               />
@@ -84,7 +86,7 @@ export function BlogSection({ blogs }: { blogs: Blog[] }) {
                           </div>
 
                           <div className="p-4">
-                            <div className="flex items-center gap-2 text-xs text-zinc-500 mb-2">
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 mb-2">
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-3 h-3" />
                                 {formatDate(blog)}
@@ -93,6 +95,11 @@ export function BlogSection({ blogs }: { blogs: Blog[] }) {
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
                                 {readingTime} min
+                              </span>
+                              <span className="text-zinc-600">•</span>
+                              <span className="flex items-center gap-1">
+                                <User className="w-3 h-3" />
+                                {AUTHOR_NAME}
                               </span>
                             </div>
 

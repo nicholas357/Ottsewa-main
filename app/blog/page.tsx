@@ -15,8 +15,9 @@ interface Blog {
   cover_image: string | null
   published_at: string | null
   created_at: string
-  author: { full_name: string } | null
 }
+
+const AUTHOR_NAME = "OTTSewa"
 
 function calculateReadingTime(content: string | null): number {
   if (!content) return 1
@@ -48,8 +49,7 @@ export default function BlogPage() {
 
         const { data, error } = await supabase
           .from("blogs")
-          .select(
-            `
+          .select(`
             id,
             title,
             slug,
@@ -57,10 +57,8 @@ export default function BlogPage() {
             content,
             cover_image,
             published_at,
-            created_at,
-            author:profiles(full_name)
-          `,
-          )
+            created_at
+          `)
           .eq("is_published", true)
           .order("created_at", { ascending: false })
 
@@ -195,13 +193,13 @@ export default function BlogPage() {
                 <div className="rounded-xl bg-[#0f0f0f] overflow-hidden">
                   <Link href={`/blog/${featuredPost.slug}`} className="group block">
                     <div className="grid lg:grid-cols-2 gap-0">
-                      <div className="relative aspect-video lg:aspect-auto lg:min-h-[400px] bg-zinc-800 overflow-hidden">
+                      <div className="relative aspect-video lg:aspect-auto lg:min-h-[400px] bg-zinc-900 overflow-hidden">
                         {featuredPost.cover_image ? (
                           <Image
                             src={featuredPost.cover_image || "/placeholder.svg"}
                             alt={featuredPost.title}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                             priority
                             sizes="(max-width: 1024px) 100vw, 50vw"
                           />
@@ -227,12 +225,10 @@ export default function BlogPage() {
                             <Clock className="w-4 h-4" />
                             {calculateReadingTime(featuredPost.content)} min read
                           </span>
-                          {featuredPost.author?.full_name && (
-                            <span className="flex items-center gap-1.5">
-                              <User className="w-4 h-4" />
-                              {featuredPost.author.full_name}
-                            </span>
-                          )}
+                          <span className="flex items-center gap-1.5">
+                            <User className="w-4 h-4" />
+                            {AUTHOR_NAME}
+                          </span>
                         </div>
 
                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4 group-hover:text-amber-400 transition-colors">
@@ -263,13 +259,13 @@ export default function BlogPage() {
                       <Link key={blog.id} href={`/blog/${blog.slug}`}>
                         <article className="group h-full">
                           <div className="relative h-full rounded-xl overflow-hidden bg-[#1a1a1a] border border-white/[0.04] hover:border-amber-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/5">
-                            <div className="relative aspect-[16/10] bg-zinc-800 overflow-hidden">
+                            <div className="relative aspect-[16/10] bg-zinc-900 overflow-hidden">
                               {blog.cover_image ? (
                                 <Image
                                   src={blog.cover_image || "/placeholder.svg"}
                                   alt={blog.title}
                                   fill
-                                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                   loading="lazy"
                                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                 />
@@ -290,6 +286,11 @@ export default function BlogPage() {
                                 <span className="flex items-center gap-1">
                                   <Clock className="w-3.5 h-3.5" />
                                   {calculateReadingTime(blog.content)} min
+                                </span>
+                                <span className="text-zinc-600">•</span>
+                                <span className="flex items-center gap-1">
+                                  <User className="w-3.5 h-3.5" />
+                                  {AUTHOR_NAME}
                                 </span>
                               </div>
 

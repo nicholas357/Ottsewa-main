@@ -46,10 +46,12 @@ interface Blog {
   published_at: string
   created_at: string
   updated_at: string
-  author: { full_name: string; email: string } | null
   blog_products: BlogProduct[]
   faqs: FAQ[] | null
 }
+
+const AUTHOR_NAME = "OTTSewa"
+const AUTHOR_URL = "https://www.ottsewa.store"
 
 export const revalidate = 60
 
@@ -94,7 +96,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     const { data: blog, error } = await supabase
       .from("blogs")
-      .select("title, excerpt, meta_title, meta_description, cover_image")
+      .select("title, excerpt, meta_title, meta_description, cover_image, published_at, created_at")
       .eq("slug", slug)
       .eq("is_published", true)
       .single()
@@ -109,11 +111,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
       title,
       description,
+      authors: [{ name: AUTHOR_NAME, url: AUTHOR_URL }],
       openGraph: {
         title: blog.title,
         description,
         type: "article",
-        images: blog.cover_image ? [blog.cover_image] : [],
+        publishedTime: blog.published_at || blog.created_at,
+        authors: [AUTHOR_NAME],
+        images: blog.cover_image ? [{ url: blog.cover_image, width: 1200, height: 630, alt: blog.title }] : [],
         siteName: "OTTSewa",
         url: `https://www.ottsewa.store/blog/${slug}`,
       },
@@ -122,6 +127,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         title: blog.title,
         description,
         images: blog.cover_image ? [blog.cover_image] : [],
+        creator: "@ottsewa",
       },
       alternates: {
         canonical: `https://www.ottsewa.store/blog/${slug}`,
@@ -146,8 +152,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
     const { data, error } = await supabase
       .from("blogs")
-      .select(
-        `
+      .select(`
         id,
         title,
         slug,
@@ -160,13 +165,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         created_at,
         updated_at,
         faqs,
-        author:profiles(full_name, email),
         blog_products(
           display_order,
           product:products(id, title, slug, image_url, base_price, original_price, discount_percent)
         )
-      `,
-      )
+      `)
       .eq("slug", slug)
       .eq("is_published", true)
       .single()
@@ -214,8 +217,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     datePublished: blog.published_at || blog.created_at,
     dateModified: blog.updated_at,
     author: {
-      "@type": "Person",
-      name: blog.author?.full_name || "OTTSewa Team",
+      "@type": "Organization",
+      name: AUTHOR_NAME,
+      url: AUTHOR_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: "https://www.ottsewa.store/logo.png",
+      },
     },
     publisher: {
       "@type": "Organization",
@@ -232,6 +240,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     },
     wordCount: blog.content?.split(/\s+/).length || 0,
     articleBody: blog.content?.replace(/<[^>]*>/g, "").substring(0, 500),
+    timeRequired: `PT${readingTime}M`,
   }
 
   const breadcrumbJsonLd = {
@@ -332,14 +341,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Double-box design wrapper */}
             <article className="relative rounded-2xl border border-white/[0.08] p-3">
               <div className="relative rounded-xl bg-[#0f0f0f] overflow-hidden">
-                {/* Cover Image */}
                 {blog.cover_image && (
-                  <div className="relative aspect-video bg-zinc-800">
+                  <div className="relative w-full aspect-[2/1] sm:aspect-[21/9] bg-zinc-900">
                     <Image
                       src={blog.cover_image || "/placeholder.svg"}
                       alt={blog.title}
                       fill
-                      className="object-cover"
+                      className="object-cover object-center"
                       priority
                       sizes="(max-width: 896px) 100vw, 896px"
                     />
@@ -358,12 +366,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                       <Clock className="w-4 h-4" />
                       {readingTime} min read
                     </span>
-                    {blog.author && (
-                      <span className="flex items-center gap-1.5">
-                        <User className="w-4 h-4" />
-                        {blog.author.full_name || "OTTSewa Team"}
-                      </span>
-                    )}
+                    <span className="flex items-center gap-1.5">
+                      <User className="w-4 h-4" />
+                      {AUTHOR_NAME}
+                    </span>
                   </div>
 
                   {/* Title */}
@@ -393,7 +399,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                       prose-pre:bg-zinc-800 prose-pre:border prose-pre:border-zinc-700
                       prose-hr:border-zinc-700
                       prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline
-                      prose-img:rounded-xl prose-img:border prose-img:border-white/[0.08]
+                      prose-img:rounded-xl prose-img:border prose-img:border-white/[0.08] prose-img:mx-auto
+                      [&_img]:max-w-full [&_img]:h-auto
                       [&_.price-table]:my-6 [&_.price-table_table]:w-full [&_.price-table_table]:border-collapse
                       [&_.price-table_th]:bg-zinc-800 [&_.price-table_th]:text-white [&_.price-table_th]:font-semibold
                       [&_.price-table_th]:px-4 [&_.price-table_th]:py-3 [&_.price-table_th]:text-left [&_.price-table_th]:border-b [&_.price-table_th]:border-zinc-700
@@ -447,7 +454,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                                   src={product.image_url || "/placeholder.svg"}
                                   alt={product.title}
                                   fill
-                                  className="object-cover"
+                                  className="object-cover object-center"
                                   loading="lazy"
                                 />
                               )}
