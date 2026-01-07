@@ -1,29 +1,20 @@
 import { put } from "@vercel/blob"
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-
-const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+import { createClient } from "@/lib/supabase/server"
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin authentication
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    const token = authHeader.replace("Bearer ", "")
+    const supabase = await createClient()
     const {
       data: { user },
-      error: authError,
-    } = await supabaseAdmin.auth.getUser(token)
+    } = await supabase.auth.getUser()
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     // Check if user is admin
-    const { data: profile } = await supabaseAdmin.from("profiles").select("role").eq("id", user.id).single()
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
 
     if (profile?.role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
@@ -31,6 +22,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData()
     const file = formData.get("file") as File
+    const type = (formData.get("type") as string) || "products"
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
@@ -50,10 +42,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File too large. Maximum size is 5MB." }, { status: 400 })
     }
 
-    // Generate unique filename
+    const folder = type === "blog" ? "blogs" : type === "banner" ? "banners" : "products"
     const timestamp = Date.now()
     const extension = file.name.split(".").pop()
-    const filename = `products/${timestamp}-${Math.random().toString(36).substring(7)}.${extension}`
+    const filename = `${folder}/${timestamp}-${Math.random().toString(36).substring(7)}.${extension}`
 
     // Upload to Vercel Blob
     const blob = await put(filename, file, {

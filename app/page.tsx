@@ -3,6 +3,8 @@ import CategoryIcons from "@/components/category-icons"
 import RecommendedSection from "@/components/recommended-section"
 import TrustSection from "@/components/trust-section"
 import ProductTagsSEO from "@/components/product-tags-seo"
+import { BlogSection } from "@/components/blog-section"
+import { createClient } from "@supabase/supabase-js"
 
 export const revalidate = 60
 
@@ -10,9 +12,6 @@ async function getBanners() {
   const emptyBanners = { main: [], side: [] }
 
   try {
-    // Dynamic import to prevent build-time initialization errors
-    const { createClient } = await import("@supabase/supabase-js")
-
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -49,6 +48,37 @@ async function getBanners() {
   } catch (error) {
     console.error("[SSG] Unexpected error in getBanners:", error)
     return emptyBanners
+  }
+}
+
+async function getBlogs() {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn("[SSG] Missing Supabase env vars, returning empty blogs")
+      return []
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const { data, error } = await supabase
+      .from("blogs")
+      .select("id, title, slug, excerpt, content, cover_image, published_at, created_at")
+      .eq("is_published", true)
+      .order("created_at", { ascending: false })
+      .limit(3)
+
+    if (error) {
+      console.error("[SSG] Error fetching blogs:", error.message)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error("[SSG] Unexpected error in getBlogs:", error)
+    return []
   }
 }
 
@@ -216,11 +246,21 @@ const merchantListingJsonLd = {
 
 export default async function Home() {
   let banners = { main: [], side: [] }
+  let blogs: Array<{
+    id: string
+    title: string
+    slug: string
+    excerpt: string | null
+    content: string | null
+    cover_image: string | null
+    published_at: string
+    created_at: string
+  }> = []
   try {
-    banners = await getBanners()
+    ;[banners, blogs] = await Promise.all([getBanners(), getBlogs()])
   } catch {
     // Silently fail - banners are not critical for SEO
-    console.error("[SSG] Failed to load banners, using empty state")
+    console.error("[SSG] Failed to load banners or blogs, using empty state")
   }
 
   return (
@@ -253,6 +293,7 @@ export default async function Home() {
         <HeroBanner initialBanners={banners} />
         <CategoryIcons />
         <RecommendedSection />
+        <BlogSection blogs={blogs} />
         <ProductTagsSEO />
         <TrustSection />
       </main>
