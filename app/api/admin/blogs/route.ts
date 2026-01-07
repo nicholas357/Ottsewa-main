@@ -87,7 +87,18 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { title, slug, excerpt, content, cover_image, meta_title, meta_description, is_published, product_ids } = body
+    const {
+      title,
+      slug,
+      excerpt,
+      content,
+      cover_image,
+      meta_title,
+      meta_description,
+      is_published,
+      product_ids,
+      faqs,
+    } = body
 
     // Validate required fields
     if (!title || !slug || !content) {
@@ -108,6 +119,7 @@ export async function POST(request: Request) {
         is_published,
         published_at: is_published ? new Date().toISOString() : null,
         author_id: user.id,
+        faqs: faqs || [],
       })
       .select()
       .single()

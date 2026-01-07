@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Home, Loader2, Save, ArrowLeft, ImageIcon, X, Search, Package } from "lucide-react"
+import { Home, Loader2, Save, ArrowLeft, ImageIcon, X, Search, Package, Plus, Trash2, HelpCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,6 +22,11 @@ interface Product {
   slug: string
   image_url: string | null
   base_price: number
+}
+
+interface FAQ {
+  question: string
+  answer: string
 }
 
 export default function EditBlogPage() {
@@ -48,6 +53,8 @@ export default function EditBlogPage() {
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
   const [productSearch, setProductSearch] = useState("")
   const [showProductSearch, setShowProductSearch] = useState(false)
+
+  const [faqs, setFaqs] = useState<FAQ[]>([])
 
   const router = useRouter()
   const supabase = createClient()
@@ -93,6 +100,7 @@ export default function EditBlogPage() {
           setMetaTitle(blog.meta_title || "")
           setMetaDescription(blog.meta_description || "")
           setIsPublished(blog.is_published)
+          setFaqs(blog.faqs || [])
 
           // Set selected products
           if (blog.blog_products?.length > 0) {
@@ -151,6 +159,20 @@ export default function EditBlogPage() {
     }
   }
 
+  const addFaq = () => {
+    setFaqs([...faqs, { question: "", answer: "" }])
+  }
+
+  const updateFaq = (index: number, field: "question" | "answer", value: string) => {
+    const updated = [...faqs]
+    updated[index][field] = value
+    setFaqs(updated)
+  }
+
+  const removeFaq = (index: number) => {
+    setFaqs(faqs.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -161,6 +183,8 @@ export default function EditBlogPage() {
 
     setLoading(true)
     try {
+      const validFaqs = faqs.filter((f) => f.question.trim() && f.answer.trim())
+
       const res = await fetch(`/api/admin/blogs/${blogId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -174,6 +198,7 @@ export default function EditBlogPage() {
           meta_description: metaDescription || excerpt,
           is_published: isPublished,
           product_ids: selectedProducts.map((p) => p.id),
+          faqs: validFaqs,
         }),
       })
 
@@ -295,6 +320,82 @@ export default function EditBlogPage() {
                 <div className="space-y-2">
                   <Label className="text-white">Content *</Label>
                   <RichTextEditor value={content} onChange={setContent} />
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-zinc-800">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="w-5 h-5 text-amber-500" />
+                      <Label className="text-white text-lg font-semibold">FAQs</Label>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={addFaq}
+                      variant="outline"
+                      size="sm"
+                      className="border-zinc-700 bg-transparent"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add FAQ
+                    </Button>
+                  </div>
+                  <p className="text-sm text-zinc-500">
+                    Add frequently asked questions related to this blog post for better SEO.
+                  </p>
+
+                  {faqs.length === 0 ? (
+                    <div className="text-center py-8 bg-zinc-800/50 rounded-lg border border-zinc-700 border-dashed">
+                      <HelpCircle className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
+                      <p className="text-zinc-500 text-sm">No FAQs added yet</p>
+                      <Button
+                        type="button"
+                        onClick={addFaq}
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2 text-amber-500 hover:text-amber-400"
+                      >
+                        Add your first FAQ
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {faqs.map((faq, index) => (
+                        <div key={index} className="p-4 bg-zinc-800/50 rounded-lg border border-zinc-700 space-y-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="text-amber-500 font-medium text-sm">FAQ #{index + 1}</span>
+                            <Button
+                              type="button"
+                              onClick={() => removeFaq(index)}
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-zinc-400 text-sm">Question</Label>
+                            <Input
+                              value={faq.question}
+                              onChange={(e) => updateFaq(index, "question", e.target.value)}
+                              placeholder="Enter the question"
+                              className="bg-zinc-900 border-zinc-700 text-white"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-zinc-400 text-sm">Answer</Label>
+                            <Textarea
+                              value={faq.answer}
+                              onChange={(e) => updateFaq(index, "answer", e.target.value)}
+                              placeholder="Enter the answer"
+                              rows={3}
+                              className="bg-zinc-900 border-zinc-700 text-white"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -63,7 +63,18 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { title, slug, excerpt, content, cover_image, meta_title, meta_description, is_published, product_ids } = body
+    const {
+      title,
+      slug,
+      excerpt,
+      content,
+      cover_image,
+      meta_title,
+      meta_description,
+      is_published,
+      product_ids,
+      faqs,
+    } = body
 
     // Get current blog to check publish status
     const { data: currentBlog } = await supabase
@@ -83,6 +94,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       meta_description,
       is_published,
       updated_at: new Date().toISOString(),
+      faqs: faqs || [],
     }
 
     // Set published_at if newly published

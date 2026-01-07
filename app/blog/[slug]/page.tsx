@@ -2,8 +2,24 @@ import { createClient } from "@supabase/supabase-js"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Calendar, ArrowLeft, User, ShoppingCart, ChevronRight, Clock, Tag, Home } from "lucide-react"
+import {
+  Calendar,
+  ArrowLeft,
+  User,
+  ShoppingCart,
+  ChevronRight,
+  Clock,
+  Tag,
+  Home,
+  HelpCircle,
+  ChevronDown,
+} from "lucide-react"
 import type { Metadata } from "next"
+
+interface FAQ {
+  question: string
+  answer: string
+}
 
 interface BlogProduct {
   display_order: number
@@ -28,9 +44,11 @@ interface Blog {
   meta_title: string | null
   meta_description: string | null
   published_at: string
+  created_at: string
   updated_at: string
   author: { full_name: string; email: string } | null
   blog_products: BlogProduct[]
+  faqs: FAQ[] | null
 }
 
 export const revalidate = 60
@@ -139,7 +157,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         meta_title,
         meta_description,
         published_at,
+        created_at,
         updated_at,
+        faqs,
         author:profiles(full_name, email),
         blog_products(
           display_order,
@@ -163,7 +183,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound()
   }
 
-  const formatDate = (date: string) => {
+  const formatDate = (date: string | null) => {
+    if (!date) return ""
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -182,6 +203,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       .filter(Boolean) || []
 
   const readingTime = calculateReadingTime(blog.content)
+  const validFaqs = blog.faqs?.filter((f) => f.question && f.answer) || []
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -189,7 +211,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     headline: blog.title,
     description: blog.excerpt || blog.meta_description,
     image: blog.cover_image,
-    datePublished: blog.published_at,
+    datePublished: blog.published_at || blog.created_at,
     dateModified: blog.updated_at,
     author: {
       "@type": "Person",
@@ -237,6 +259,22 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     ],
   }
 
+  const faqJsonLd =
+    validFaqs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: validFaqs.map((faq) => ({
+            "@type": "Question",
+            name: faq.question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: faq.answer,
+            },
+          })),
+        }
+      : null
+
   return (
     <>
       <script
@@ -249,6 +287,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         suppressHydrationWarning
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+          suppressHydrationWarning
+        />
+      )}
 
       <div className="min-h-screen bg-transparent">
         {/* Breadcrumb */}
@@ -307,7 +352,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500 mb-4">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="w-4 h-4" />
-                      {formatDate(blog.published_at)}
+                      {formatDate(blog.published_at || blog.created_at)}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <Clock className="w-4 h-4" />
@@ -356,6 +401,31 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                       [&_.price-table_tr:hover_td]:bg-zinc-800/50"
                     dangerouslySetInnerHTML={{ __html: blog.content }}
                   />
+
+                  {validFaqs.length > 0 && (
+                    <div className="mt-10 pt-8 border-t border-white/[0.08]">
+                      <div className="flex items-center gap-2 mb-6">
+                        <HelpCircle className="w-5 h-5 text-amber-400" />
+                        <h2 className="text-xl font-bold text-white">Frequently Asked Questions</h2>
+                      </div>
+                      <div className="space-y-4">
+                        {validFaqs.map((faq, index) => (
+                          <details
+                            key={index}
+                            className="group bg-[#1a1a1a] rounded-xl border border-white/[0.04] overflow-hidden"
+                          >
+                            <summary className="flex items-center justify-between p-4 cursor-pointer list-none hover:bg-white/[0.02] transition-colors">
+                              <span className="font-medium text-white pr-4">{faq.question}</span>
+                              <ChevronDown className="w-5 h-5 text-zinc-500 transition-transform group-open:rotate-180 shrink-0" />
+                            </summary>
+                            <div className="px-4 pb-4 pt-0">
+                              <p className="text-zinc-400 leading-relaxed">{faq.answer}</p>
+                            </div>
+                          </details>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Related Products */}
                   {relatedProducts.length > 0 && (
