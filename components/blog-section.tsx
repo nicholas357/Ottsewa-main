@@ -1,7 +1,11 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { FileText, Calendar, ChevronRight, Newspaper, Clock, User } from "lucide-react"
-import { memo } from "react"
+import { memo, useState, useCallback } from "react"
+
+const loadedBlogImages = new Set<string>()
 
 interface Blog {
   id: string
@@ -22,6 +26,36 @@ function calculateReadingTime(content: string | null | undefined): number {
   const textContent = content.replace(/<[^>]*>/g, "")
   const wordCount = textContent.split(/\s+/).filter(Boolean).length
   return Math.max(1, Math.ceil(wordCount / wordsPerMinute))
+}
+
+function StableBlogImage({
+  src,
+  alt,
+  priority = false,
+}: {
+  src: string
+  alt: string
+  priority?: boolean
+}) {
+  const [hasLoaded, setHasLoaded] = useState(() => priority || loadedBlogImages.has(src))
+
+  const handleLoad = useCallback(() => {
+    loadedBlogImages.add(src)
+    setHasLoaded(true)
+  }, [src])
+
+  return (
+    <Image
+      src={src || "/placeholder.svg"}
+      alt={alt}
+      fill
+      className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+      loading={hasLoaded || priority ? "eager" : "lazy"}
+      decoding="async"
+      sizes="(max-width: 768px) 100vw, 33vw"
+      onLoad={handleLoad}
+    />
+  )
 }
 
 export const BlogSection = memo(function BlogSection({ blogs }: { blogs: Blog[] }) {
@@ -69,18 +103,16 @@ export const BlogSection = memo(function BlogSection({ blogs }: { blogs: Blog[] 
                     <Link key={blog.id} href={`/blog/${blog.slug}`}>
                       <article className="group h-full">
                         <div className="relative h-full rounded-xl overflow-hidden bg-[#1a1a1a] border border-white/[0.04] hover:border-amber-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/5">
-                          <div className="relative aspect-[16/10] bg-zinc-900 overflow-hidden">
+                          <div
+                            className="relative aspect-[16/10] bg-zinc-900 overflow-hidden"
+                            style={{
+                              transform: "translateZ(0)",
+                              backfaceVisibility: "hidden",
+                              contain: "layout paint",
+                            }}
+                          >
                             {blog.cover_image ? (
-                              <Image
-                                src={blog.cover_image || "/placeholder.svg"}
-                                alt={blog.title}
-                                fill
-                                className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                                loading={index === 0 ? "eager" : "lazy"}
-                                decoding="async"
-                                sizes="(max-width: 768px) 100vw, 33vw"
-                                style={{ contentVisibility: "auto" }}
-                              />
+                              <StableBlogImage src={blog.cover_image} alt={blog.title} priority={index === 0} />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
                                 <FileText className="w-10 h-10 text-zinc-600" />

@@ -4,9 +4,11 @@ import type React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Heart, Eye, Star, Flame, Sparkles, TrendingUp, Clock } from "lucide-react"
-import { useMemo, memo } from "react"
+import { useMemo, memo, useState, useCallback, useEffect, useRef } from "react"
 import { useWishlist } from "@/contexts/wishlist-context"
 import type { Product } from "@/lib/products"
+
+const loadedProductImages = new Set<string>()
 
 interface ProductCardProps {
   product: Product
@@ -38,6 +40,38 @@ function getPriceValidUntil(): string {
 
 const ProductCard = memo(function ProductCard({ product, index = 0, showTags = true }: ProductCardProps) {
   const { isInWishlist, addItem, removeItem } = useWishlist()
+  const imageRef = useRef<HTMLDivElement>(null)
+  const imageSrc = product.image_url || product.thumbnail_url || "/placeholder.svg"
+
+  const [hasLoaded, setHasLoaded] = useState(() => loadedProductImages.has(imageSrc))
+  const [isVisible, setIsVisible] = useState(index < 4)
+
+  useEffect(() => {
+    if (hasLoaded || index < 4) return
+
+    const element = imageRef.current
+    if (!element) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true)
+            observer.disconnect()
+          }
+        })
+      },
+      { rootMargin: "300px", threshold: 0 },
+    )
+
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [hasLoaded, index])
+
+  const handleImageLoad = useCallback(() => {
+    loadedProductImages.add(imageSrc)
+    setHasLoaded(true)
+  }, [imageSrc])
 
   const discountedPrice =
     product.discount_percent > 0 ? product.base_price * (1 - product.discount_percent / 100) : product.base_price
@@ -160,17 +194,28 @@ const ProductCard = memo(function ProductCard({ product, index = 0, showTags = t
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/15 to-transparent z-10" />
 
-        <div className="relative w-full aspect-[3/4] overflow-hidden bg-zinc-800 image-stable">
-          <Image
-            src={product.image_url || product.thumbnail_url || "/placeholder.svg"}
-            alt={product.title}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            loading={index < 4 ? "eager" : "lazy"}
-            decoding="async"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            style={{ contentVisibility: "auto" }}
-          />
+        <div
+          ref={imageRef}
+          className="relative w-full aspect-[3/4] overflow-hidden bg-zinc-800"
+          style={{
+            // Force GPU layer promotion to prevent Chrome compositor issues
+            transform: "translateZ(0)",
+            backfaceVisibility: "hidden",
+            contain: "layout paint",
+          }}
+        >
+          {isVisible && (
+            <Image
+              src={imageSrc || "/placeholder.svg"}
+              alt={product.title}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              loading={hasLoaded || index < 4 ? "eager" : "lazy"}
+              decoding="async"
+              onLoad={handleImageLoad}
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
           {/* Wishlist button */}
