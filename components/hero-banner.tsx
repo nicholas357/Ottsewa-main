@@ -235,7 +235,9 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                                         fill
                                         priority={idx === 0}
                                         sizes="(max-width: 1024px) 100vw, 68vw"
+                                        decoding="async"
                                         className="object-cover"
+                                        style={{ contentVisibility: "auto" }}
                                       />
                                     </motion.div>
                                   ),
@@ -338,7 +340,9 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                                     alt={banner.title}
                                     fill
                                     sizes="(max-width: 1024px) 50vw, 32vw"
+                                    decoding="async"
                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                    style={{ contentVisibility: "auto" }}
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-[1]" />
                                   <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3 z-[2]">

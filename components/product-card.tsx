@@ -4,7 +4,7 @@ import type React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Heart, Eye, Star, Flame, Sparkles, TrendingUp, Clock } from "lucide-react"
-import { useMemo } from "react"
+import { useMemo, memo } from "react"
 import { useWishlist } from "@/contexts/wishlist-context"
 import type { Product } from "@/lib/products"
 
@@ -36,7 +36,7 @@ function getPriceValidUntil(): string {
   return date.toISOString().split("T")[0]
 }
 
-export default function ProductCard({ product, index = 0, showTags = true }: ProductCardProps) {
+const ProductCard = memo(function ProductCard({ product, index = 0, showTags = true }: ProductCardProps) {
   const { isInWishlist, addItem, removeItem } = useWishlist()
 
   const discountedPrice =
@@ -167,9 +167,9 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             loading={index < 4 ? "eager" : "lazy"}
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGBkaGx0f/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBEQCEAPwCwAB//9k="
+            decoding="async"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
+            style={{ contentVisibility: "auto" }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
@@ -302,4 +302,6 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
       </Link>
     </li>
   )
-}
+})
+
+export default ProductCard

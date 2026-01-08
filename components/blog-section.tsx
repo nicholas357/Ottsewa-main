@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { FileText, Calendar, ChevronRight, Newspaper, Clock, User } from "lucide-react"
+import { memo } from "react"
 
 interface Blog {
   id: string
@@ -23,7 +24,7 @@ function calculateReadingTime(content: string | null | undefined): number {
   return Math.max(1, Math.ceil(wordCount / wordsPerMinute))
 }
 
-export function BlogSection({ blogs }: { blogs: Blog[] }) {
+export const BlogSection = memo(function BlogSection({ blogs }: { blogs: Blog[] }) {
   if (!blogs || blogs.length === 0) {
     return null
   }
@@ -76,7 +77,9 @@ export function BlogSection({ blogs }: { blogs: Blog[] }) {
                                 fill
                                 className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                 loading={index === 0 ? "eager" : "lazy"}
+                                decoding="async"
                                 sizes="(max-width: 768px) 100vw, 33vw"
+                                style={{ contentVisibility: "auto" }}
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
@@ -130,4 +133,4 @@ export function BlogSection({ blogs }: { blogs: Blog[] }) {
       </div>
     </section>
   )
-}
+})
