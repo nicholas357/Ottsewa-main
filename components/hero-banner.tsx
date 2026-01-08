@@ -234,6 +234,7 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                                         alt={slide.title}
                                         fill
                                         priority={idx === 0}
+                                        loading="eager"
                                         sizes="(max-width: 1024px) 100vw, 68vw"
                                         className="object-cover"
                                       />
@@ -261,7 +262,10 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                               {getBannerLink(currentMain) !== "#" && (
                                 <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-white/70 font-medium group-hover:text-amber-400 transition-colors">
                                   Shop Now
-                                  <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                                  <ChevronRight
+                                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/80"
+                                    aria-hidden="true"
+                                  />
                                 </span>
                               )}
                             </div>
@@ -337,6 +341,7 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                                     src={banner.image_url || "/placeholder.svg"}
                                     alt={banner.title}
                                     fill
+                                    loading="eager"
                                     sizes="(max-width: 1024px) 50vw, 32vw"
                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                                   />

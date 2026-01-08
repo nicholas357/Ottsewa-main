@@ -160,16 +160,15 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/15 to-transparent z-10" />
 
-        <div className="relative w-full aspect-[3/4] overflow-hidden bg-zinc-800">
+        <div className="relative w-full aspect-[3/4] overflow-hidden bg-zinc-800" style={{ contentVisibility: "auto" }}>
           <Image
             src={product.image_url || product.thumbnail_url || "/placeholder.svg"}
             alt={product.title}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            loading={index < 4 ? "eager" : "lazy"}
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGBkaGx0f/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBEQCEAPwCwAB//9k="
+            loading={index < 8 ? "eager" : "lazy"}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
+            unoptimized={false}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
