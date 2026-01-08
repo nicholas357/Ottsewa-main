@@ -2,6 +2,7 @@
 
 import type React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Heart, Eye, Star, Flame, Sparkles, TrendingUp, Clock } from "lucide-react"
 import { useMemo } from "react"
 import { useWishlist } from "@/contexts/wishlist-context"
@@ -160,12 +161,13 @@ export default function ProductCard({ product, index = 0, showTags = true }: Pro
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/15 to-transparent z-10" />
 
         <div className="relative w-full aspect-[3/4] overflow-hidden bg-zinc-800">
-          <img
+          <Image
             src={product.image_url || product.thumbnail_url || "/placeholder.svg"}
             alt={product.title}
-            loading={index < 8 ? "eager" : "lazy"}
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            loading="eager"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 

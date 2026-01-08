@@ -458,22 +458,20 @@ button {
 }
 
 /* Remove content-visibility: auto which causes Chrome scroll flicker */
-/* Force all images to use GPU compositing to prevent scroll flicker */
+/* Removed GPU acceleration rules that can cause Chrome issues */
+/* Use simpler contain property for better Chrome compatibility */
 img,
 picture,
 video {
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  perspective: 1000px;
+  contain: layout style;
 }
 
-/* Hardware acceleration for animated elements */
-.transition-transform,
-.group-hover\:scale-105,
-[class*="hover:scale"] {
+/* Removed will-change which can cause Chrome to constantly re-composite */
+/* Hardware acceleration for animated elements - use sparingly */
+.transition-transform:hover,
+.group-hover\:scale-105:hover,
+[class*="hover:scale"]:hover {
   will-change: transform;
-  backface-visibility: hidden;
 }
 
 /* Smooth skeleton pulse animation */
@@ -623,12 +621,10 @@ video {
   }
 }
 
-/* Stable image containers with GPU acceleration */
+/* Fixed image container stability without transform hacks */
 .aspect-\[3\/4\],
 .aspect-\[16\/9\],
 .aspect-square,
 [style*="aspect-ratio"] {
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  contain: layout style paint;
 }
