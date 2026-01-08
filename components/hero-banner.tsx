@@ -1,13 +1,11 @@
 "use client"
 
 import type React from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
-import { useState, useEffect, useCallback, memo } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import Image from "next/image"
-
-// ... existing code (Banner interface, BannerSkeleton, NoBannersState) ...
 
 interface Banner {
   id: string
@@ -24,6 +22,11 @@ interface Banner {
   category?: { slug: string } | null
 }
 
+interface CachedBanners {
+  main: Banner[]
+  side: Banner[]
+}
+
 interface HeroBannerProps {
   initialBanners?: {
     main: Banner[]
@@ -35,9 +38,12 @@ function BannerSkeleton() {
   return (
     <section className="relative px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <div className="max-w-7xl mx-auto">
+        {/* Outer box - subtle border */}
         <div className="rounded-3xl border border-white/[0.08] p-2 sm:p-3 bg-transparent">
+          {/* Inner box - darker background */}
           <div className="rounded-2xl bg-[#0c0c0c] p-4 sm:p-5">
             <div className="flex flex-col lg:flex-row gap-4 sm:gap-5">
+              {/* Main banner skeleton */}
               <div className="relative w-full lg:w-[68%]">
                 <div
                   className="rounded-xl overflow-hidden bg-[#151515] border border-white/[0.05]"
@@ -45,12 +51,14 @@ function BannerSkeleton() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-shimmer" />
                 </div>
+                {/* Dots skeleton */}
                 <div className="flex justify-center gap-2 mt-4">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className={`h-2 rounded-full bg-white/10 ${i === 1 ? "w-8" : "w-2"}`} />
                   ))}
                 </div>
               </div>
+              {/* Side banners skeleton */}
               <div className="w-full lg:w-[32%]">
                 <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4 h-full">
                   {[1, 2].map((i) => (
@@ -93,30 +101,6 @@ function NoBannersState() {
     </section>
   )
 }
-
-const BannerImage = memo(function BannerImage({
-  src,
-  alt,
-  priority = false,
-  sizes,
-}: {
-  src: string
-  alt: string
-  priority?: boolean
-  sizes: string
-}) {
-  return (
-    <Image
-      src={src || "/placeholder.svg"}
-      alt={alt}
-      fill
-      priority={priority}
-      sizes={sizes}
-      loading="eager"
-      className="object-cover"
-    />
-  )
-})
 
 export default function HeroBanner({ initialBanners }: HeroBannerProps) {
   const [mainBanners, setMainBanners] = useState<Banner[]>(initialBanners?.main || [])
@@ -218,7 +202,9 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
           animate={isMounted ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.5 }}
         >
+          {/* Outer box - clean subtle border with more rounded corners */}
           <div className="rounded-3xl border border-white/[0.08] p-2 sm:p-3 bg-transparent">
+            {/* Inner box - darker background for depth */}
             <div className="rounded-2xl bg-[#0c0c0c] overflow-hidden">
               <div className="p-4 sm:p-5">
                 <h1 className="sr-only">OTTSewa - Buy Streaming Subscriptions in Nepal</h1>
@@ -227,27 +213,40 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                   {/* Main banner */}
                   {currentMain && (
                     <div className={`relative w-full ${currentSide.length > 0 ? "lg:w-[68%]" : "lg:w-full"}`}>
+                      {/* Banner container with subtle border */}
                       <div className="rounded-xl border border-white/[0.05] overflow-hidden">
                         <MainBannerWrapper banner={currentMain}>
                           <div className="absolute inset-0 bg-zinc-900" role="img" aria-label={currentMain.title}>
-                            {mainBanners.map((slide, idx) => (
-                              <div
-                                key={slide.id}
-                                className="absolute inset-0 transition-opacity duration-300"
-                                style={{ opacity: idx === mainIndex ? 1 : 0 }}
-                              >
-                                <BannerImage
-                                  src={slide.image_url}
-                                  alt={slide.title}
-                                  priority={idx < 2}
-                                  sizes="(max-width: 1024px) 100vw, 68vw"
-                                />
-                              </div>
-                            ))}
+                            <AnimatePresence mode="wait" initial={false}>
+                              {mainBanners.map(
+                                (slide, idx) =>
+                                  idx === mainIndex && (
+                                    <motion.div
+                                      key={slide.id}
+                                      className="absolute inset-0"
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      exit={{ opacity: 0 }}
+                                      transition={{ duration: 0.3 }}
+                                    >
+                                      <Image
+                                        src={slide.image_url || "/placeholder.svg"}
+                                        alt={slide.title}
+                                        fill
+                                        priority={idx === 0}
+                                        sizes="(max-width: 1024px) 100vw, 68vw"
+                                        className="object-cover"
+                                      />
+                                    </motion.div>
+                                  ),
+                              )}
+                            </AnimatePresence>
                           </div>
 
+                          {/* Subtle gradient overlay for text readability */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-[1]" />
 
+                          {/* Content overlay */}
                           <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 z-10">
                             <div className="max-w-md space-y-1 sm:space-y-1.5">
                               {currentMain.subtitle && (
@@ -268,6 +267,7 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                             </div>
                           </div>
 
+                          {/* Navigation arrows */}
                           {mainBanners.length > 1 && (
                             <>
                               <button
@@ -297,6 +297,7 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                         </MainBannerWrapper>
                       </div>
 
+                      {/* Pagination dots */}
                       {mainBanners.length > 1 && (
                         <div className="flex justify-center gap-1.5 mt-3" role="tablist" aria-label="Banner navigation">
                           {mainBanners.map((banner, idx) => (
@@ -321,15 +322,23 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                     <aside className="w-full lg:w-[32%]" aria-label="Additional offers">
                       <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4 h-full lg:content-stretch">
                         {currentSide.map((banner, idx) => (
-                          <div key={`${banner.id}-${idx}`} className="lg:flex-1">
+                          <motion.div
+                            key={`${banner.id}-${idx}`}
+                            initial={false}
+                            animate={isMounted ? { opacity: 1, x: 0 } : undefined}
+                            transition={{ duration: 0.4, delay: idx * 0.1 }}
+                            className="lg:flex-1"
+                          >
+                            {/* Side banner container with subtle border */}
                             <div className="rounded-xl border border-white/[0.05] overflow-hidden h-full">
                               <SideBannerWrapper banner={banner}>
                                 <div className="relative aspect-[16/9] lg:h-full lg:min-h-[140px] bg-zinc-900">
-                                  <BannerImage
-                                    src={banner.image_url}
+                                  <Image
+                                    src={banner.image_url || "/placeholder.svg"}
                                     alt={banner.title}
-                                    priority={true}
+                                    fill
                                     sizes="(max-width: 1024px) 50vw, 32vw"
+                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-[1]" />
                                   <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3 z-[2]">
@@ -340,7 +349,7 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                                 </div>
                               </SideBannerWrapper>
                             </div>
-                          </div>
+                          </motion.div>
                         ))}
                       </div>
                     </aside>

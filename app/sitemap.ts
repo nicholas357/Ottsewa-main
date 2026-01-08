@@ -20,12 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
 
-  const { data: blogs } = await supabase
-    .from("blogs")
-    .select("slug, updated_at, published_at")
-    .eq("is_published", true)
-    .order("published_at", { ascending: false })
-
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -44,12 +38,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/search`,
       lastModified: new Date(),
       changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
       priority: 0.8,
     },
     {
@@ -130,12 +118,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }))
 
-  const blogPages: MetadataRoute.Sitemap = (blogs || []).map((blog) => ({
-    url: `${baseUrl}/blog/${blog.slug}`,
-    lastModified: new Date(blog.updated_at || blog.published_at),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }))
-
-  return [...staticPages, ...categoryPages, ...productPages, ...blogPages]
+  return [...staticPages, ...categoryPages, ...productPages]
 }
