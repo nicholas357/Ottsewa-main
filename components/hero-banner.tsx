@@ -216,14 +216,18 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                       {/* Banner container with subtle border */}
                       <div className="rounded-xl border border-white/[0.05] overflow-hidden">
                         <MainBannerWrapper banner={currentMain}>
-                          <div className="absolute inset-0 bg-zinc-900" role="img" aria-label={currentMain.title}>
+                          <div
+                            className="absolute inset-0 bg-zinc-900 image-stable"
+                            role="img"
+                            aria-label={currentMain.title}
+                          >
                             <AnimatePresence mode="wait" initial={false}>
                               {mainBanners.map(
                                 (slide, idx) =>
                                   idx === mainIndex && (
                                     <motion.div
                                       key={slide.id}
-                                      className="absolute inset-0"
+                                      className="absolute inset-0 image-stable"
                                       initial={{ opacity: 0 }}
                                       animate={{ opacity: 1 }}
                                       exit={{ opacity: 0 }}
@@ -334,7 +338,7 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                             {/* Side banner container with subtle border */}
                             <div className="rounded-xl border border-white/[0.05] overflow-hidden h-full">
                               <SideBannerWrapper banner={banner}>
-                                <div className="relative aspect-[16/9] lg:h-full lg:min-h-[140px] bg-zinc-900">
+                                <div className="relative aspect-[16/9] lg:h-full lg:min-h-[140px] bg-zinc-900 image-stable">
                                   <Image
                                     src={banner.image_url || "/placeholder.svg"}
                                     alt={banner.title}

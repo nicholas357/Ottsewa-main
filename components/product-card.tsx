@@ -156,11 +156,11 @@ const ProductCard = memo(function ProductCard({ product, index = 0, showTags = t
       <Link
         href={`/product/${product.slug}`}
         prefetch={true}
-        className="group relative overflow-hidden rounded-xl bg-zinc-900/50 border border-amber-500/[0.08] transition-all duration-200 hover:border-amber-500/20 flex flex-col cursor-pointer h-full"
+        className="group relative overflow-hidden rounded-xl bg-zinc-900/50 border border-amber-500/[0.08] transition-all duration-200 hover:border-amber-500/20 flex flex-col cursor-pointer h-full image-stable"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/15 to-transparent z-10" />
 
-        <div className="relative w-full aspect-[3/4] overflow-hidden bg-zinc-800">
+        <div className="relative w-full aspect-[3/4] overflow-hidden bg-zinc-800 image-stable">
           <Image
             src={product.image_url || product.thumbnail_url || "/placeholder.svg"}
             alt={product.title}
