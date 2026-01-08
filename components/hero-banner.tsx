@@ -1,13 +1,13 @@
 "use client"
 
 import type React from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, memo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 
-const loadedBannerImages = new Set<string>()
+// ... existing code (Banner interface, BannerSkeleton, NoBannersState) ...
 
 interface Banner {
   id: string
@@ -94,7 +94,7 @@ function NoBannersState() {
   )
 }
 
-function StableBannerImage({
+const BannerImage = memo(function BannerImage({
   src,
   alt,
   priority = false,
@@ -105,13 +105,6 @@ function StableBannerImage({
   priority?: boolean
   sizes: string
 }) {
-  const [hasLoaded, setHasLoaded] = useState(() => priority || loadedBannerImages.has(src))
-
-  const handleLoad = useCallback(() => {
-    loadedBannerImages.add(src)
-    setHasLoaded(true)
-  }, [src])
-
   return (
     <Image
       src={src || "/placeholder.svg"}
@@ -119,13 +112,11 @@ function StableBannerImage({
       fill
       priority={priority}
       sizes={sizes}
-      decoding="async"
-      loading={hasLoaded || priority ? "eager" : "lazy"}
-      onLoad={handleLoad}
+      loading="eager"
       className="object-cover"
     />
   )
-}
+})
 
 export default function HeroBanner({ initialBanners }: HeroBannerProps) {
   const [mainBanners, setMainBanners] = useState<Banner[]>(initialBanners?.main || [])
@@ -238,38 +229,21 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                     <div className={`relative w-full ${currentSide.length > 0 ? "lg:w-[68%]" : "lg:w-full"}`}>
                       <div className="rounded-xl border border-white/[0.05] overflow-hidden">
                         <MainBannerWrapper banner={currentMain}>
-                          <div
-                            className="absolute inset-0 bg-zinc-900"
-                            role="img"
-                            aria-label={currentMain.title}
-                            style={{
-                              transform: "translateZ(0)",
-                              backfaceVisibility: "hidden",
-                              contain: "layout paint",
-                            }}
-                          >
-                            <AnimatePresence mode="wait" initial={false}>
-                              {mainBanners.map(
-                                (slide, idx) =>
-                                  idx === mainIndex && (
-                                    <motion.div
-                                      key={slide.id}
-                                      className="absolute inset-0"
-                                      initial={{ opacity: 0 }}
-                                      animate={{ opacity: 1 }}
-                                      exit={{ opacity: 0 }}
-                                      transition={{ duration: 0.3 }}
-                                    >
-                                      <StableBannerImage
-                                        src={slide.image_url}
-                                        alt={slide.title}
-                                        priority={idx === 0}
-                                        sizes="(max-width: 1024px) 100vw, 68vw"
-                                      />
-                                    </motion.div>
-                                  ),
-                              )}
-                            </AnimatePresence>
+                          <div className="absolute inset-0 bg-zinc-900" role="img" aria-label={currentMain.title}>
+                            {mainBanners.map((slide, idx) => (
+                              <div
+                                key={slide.id}
+                                className="absolute inset-0 transition-opacity duration-300"
+                                style={{ opacity: idx === mainIndex ? 1 : 0 }}
+                              >
+                                <BannerImage
+                                  src={slide.image_url}
+                                  alt={slide.title}
+                                  priority={idx < 2}
+                                  sizes="(max-width: 1024px) 100vw, 68vw"
+                                />
+                              </div>
+                            ))}
                           </div>
 
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-[1]" />
@@ -347,26 +321,14 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                     <aside className="w-full lg:w-[32%]" aria-label="Additional offers">
                       <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4 h-full lg:content-stretch">
                         {currentSide.map((banner, idx) => (
-                          <motion.div
-                            key={`${banner.id}-${idx}`}
-                            initial={false}
-                            animate={isMounted ? { opacity: 1, x: 0 } : undefined}
-                            transition={{ duration: 0.4, delay: idx * 0.1 }}
-                            className="lg:flex-1"
-                          >
+                          <div key={`${banner.id}-${idx}`} className="lg:flex-1">
                             <div className="rounded-xl border border-white/[0.05] overflow-hidden h-full">
                               <SideBannerWrapper banner={banner}>
-                                <div
-                                  className="relative aspect-[16/9] lg:h-full lg:min-h-[140px] bg-zinc-900"
-                                  style={{
-                                    transform: "translateZ(0)",
-                                    backfaceVisibility: "hidden",
-                                    contain: "layout paint",
-                                  }}
-                                >
-                                  <StableBannerImage
+                                <div className="relative aspect-[16/9] lg:h-full lg:min-h-[140px] bg-zinc-900">
+                                  <BannerImage
                                     src={banner.image_url}
                                     alt={banner.title}
+                                    priority={true}
                                     sizes="(max-width: 1024px) 50vw, 32vw"
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-[1]" />
@@ -378,7 +340,7 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                                 </div>
                               </SideBannerWrapper>
                             </div>
-                          </motion.div>
+                          </div>
                         ))}
                       </div>
                     </aside>

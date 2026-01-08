@@ -458,32 +458,42 @@ button {
 }
 
 /* Optimized image loading */
+/* Simplified image stability - removed lazy loading fixes, use eager loading instead */
+/* Force GPU layer promotion for all images */
 img {
-  content-visibility: auto;
-}
-
-/* Hardware acceleration for animated elements */
-.transition-transform,
-.group-hover\:scale-105,
-[class*="hover:scale"] {
-  will-change: transform;
+  transform: translateZ(0);
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-/* Smooth skeleton pulse animation */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+/* Ensure stable containers */
+[data-nimg],
+span:has(> img[data-nimg]) {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-.animate-shimmer {
-  background: linear-gradient(90deg, rgba(39, 39, 42, 0) 0%, rgba(63, 63, 70, 0.4) 50%, rgba(39, 39, 42, 0) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+/* Stable image containers - prevents Chrome layer de-promotion on scroll direction change */
+.aspect-\[3\/4\],
+.aspect-\[16\/9\],
+.aspect-\[16\/10\],
+.aspect-\[2\/1\],
+.aspect-video,
+.aspect-square {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  contain: layout paint style;
+}
+
+/* Prevent re-decode on scroll for lazy loaded images */
+
+/* Force GPU layer retention for cards with images */
+.group:has(img) {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Added keyframe animations for order success page */
@@ -627,12 +637,6 @@ img {
 }
 
 /* Apply to all Next.js Image wrappers globally */
-[data-nimg],
-span:has(> img[data-nimg]) {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
 
 /* Stable image containers - prevents Chrome layer de-promotion on scroll direction change */
 .aspect-\[3\/4\],
@@ -645,20 +649,4 @@ span:has(> img[data-nimg]) {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   contain: layout paint style;
-}
-
-/* Prevent re-decode on scroll for lazy loaded images */
-img[loading="lazy"] {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  content-visibility: auto;
-  contain-intrinsic-size: auto 300px;
-}
-
-/* Force GPU layer retention for cards with images */
-.group:has(img) {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
