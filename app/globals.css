@@ -457,9 +457,15 @@ button {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Optimized image loading */
-img {
-  content-visibility: auto;
+/* Remove content-visibility: auto which causes Chrome scroll flicker */
+/* Force all images to use GPU compositing to prevent scroll flicker */
+img,
+picture,
+video {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* Hardware acceleration for animated elements */
@@ -617,30 +623,12 @@ img {
   }
 }
 
-/* Fix Chrome image flicker on scroll up - remove content-visibility and add GPU acceleration */
-/* Force GPU compositing layer for images to prevent Chrome scroll flicker */
-img,
-picture,
-video {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Next.js Image component wrapper fix */
-[data-nimg],
-span:has(> img[data-nimg]) {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Stable image containers */
+/* Stable image containers with GPU acceleration */
 .aspect-\[3\/4\],
 .aspect-\[16\/9\],
 .aspect-square,
 [style*="aspect-ratio"] {
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
-  contain: layout style paint;
+  -webkit-backface-visibility: hidden;
 }

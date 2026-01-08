@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import Image from "next/image"
 
 interface Banner {
   id: string
@@ -229,14 +228,12 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                                       exit={{ opacity: 0 }}
                                       transition={{ duration: 0.3 }}
                                     >
-                                      <Image
+                                      <img
                                         src={slide.image_url || "/placeholder.svg"}
                                         alt={slide.title}
-                                        fill
-                                        priority={idx === 0}
                                         loading="eager"
-                                        sizes="(max-width: 1024px) 100vw, 68vw"
-                                        className="object-cover"
+                                        decoding="async"
+                                        className="absolute inset-0 w-full h-full object-cover"
                                       />
                                     </motion.div>
                                   ),
@@ -337,13 +334,12 @@ export default function HeroBanner({ initialBanners }: HeroBannerProps) {
                             <div className="rounded-xl border border-white/[0.05] overflow-hidden h-full">
                               <SideBannerWrapper banner={banner}>
                                 <div className="relative aspect-[16/9] lg:h-full lg:min-h-[140px] bg-zinc-900">
-                                  <Image
+                                  <img
                                     src={banner.image_url || "/placeholder.svg"}
                                     alt={banner.title}
-                                    fill
                                     loading="eager"
-                                    sizes="(max-width: 1024px) 50vw, 32vw"
-                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                    decoding="async"
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-[1]" />
                                   <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3 z-[2]">
