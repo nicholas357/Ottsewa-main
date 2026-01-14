@@ -44,7 +44,6 @@
 }
 
 @theme inline {
-  /* Updated font stack with Montserrat for headings */
   --font-sans: var(--font-inter, "Inter", system-ui, sans-serif);
   --font-heading: var(--font-montserrat, "Montserrat", system-ui, sans-serif);
   --font-mono: var(--font-geist-mono, "Geist Mono", monospace);
@@ -93,7 +92,6 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
-  /* Apply heading font to all heading elements */
   h1,
   h2,
   h3,
@@ -107,7 +105,6 @@
 }
 
 @layer utilities {
-  /* Enhanced blending backgrounds with richer colors */
   .bg-blend-app {
     background: linear-gradient(180deg, #0a0a0a 0%, #0d0d0d 50%, #0a0a0a 100%);
     position: relative;
@@ -123,7 +120,6 @@
     pointer-events: none;
   }
 
-  /* Section blending with more vibrant amber accents */
   .bg-blend-section {
     background: linear-gradient(180deg, transparent 0%, rgba(20, 20, 20, 0.5) 50%, transparent 100%);
     position: relative;
@@ -156,7 +152,6 @@
     animation: sectionGlow2 20s ease-in-out infinite;
   }
 
-  /* Card with glassmorphism effect */
   .bg-blend-card {
     background: linear-gradient(135deg, rgba(20, 20, 20, 0.9) 0%, rgba(20, 20, 20, 0.7) 100%);
     backdrop-filter: blur(10px);
@@ -170,7 +165,6 @@
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 183, 77, 0.05), inset 0 1px 0 rgba(255, 183, 77, 0.1);
   }
 
-  /* Premium card with enhanced depth */
   .premium-card {
     background: linear-gradient(145deg, #161616 0%, #111111 100%);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 183, 77, 0.05), inset 0 1px 0
@@ -186,7 +180,6 @@
     border-color: rgba(255, 183, 77, 0.15);
   }
 
-  /* Enhanced amber glow effect */
   .amber-glow {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -212,14 +205,16 @@
     box-shadow: 0 0 30px rgba(255, 183, 77, 0.15), 0 0 60px rgba(255, 183, 77, 0.08);
   }
 
-  /* Enhanced depth shadow with multiple layers */
   .depth-shadow {
     box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.25), 0 8px 16px rgba(0, 0, 0, 0.2),
-      0 16px 32px rgba(0, 0, 0, 0.15), 0 32px 64px rgba(0, 0, 0, 0.1);
+      0 2px 4px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.25), 0 8px 16px rgba(0, 0, 0, 0.2), 0 16px 32px rgba(
+        0,
+        0,
+        0,
+        0.15
+      ), 0 32px 64px rgba(0, 0, 0, 0.1);
   }
 
-  /* Updated shine utilities with warmer amber */
   .shine-line::before {
     content: "";
     position: absolute;
@@ -243,6 +238,7 @@
     position: relative;
     overflow: hidden;
   }
+
   .shine-btn::before {
     content: "";
     position: absolute;
@@ -253,6 +249,7 @@
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: left 0.5s ease;
   }
+
   .shine-btn:hover::before {
     left: 100%;
   }
@@ -262,6 +259,7 @@
     background: linear-gradient(180deg, rgba(255, 183, 77, 0.03) 0%, transparent 30%);
     position: relative;
   }
+
   .shine-border-subtle::after {
     content: "";
     position: absolute;
@@ -271,14 +269,15 @@
     opacity: 0;
     transition: opacity 0.3s ease;
   }
+
   .shine-border-subtle:hover::after {
     opacity: 1;
   }
+
   .shine-border-subtle:hover {
     border-color: rgba(255, 183, 77, 0.2);
   }
 
-  /* Enhanced text shine with gradient animation */
   .text-shine {
     background: linear-gradient(135deg, #ffe082 0%, #ffb74d 50%, #ff9800 100%);
     background-size: 200% auto;
@@ -288,7 +287,6 @@
     animation: textShine 3s ease-in-out infinite;
   }
 
-  /* Secondary muted text color */
   .text-secondary {
     color: #a3a3a3;
   }
@@ -315,7 +313,6 @@
     transition: opacity 150ms ease-in, transform 150ms ease-in;
   }
 
-  /* Fade-in animation utility */
   .animate-fade-in {
     animation: fadeInUp 0.4s ease-out forwards;
   }
@@ -334,16 +331,12 @@
     animation: fadeInUp 0.4s ease-out 0.3s forwards;
     opacity: 0;
   }
-}
 
-/* Added safe area support for mobile bottom nav */
-@layer utilities {
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 
-/* New keyframe animations for alive background */
 @keyframes sectionGlow {
   0%,
   100% {
@@ -378,7 +371,6 @@
   }
 }
 
-/* New fade-in animation keyframe */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -442,14 +434,12 @@
   }
 }
 
-/* Better mobile bottom nav safe area handling */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .mobile-nav-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
-/* Smoother transitions with longer duration */
 a,
 button {
   transition-property: color, background-color, border-color, opacity, transform, box-shadow;
@@ -457,24 +447,18 @@ button {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Remove content-visibility: auto which causes Chrome scroll flicker */
-/* Removed GPU acceleration rules that can cause Chrome issues */
-/* Use simpler contain property for better Chrome compatibility */
 img,
 picture,
 video {
   contain: layout style;
 }
 
-/* Removed will-change which can cause Chrome to constantly re-composite */
-/* Hardware acceleration for animated elements - use sparingly */
 .transition-transform:hover,
 .group-hover\:scale-105:hover,
 [class*="hover:scale"]:hover {
   will-change: transform;
 }
 
-/* Smooth skeleton pulse animation */
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -490,8 +474,6 @@ video {
   animation: shimmer 1.5s infinite;
 }
 
-/* Added keyframe animations for order success page */
-
 @keyframes toast-progress {
   from {
     transform: scaleX(1);
@@ -506,7 +488,6 @@ video {
   transform-origin: left;
 }
 
-/* Updated table styles with new colors */
 .product-description .table-scroll-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -601,7 +582,6 @@ video {
   background: rgba(20, 20, 20, 0.8);
 }
 
-/* Long content handling */
 .product-description td,
 .product-description p,
 .product-description li {
@@ -610,7 +590,6 @@ video {
   hyphens: auto;
 }
 
-/* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -621,7 +600,6 @@ video {
   }
 }
 
-/* Fixed image container stability without transform hacks */
 .aspect-\[3\/4\],
 .aspect-\[16\/9\],
 .aspect-square,
