@@ -238,8 +238,8 @@ export default function Footer() {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/15 to-transparent" />
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-zinc-600 text-sm">
-              <span itemProp="copyrightYear">{new Date().getFullYear()}</span>{" "}
-              <span itemProp="copyrightHolder">OTTSewa</span>. All rights reserved.
+              <span itemProp="copyrightYear">2026</span> <span itemProp="copyrightHolder">OTTSewa</span>. All rights
+              reserved.
             </p>
             <nav aria-label="Legal links">
               <ul className="flex flex-wrap gap-6 text-sm list-none">
