@@ -255,12 +255,7 @@ const faqItems = [
   },
 ]
 
-const quickLinks = [
-  { title: "Browse Products", description: "See all Netflix plans", href: "/category", icon: null },
-  { title: "How It Works", description: "Complete purchase guide", href: "/how-it-works", icon: null },
-  { title: "FAQs", description: "Common questions", href: "/faq", icon: null },
-  { title: "Contact Support", description: "Get help anytime", href: "/contact", icon: null },
-]
+
 
 // Schema.org structured data
 const articleJsonLd = {
@@ -270,7 +265,7 @@ const articleJsonLd = {
   description: "Complete guide to Netflix in Nepal 2026 including pricing from Rs. 350, plans comparison (Mobile, Basic, Standard, Premium), 4K features, and how to buy with instant delivery.",
   image: ["/og-netflix-nepal.png"],
   datePublished: "2024-01-15",
-  dateModified: new Date().toISOString(),
+  dateModified: "2026-02-17",
   author: {
     "@type": "Organization",
     name: "OTTSewa",

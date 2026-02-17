@@ -62,15 +62,15 @@ export const metadata: Metadata = {
 
 const guides = [
   {
-    title: "Netflix in Nepal - Complete Guide 2025",
+    title: "Netflix in Nepal 2026 - Complete Guide Starting Rs. 350",
     description:
-      "Explore Netflix subscription plans, pricing, features, and how to buy in Nepal. Get information about all plans from Mobile to Premium with 4K support.",
+      "Explore Netflix subscription plans in Nepal 2026, pricing from Rs. 350, features, 4K quality, family sharing, and how to buy. Compare Mobile, Basic, Standard, Premium plans.",
     href: "/netflix-in-nepal",
     icon: "🎬",
     category: "Streaming Platform",
     readTime: "12 min",
     featured: true,
-    topics: ["Plans", "Pricing", "Features", "How to Buy"],
+    topics: ["Plans", "Pricing Rs. 350", "4K Features", "How to Buy"],
   },
   {
     title: "How to Buy Subscriptions - Step by Step Guide",
