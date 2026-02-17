@@ -259,30 +259,30 @@ export default async function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Main Featured Card */}
             <div className="mb-12">
-              <div className="bg-gradient-to-br from-red-500/15 via-red-600/5 to-transparent border border-red-500/30 rounded-2xl p-8 sm:p-12 overflow-hidden relative">
-                <div className="absolute -right-20 -top-20 w-40 h-40 bg-red-500/5 rounded-full blur-3xl" />
+              <div className="bg-gradient-to-br from-amber-500/15 via-amber-600/5 to-transparent border border-amber-500/30 rounded-2xl p-8 sm:p-12 overflow-hidden relative">
+                <div className="absolute -right-20 -top-20 w-40 h-40 bg-amber-500/5 rounded-full blur-3xl" />
                 <div className="relative">
                   <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
                     <div className="flex-1">
-                      <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-full px-4 py-1.5 mb-4">
-                        <span className="text-red-400 text-sm font-semibold">🎬 STREAMING GUIDE</span>
+                      <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-1.5 mb-4">
+                        <span className="text-amber-400 text-sm font-semibold">🎬 COMPLETE GUIDE 2026</span>
                       </div>
-                      <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Netflix in Nepal - Complete Guide 2025</h2>
+                      <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Netflix in Nepal 2026 - Price, Plans & Guide</h2>
                       <p className="text-gray-300 text-lg leading-relaxed mb-6">
-                        Everything you need to know about Netflix in Nepal. Explore subscription plans from Mobile (₹250/month) to Premium 4K (₹1100/month), pricing comparison, features, and how to buy instantly with OTTSewa.
+                        Complete guide to Netflix subscription in Nepal 2026. Explore plans: Mobile Rs. 350, Basic Rs. 350, Standard Rs. 499, Premium 4K Rs. 999. Features, pricing comparison, family sharing, and instant delivery with OTTSewa.
                       </p>
                       <div className="flex flex-col sm:flex-row gap-3">
                         <a 
                           href="/netflix-in-nepal" 
-                          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold px-8 py-3 rounded-lg transition-all shadow-lg shadow-red-600/20"
+                          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold px-8 py-3 rounded-lg transition-all shadow-lg shadow-amber-500/20"
                         >
                           📖 Read Full Guide
                         </a>
                         <a 
                           href="/category?search=netflix" 
-                          className="inline-flex items-center justify-center gap-2 border border-red-500/30 hover:border-red-500/60 text-white font-semibold px-8 py-3 rounded-lg transition-all"
+                          className="inline-flex items-center justify-center gap-2 border border-amber-500/30 hover:border-amber-500/60 text-amber-400 font-semibold px-8 py-3 rounded-lg transition-all"
                         >
-                          🛒 Buy Netflix
+                          🛒 Buy Netflix Now
                         </a>
                       </div>
                     </div>
@@ -292,14 +292,14 @@ export default async function Home() {
                   {/* Quick Info Cards */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-10 pt-10 border-t border-white/[0.05]">
                     {[
-                      { label: "Plans", value: "4" },
-                      { label: "From", value: "₹250" },
+                      { label: "Plans", value: "4 Options" },
+                      { label: "From", value: "Rs. 350" },
                       { label: "4K Support", value: "Yes" },
                       { label: "Instant", value: "Delivery" },
                     ].map((item) => (
                       <div key={item.label} className="bg-white/[0.05] rounded-lg p-3 text-center">
                         <p className="text-xs text-gray-400 mb-1">{item.label}</p>
-                        <p className="text-red-400 font-bold text-sm">{item.value}</p>
+                        <p className="text-amber-400 font-bold text-sm">{item.value}</p>
                       </div>
                     ))}
                   </div>
@@ -319,13 +319,13 @@ export default async function Home() {
                   <a
                     key={item.title}
                     href={item.href}
-                    className="group bg-[#1a1a1a] border border-white/[0.05] hover:border-white/[0.1] rounded-xl p-6 transition-all hover:bg-[#222222]"
+                    className="group bg-[#1a1a1a] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-6 transition-all hover:bg-amber-500/5"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <span className="text-3xl">{item.emoji}</span>
-                      <span className="text-xs font-semibold text-amber-500/60 bg-amber-500/10 px-2 py-1 rounded-full">{item.tag}</span>
+                      <span className="text-xs font-semibold text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full">{item.tag}</span>
                     </div>
-                    <h4 className="text-lg font-bold text-white group-hover:text-red-400 transition-colors mb-2">{item.title}</h4>
+                    <h4 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors mb-2">{item.title}</h4>
                     <p className="text-gray-400 text-sm">{item.desc}</p>
                   </a>
                 ))}

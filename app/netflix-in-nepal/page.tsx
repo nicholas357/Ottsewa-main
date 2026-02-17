@@ -6,24 +6,40 @@ import { SectionCard } from "@/components/info-pages/section-card"
 import { QuickLinks } from "@/components/info-pages/quick-links"
 
 export const metadata: Metadata = {
-  title: "Netflix in Nepal - Price, Plans, Best Deal 2025 | OTTSewa",
+  title: "Netflix in Nepal 2026 - Price, Plans, Best Deal Starting Rs. 350 | OTTSewa",
   description:
-    "Netflix in Nepal 2025 - Complete guide to Netflix pricing, plans, benefits, and how to buy. Get the best Netflix plans in Nepal with instant delivery. Netflix 4K, HD, Standard plans at affordable prices with OTTSewa.",
+    "Netflix in Nepal 2026 - Complete guide to Netflix pricing in Nepal starting from Rs. 350. Compare Netflix plans: Mobile, Basic, Standard, Premium with instant delivery. Netflix 4K Ultra HD, HD, streaming quality, multiple screens. How to buy Netflix in Nepal with OTTSewa.",
   keywords: [
-    "Netflix Nepal",
+    "Netflix Nepal 2026",
     "Netflix price Nepal",
-    "Netflix plans Nepal 2025",
+    "Netflix plans Nepal 2026",
     "Netflix subscription Nepal",
     "Netflix 4K Nepal",
-    "Netflix Premium Nepal",
-    "buy Netflix Nepal",
-    "Netflix cost Nepal",
+    "Netflix Premium Nepal Rs.",
+    "Netflix Basic plan Nepal",
+    "Netflix Standard plan Nepal",
+    "Netflix Mobile plan Nepal Rs. 350",
+    "Netflix cost Nepal NPR",
     "Netflix streaming Nepal",
     "best Netflix plan Nepal",
-    "Netflix account Nepal",
-    "Netflix in Nepal",
+    "Netflix account Nepal subscription",
+    "Netflix in Nepal buy",
     "Netflix subscription cost Nepal",
-    "Netflix delivery Nepal",
+    "Netflix delivery Nepal instant",
+    "Netflix price Rs. 350 Nepal",
+    "Netflix HD quality Nepal",
+    "Netflix 4K ultra HD Nepal",
+    "Netflix two screens Nepal",
+    "Netflix four screens Nepal",
+    "Netflix download content Nepal",
+    "Netflix family sharing Nepal",
+    "Netflix payment methods Nepal eSewa Khalti",
+    "buy Netflix online Nepal",
+    "Netflix subscription discount Nepal",
+    "Netflix best deal Nepal",
+    "Netflix streaming quality Nepal",
+    "Netflix watch offline Nepal",
+    "Netflix original content Nepal",
   ],
   authors: [{ name: "OTTSewa", url: "https://www.ottsewa.store" }],
   creator: "OTTSewa",
@@ -37,22 +53,22 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://www.ottsewa.store/netflix-in-nepal",
     siteName: "OTTSewa",
-    title: "Netflix in Nepal - Price, Plans, Best Deal 2025",
+    title: "Netflix in Nepal 2026 - Price, Plans, Pricing Starting Rs. 350",
     description:
-      "Complete guide to Netflix in Nepal - pricing, plans, features, and how to buy. Get instant delivery of Netflix subscriptions.",
+      "Netflix in Nepal 2026 - Complete guide with pricing starting from Rs. 350, plan comparison, 4K quality, instant delivery. Buy Netflix subscription code now on OTTSewa.",
     images: [
       {
         url: "/og-netflix-nepal.png",
         width: 1200,
         height: 630,
-        alt: "Netflix in Nepal - OTTSewa",
+        alt: "Netflix in Nepal 2026 - Plans, Pricing & Subscription Guide",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Netflix in Nepal - Price & Plans",
-    description: "Complete guide to Netflix in Nepal with best prices and instant delivery.",
+    title: "Netflix in Nepal 2026 - From Rs. 350 | Instant Delivery",
+    description: "Netflix pricing in Nepal starting at Rs. 350. Compare plans, get 4K quality, family sharing. Buy instant Netflix codes on OTTSewa.",
     images: ["/og-netflix-nepal.png"],
     creator: "@ottsewa",
   },
@@ -72,63 +88,69 @@ export const metadata: Metadata = {
 const netflixPlans = [
   {
     name: "Mobile",
-    price: "₹149",
-    nprPrice: "NPR 250-300",
+    price: "Rs. 350",
+    nprPrice: "NPR 350",
+    duration: "1 Month",
     features: [
-      "Watch on mobile phones",
-      "Resolution: 480p",
-      "One screen at a time",
-      "Download content",
-      "Access to all content",
+      "Watch on mobile phones only",
+      "Resolution: 480p SD Quality",
+      "Single screen at a time",
+      "Download content to watch offline",
+      "Access to full Netflix library",
+      "Ad-supported streaming",
     ],
     best: false,
-    availability: "Available in Nepal",
+    availability: "Available in Nepal 2026",
   },
   {
     name: "Basic",
-    price: "₹199",
-    nprPrice: "NPR 350-400",
+    price: "Rs. 350",
+    nprPrice: "NPR 350",
+    duration: "1 Month",
     features: [
       "Watch on TV, computer, mobile",
-      "Resolution: 720p (HD)",
-      "One screen at a time",
-      "Download content",
-      "Full library access",
+      "Resolution: 720p (HD Quality)",
+      "Single screen at a time",
+      "Download content to watch offline",
+      "Full Netflix library access",
+      "No ads included",
     ],
     best: false,
-    availability: "Available in Nepal",
+    availability: "Available in Nepal 2026",
   },
   {
     name: "Standard",
-    price: "₹499",
-    nprPrice: "NPR 750-850",
+    price: "Rs. 499",
+    nprPrice: "NPR 499",
+    duration: "1 Month",
     features: [
       "Watch on TV, computer, mobile",
-      "Resolution: 1080p (Full HD)",
+      "Resolution: 1080p (Full HD Quality)",
       "Two screens at the same time",
-      "Download content",
-      "Full library access",
-      "Group watch feature",
+      "Download content for offline viewing",
+      "Full Netflix library access",
+      "Group watch & screen sharing feature",
     ],
     best: true,
-    availability: "Most Popular",
+    availability: "Most Popular in Nepal 2026",
   },
   {
     name: "Premium",
-    price: "₹649",
-    nprPrice: "NPR 950-1100",
+    price: "Rs. 999",
+    nprPrice: "NPR 999",
+    duration: "1 Month",
     features: [
       "Watch on TV, computer, mobile",
-      "Resolution: 4K Ultra HD",
+      "Resolution: 4K Ultra HD Quality",
       "Four screens simultaneously",
-      "Download content",
-      "Full library access",
-      "Group watch feature",
-      "Spatial audio support",
-      "HDR content access",
+      "Download unlimited content",
+      "Full Netflix library access",
+      "Group watch & screen sharing",
+      "Spatial audio & Dolby Atmos support",
+      "HDR & HDR10+ content access",
     ],
     best: false,
-    availability: "4K Experience",
+    availability: "4K Experience Available 2026",
   },
 ]
 
@@ -200,36 +222,36 @@ const whyNetflix = [
 
 const faqItems = [
   {
-    q: "Is Netflix available in Nepal?",
-    a: "Yes, Netflix is fully available in Nepal. You can subscribe directly from Nepal using local payment methods or purchase from authorized resellers like OTTSewa for instant delivery.",
+    q: "Is Netflix available and working in Nepal 2026?",
+    a: "Yes, Netflix is fully available and working in Nepal 2026. You can subscribe directly from Nepal using local payment methods like eSewa, Khalti, bank transfer, or purchase from authorized resellers like OTTSewa for instant delivery of subscription codes.",
   },
   {
-    q: "What is the price of Netflix in Nepal?",
-    a: "Netflix plans in Nepal range from NPR 250-1100 depending on the plan. Mobile plan starts from NPR 250, Basic at NPR 350, Standard at NPR 750-850, and Premium at NPR 950-1100. Prices are subject to change.",
+    q: "What is the Netflix price in Nepal - Complete pricing breakdown?",
+    a: "Netflix pricing in Nepal 2026: Mobile plan starts at Rs. 350/month (480p single screen), Basic at Rs. 350/month (720p HD single screen), Standard at Rs. 499/month (1080p Full HD two screens), Premium at Rs. 999/month (4K Ultra HD four screens). Prices subject to change.",
   },
   {
-    q: "Can I share Netflix account with family?",
-    a: "Netflix allows account sharing with restrictions. Standard plan allows 2 simultaneous screens, Premium allows 4 screens. Each profile has separate viewing history and recommendations.",
+    q: "Can I share Netflix account with family members?",
+    a: "Yes, Netflix allows family account sharing. Standard plan (Rs. 499) allows 2 simultaneous screens, Premium plan (Rs. 999) allows 4 screens at same time. Create up to 5 profiles per account. Each family member gets separate viewing history and personalized recommendations.",
   },
   {
-    q: "How to buy Netflix in Nepal?",
-    a: "You can buy Netflix through OTTSewa with instant delivery using local payment methods like eSewa, Khalti, or bank transfer. We provide genuine subscription codes delivered instantly after payment confirmation.",
+    q: "How to buy Netflix in Nepal with instant delivery?",
+    a: "Buy Netflix through OTTSewa for instant delivery. Choose your preferred plan (Mobile, Basic, Standard, Premium), make payment via eSewa, Khalti, or bank transfer, and get genuine Netflix subscription code delivered instantly. Activate code to start streaming.",
   },
   {
-    q: "What payment methods work in Nepal?",
-    a: "Netflix in Nepal accepts eSewa, Khalti, Visa, Mastercard, and bank transfers. OTTSewa also accepts all these methods with additional local payment options for convenience.",
+    q: "What payment methods work for Netflix in Nepal?",
+    a: "Netflix and OTTSewa in Nepal accept multiple local payment methods: eSewa, Khalti, Visa, Mastercard, debit card, bank transfer, and FonePay. Choose the most convenient payment option for buying Netflix subscription.",
   },
   {
-    q: "Can I download content on Netflix?",
-    a: "Yes, all Netflix plans support downloading content to watch offline on mobile devices. Downloaded content is available for 30 days.",
+    q: "Can I download Netflix content to watch offline?",
+    a: "Yes, all Netflix plans support downloading movies, series, and content to watch offline on mobile devices. Downloaded content is available for 30 days. Perfect for watching on flights or without internet.",
   },
   {
-    q: "Is Netflix 4K available in Nepal?",
-    a: "Yes, Netflix Premium plan with 4K Ultra HD is available in Nepal. You need a Premium account and 4K-compatible device with high-speed internet (25 Mbps+) for 4K streaming.",
+    q: "Is Netflix 4K Ultra HD available in Nepal?",
+    a: "Yes, Netflix Premium 4K plan is available in Nepal for Rs. 999/month. Enjoy movies and series in 4K Ultra HD resolution with HDR support. Requires Premium plan, 4K compatible device, and high-speed internet (25 Mbps+).",
   },
   {
-    q: "How many profiles can I create?",
-    a: "Netflix allows up to 5 profiles per account. Each profile maintains separate viewing history, watchlist, and recommendations. You can create profiles for family members.",
+    q: "How many profiles can I create on one Netflix account?",
+    a: "Netflix allows creating up to 5 profiles per account. Each profile maintains separate viewing history, watchlist, recommendations, and parental controls. Perfect for family members to have personalized Netflix experience.",
   },
 ]
 
@@ -244,8 +266,8 @@ const quickLinks = [
 const articleJsonLd = {
   "@context": "https://schema.org",
   "@type": "Article",
-  headline: "Netflix in Nepal - Price, Plans, Best Deal 2025",
-  description: "Complete guide to Netflix in Nepal including pricing, plans, features, and how to buy with instant delivery.",
+  headline: "Netflix in Nepal 2026 - Price, Plans, Best Deal Starting Rs. 350",
+  description: "Complete guide to Netflix in Nepal 2026 including pricing from Rs. 350, plans comparison (Mobile, Basic, Standard, Premium), 4K features, and how to buy with instant delivery.",
   image: ["/og-netflix-nepal.png"],
   datePublished: "2024-01-15",
   dateModified: new Date().toISOString(),
@@ -311,17 +333,23 @@ export default function NetflixNepalPage() {
 
       {/* Page Header */}
       <PageHeader
-        title="Netflix in Nepal - Complete Guide to Plans & Pricing"
-        description="Explore Netflix subscription plans available in Nepal with detailed pricing, features comparison, and instant delivery. Get the best Netflix deals with OTTSewa."
-        badge="Netflix Guide"
+        title="Netflix in Nepal 2026 - Complete Guide to Plans, Pricing & Subscription Starting Rs. 350"
+        description="Netflix in Nepal 2026 - Complete guide to Netflix subscription plans, pricing from Rs. 350, features, 4K quality, and how to buy Netflix online instantly. Compare Mobile, Basic, Standard, Premium plans with family sharing options and instant delivery by OTTSewa."
+        badge="Netflix in Nepal 2026"
       >
-        <div className="mt-8">
+        <div className="mt-8 flex gap-3 flex-wrap">
           <Link
             href="/category?search=netflix"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold px-8 py-3 rounded-lg transition-all shadow-lg shadow-red-600/20"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold px-8 py-3 rounded-lg transition-all shadow-lg shadow-amber-500/20"
           >
             <Play className="w-5 h-5" />
-            Buy Netflix Now
+            Buy Netflix at Rs. 350
+          </Link>
+          <Link
+            href="#plans"
+            className="inline-flex items-center gap-2 border border-amber-500/30 hover:border-amber-500/60 text-amber-400 font-semibold px-8 py-3 rounded-lg transition-all"
+          >
+            View All Plans
           </Link>
         </div>
       </PageHeader>
@@ -331,42 +359,42 @@ export default function NetflixNepalPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-4">About Netflix in Nepal</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">About Netflix in Nepal 2026</h2>
               <p className="text-gray-300 mb-4 leading-relaxed">
-                Netflix is the world's leading entertainment platform with a library of thousands of movies, TV series, documentaries, stand-up comedy, and original content. In Nepal, Netflix offers multiple subscription plans with instant streaming, offline download, and support for multiple devices.
+                Netflix is the world's leading entertainment and streaming platform with a massive library of thousands of movies, TV series, documentaries, stand-up comedy shows, and award-winning Netflix original content. In Nepal, Netflix offers multiple subscription plans starting from just Rs. 350 with instant streaming, offline download to watch content anytime, and support for multiple devices and screens.
               </p>
               <p className="text-gray-300 mb-4 leading-relaxed">
-                With over 200 million subscribers worldwide, Netflix dominates the streaming industry with award-winning original content and an ever-growing library of entertainment options suitable for all ages.
+                With over 200 million subscribers worldwide, Netflix dominates the streaming industry with exclusive Netflix originals, award-winning shows, and an ever-growing library of quality entertainment suitable for families, kids, and all age groups. Netflix Nepal subscription is available for instant delivery through OTTSewa.
               </p>
               <p className="text-gray-300 leading-relaxed">
-                Whether you're looking for the latest movies, classic TV series, or exclusive Netflix originals, there's something for everyone at an affordable price point.
+                Whether you're looking for the latest movies, classic TV series, premium 4K ultra HD content, or exclusive Netflix originals like Stranger Things and The Crown, there's something for everyone at affordable Netflix prices starting from Rs. 350 per month.
               </p>
             </div>
             <div className="space-y-4">
-              <div className="bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-6">
+              <div className="bg-[#1a1a1a] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-6 transition-all">
                 <div className="flex items-start gap-3 mb-4">
-                  <Globe className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" />
+                  <Globe className="w-6 h-6 text-amber-500 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-white font-semibold mb-1">Global Presence</h3>
-                    <p className="text-gray-400 text-sm">Available in 190+ countries including Nepal</p>
+                    <h3 className="text-white font-semibold mb-1">Global Streaming Platform</h3>
+                    <p className="text-gray-400 text-sm">Netflix available in 190+ countries including Nepal with local payment</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-6">
+              <div className="bg-[#1a1a1a] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-6 transition-all">
                 <div className="flex items-start gap-3 mb-4">
-                  <Users className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" />
+                  <Users className="w-6 h-6 text-amber-500 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-white font-semibold mb-1">200M+ Subscribers</h3>
-                    <p className="text-gray-400 text-sm">Trusted by millions worldwide</p>
+                    <h3 className="text-white font-semibold mb-1">200M+ Global Subscribers</h3>
+                    <p className="text-gray-400 text-sm">Millions trust Netflix for quality entertainment streaming</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-6">
+              <div className="bg-[#1a1a1a] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-6 transition-all">
                 <div className="flex items-start gap-3 mb-4">
-                  <Zap className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" />
+                  <Zap className="w-6 h-6 text-amber-500 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-white font-semibold mb-1">Instant Delivery</h3>
-                    <p className="text-gray-400 text-sm">Get access immediately after purchase</p>
+                    <h3 className="text-white font-semibold mb-1">Instant Delivery in Nepal</h3>
+                    <p className="text-gray-400 text-sm">Buy Netflix and get access immediately via OTTSewa</p>
                   </div>
                 </div>
               </div>
@@ -376,12 +404,13 @@ export default function NetflixNepalPage() {
       </section>
 
       {/* Netflix Plans Comparison */}
-      <section className="py-16 border-b border-white/[0.05]">
+      <section id="plans" className="py-16 border-b border-white/[0.05]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Netflix Plans in Nepal 2025</h2>
+            <h2 className="text-3xl font-bold text-white mb-2">Netflix Plans & Pricing in Nepal 2026</h2>
+            <p className="text-amber-400/80 text-sm font-semibold mb-4">Starting from Rs. 350</p>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Choose the perfect Netflix plan for your viewing needs. All plans include access to our full library with new content added daily.
+              Choose the perfect Netflix plan for your viewing needs in Nepal. All subscription plans include access to our full Netflix library with thousands of movies, series, and originals. New content added daily.
             </p>
           </div>
 
@@ -393,30 +422,30 @@ export default function NetflixNepalPage() {
                     key={plan.name}
                     className={`relative border rounded-xl p-6 transition-all ${
                       plan.best
-                        ? "border-red-500/50 bg-[#1a0a0a]"
-                        : "border-white/[0.05] bg-[#1a1a1a] hover:border-white/[0.1]"
+                        ? "border-amber-500/60 bg-gradient-to-br from-amber-500/10 to-transparent"
+                        : "border-white/[0.05] bg-[#1a1a1a] hover:border-amber-500/30"
                     }`}
                   >
                     {plan.best && (
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <span className="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-1 rounded-full text-xs font-semibold">
-                          MOST POPULAR
+                        <span className="bg-gradient-to-r from-amber-500 to-amber-600 text-black px-4 py-1 rounded-full text-xs font-semibold shadow-lg shadow-amber-500/30">
+                          BEST VALUE ✨
                         </span>
                       </div>
                     )}
 
-                    <h3 className="text-lg font-bold text-white mb-2">{plan.name}</h3>
-                    <p className="text-sm text-gray-400 mb-4">{plan.availability}</p>
+                    <h3 className="text-lg font-bold text-white mb-1">{plan.name} Plan</h3>
+                    <p className="text-xs text-amber-400/70 font-semibold mb-4">{plan.availability}</p>
 
-                    <div className="mb-6">
-                      <p className="text-2xl font-bold text-red-500 mb-1">{plan.nprPrice}</p>
-                      <p className="text-xs text-gray-500">per month</p>
+                    <div className="mb-6 p-3 bg-black/30 rounded-lg">
+                      <p className="text-3xl font-bold text-amber-400 mb-1">{plan.price}</p>
+                      <p className="text-xs text-gray-400">{plan.duration} subscription</p>
                     </div>
 
                     <div className="space-y-2 mb-6">
                       {plan.features.map((feature) => (
                         <div key={feature} className="flex items-start gap-2">
-                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <Check className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
                           <span className="text-sm text-gray-300">{feature}</span>
                         </div>
                       ))}
@@ -424,13 +453,13 @@ export default function NetflixNepalPage() {
 
                     <Link
                       href="/category?search=netflix"
-                      className={`block text-center py-2 rounded-lg font-semibold transition-all w-full ${
+                      className={`block text-center py-2.5 rounded-lg font-semibold transition-all w-full ${
                         plan.best
-                          ? "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-500 hover:to-red-600"
-                          : "bg-[#222222] text-white hover:bg-[#2a2a2a]"
+                          ? "bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 shadow-lg shadow-amber-500/20"
+                          : "bg-white/10 text-white hover:bg-white/20 border border-white/10"
                       }`}
                     >
-                      Choose Plan
+                      Buy {plan.name} Plan
                     </Link>
                   </div>
                 ))}
@@ -439,7 +468,7 @@ export default function NetflixNepalPage() {
           </div>
 
           <p className="text-center text-gray-400 text-sm mt-8">
-            Prices shown are in Nepali Rupees. Actual prices may vary based on current exchange rates and promotional offers. All plans include free trial period (where applicable).
+            Netflix prices in Nepal 2026 are shown in Nepali Rupees (NPR). Standard Netflix plan starting from Rs. 350 for Mobile plan, Rs. 350 Basic, Rs. 499 Standard, Rs. 999 Premium. Prices may vary based on promotions. Get instant Netflix delivery on OTTSewa.
           </p>
         </div>
       </section>
@@ -448,9 +477,9 @@ export default function NetflixNepalPage() {
       <section className="py-16 bg-transparent border-b border-white/[0.05]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Netflix Features & Benefits</h2>
+            <h2 className="text-3xl font-bold text-white mb-4">Netflix Features & Benefits in Nepal</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Discover what makes Netflix the world's most popular streaming platform
+              Discover the amazing features that make Netflix the world's most popular streaming service. Get instant access with streaming from Rs. 350 plan.
             </p>
           </div>
 
@@ -474,14 +503,15 @@ export default function NetflixNepalPage() {
       {/* Why Choose Netflix */}
       <section className="py-16 border-b border-white/[0.05]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-12 text-center">Why Netflix is the Best Choice</h2>
+          <h2 className="text-3xl font-bold text-white mb-4 text-center">Why Netflix is the Best Choice in Nepal</h2>
+          <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">Learn why millions of Nepali users choose Netflix over other streaming platforms for entertainment, quality, and value.</p>
 
           <div className="space-y-6">
             {whyNetflix.map((item, idx) => (
-              <div key={idx} className="bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-6 hover:border-white/[0.1] transition-all">
+              <div key={idx} className="bg-[#1a1a1a] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-6 transition-all">
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-red-500 font-bold text-sm">{idx + 1}</span>
+                  <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                    <span className="text-amber-400 font-bold text-sm">{idx + 1}</span>
                   </div>
                   <div>
                     <h3 className="text-white font-semibold mb-2">{item.title}</h3>
@@ -497,34 +527,35 @@ export default function NetflixNepalPage() {
       {/* How to Get Netflix in Nepal */}
       <section className="py-16 border-b border-white/[0.05]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-12 text-center">How to Get Netflix in Nepal</h2>
+          <h2 className="text-3xl font-bold text-white mb-4 text-center">How to Buy Netflix in Nepal - Easy 4 Step Process</h2>
+          <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">Get Netflix subscription instantly delivered to your account in just 4 simple steps. Fastest way to buy Netflix in Nepal starting from Rs. 350.</p>
 
           <div className="grid md:grid-cols-4 gap-6">
             {[
               {
                 step: "1",
-                title: "Choose Your Plan",
-                description: "Select from Mobile, Basic, Standard, or Premium Netflix plans",
+                title: "Choose Netflix Plan",
+                description: "Select from Mobile (Rs. 350), Basic (Rs. 350), Standard (Rs. 499), or Premium 4K (Rs. 999) Netflix plans",
               },
               {
                 step: "2",
                 title: "Make Payment",
-                description: "Pay using eSewa, Khalti, bank transfer, or credit card",
+                description: "Pay securely using eSewa, Khalti, bank transfer, FonePay, or credit/debit card",
               },
               {
                 step: "3",
                 title: "Instant Delivery",
-                description: "Receive your Netflix subscription code instantly after payment",
+                description: "Receive your genuine Netflix subscription code instantly after payment confirmation",
               },
               {
                 step: "4",
                 title: "Start Streaming",
-                description: "Use the code to activate Netflix and enjoy unlimited entertainment",
+                description: "Activate Netflix code and enjoy unlimited movies, series, originals in HD/4K quality",
               },
             ].map((item) => (
-              <div key={item.step} className="bg-[#1a1a1a] border border-white/[0.05] rounded-xl p-6 text-center hover:border-red-500/30 transition-all">
-                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-red-500 font-bold text-lg">{item.step}</span>
+              <div key={item.step} className="bg-[#1a1a1a] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-6 text-center transition-all">
+                <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-amber-400 font-bold text-lg">{item.step}</span>
                 </div>
                 <h3 className="text-white font-semibold mb-2">{item.title}</h3>
                 <p className="text-gray-400 text-sm">{item.description}</p>
@@ -535,9 +566,9 @@ export default function NetflixNepalPage() {
           <div className="mt-8 text-center">
             <Link
               href="/how-it-works"
-              className="inline-flex items-center gap-2 text-red-500 hover:text-red-400 font-semibold transition-colors"
+              className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300 font-semibold transition-colors"
             >
-              View Detailed Guide →
+              View Detailed Netflix Buying Guide →
             </Link>
           </div>
         </div>
@@ -546,7 +577,8 @@ export default function NetflixNepalPage() {
       {/* FAQ Section */}
       <section className="py-16 border-b border-white/[0.05]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-12 text-center">Frequently Asked Questions</h2>
+          <h2 className="text-3xl font-bold text-white mb-4 text-center">Netflix in Nepal - Frequently Asked Questions</h2>
+          <p className="text-center text-gray-400 mb-12">Common questions about Netflix plans, pricing, features, payment methods, and account management in Nepal</p>
 
           <div className="space-y-4">
             {faqItems.map((item, idx) => (
@@ -574,8 +606,8 @@ export default function NetflixNepalPage() {
       {/* Content Library Highlight */}
       <section className="py-16 border-b border-white/[0.05]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-[#1E1E1E]/30 backdrop-blur-sm border border-zinc-800/30 rounded-2xl p-8 sm:p-12">
-            <h2 className="text-3xl font-bold text-white mb-8 text-center">What's On Netflix</h2>
+          <div className="bg-[#1E1E1E]/30 backdrop-blur-sm border border-amber-500/20 rounded-2xl p-8 sm:p-12">
+            <h2 className="text-3xl font-bold text-white mb-8 text-center">Netflix Content Library - What's Available</h2>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
@@ -587,13 +619,13 @@ export default function NetflixNepalPage() {
                 <div key={item.category} className="text-center">
                   <p className="text-4xl mb-2">{item.icon}</p>
                   <p className="text-gray-300 font-semibold mb-1">{item.category}</p>
-                  <p className="text-red-500 font-bold">{item.count}</p>
+                  <p className="text-amber-400 font-bold">{item.count}</p>
                 </div>
               ))}
             </div>
 
             <p className="text-center text-gray-400 mt-8">
-              Netflix adds new content every day, ensuring there's always something fresh to watch. From award-winning originals to classic films, find your next favorite show.
+              Netflix adds new movies, series, documentaries, and originals every day, ensuring there's always something fresh to watch. From award-winning Netflix originals to classic films, find your next favorite entertainment on Netflix Nepal.
             </p>
           </div>
         </div>
@@ -602,31 +634,32 @@ export default function NetflixNepalPage() {
       {/* Comparison with Other Platforms */}
       <section className="py-16 border-b border-white/[0.05]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-12 text-center">Netflix vs Other Streaming Platforms</h2>
+          <h2 className="text-3xl font-bold text-white mb-4 text-center">Netflix vs Other Streaming Platforms in Nepal</h2>
+          <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">Compare Netflix with Amazon Prime Video, Disney+ and other streaming services available in Nepal</p>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#1a1a1a] border-b border-white/[0.05]">
+                <tr className="bg-[#1a1a1a] border-b border-amber-500/20">
                   <th className="px-4 py-3 text-left text-white font-semibold">Feature</th>
-                  <th className="px-4 py-3 text-center text-white font-semibold">Netflix</th>
+                  <th className="px-4 py-3 text-center text-amber-400 font-semibold">Netflix</th>
                   <th className="px-4 py-3 text-center text-white font-semibold">Prime Video</th>
                   <th className="px-4 py-3 text-center text-white font-semibold">Disney+</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/[0.05]">
                 {[
-                  { feature: "Content Library", netflix: "6000+", prime: "5000+", disney: "2000+" },
+                  { feature: "Content Library", netflix: "6000+ Titles", prime: "5000+ Titles", disney: "2000+ Titles" },
                   { feature: "Original Content", netflix: "Excellent", prime: "Good", disney: "Excellent" },
-                  { feature: "4K Support", netflix: "Yes", prime: "Yes", disney: "Yes" },
-                  { feature: "Offline Download", netflix: "Yes", prime: "Yes", disney: "Yes" },
-                  { feature: "Simultaneous Streams", netflix: "2-4", prime: "3", disney: "4" },
-                  { feature: "Starting Price", netflix: "₹250", prime: "₹299", disney: "₹99" },
-                  { feature: "Ad-free Option", netflix: "All", prime: "Premium", disney: "Yes" },
+                  { feature: "4K Ultra HD", netflix: "Yes (Premium)", prime: "Yes", disney: "Yes" },
+                  { feature: "Offline Download", netflix: "All Plans", prime: "Yes", disney: "Yes" },
+                  { feature: "Simultaneous Screens", netflix: "2-4 Screens", prime: "3 Screens", disney: "4 Screens" },
+                  { feature: "Starting Price Nepal", netflix: "Rs. 350", prime: "Rs. 399", disney: "Rs. 99" },
+                  { feature: "Ad-free Option", netflix: "All Plans", prime: "Premium Only", disney: "Yes" },
                 ].map((row, idx) => (
                   <tr key={idx} className="bg-[#0f0f0f]">
                     <td className="px-4 py-3 text-gray-300 font-medium">{row.feature}</td>
-                    <td className="px-4 py-3 text-center text-white">{row.netflix}</td>
+                    <td className="px-4 py-3 text-center text-amber-400 font-semibold">{row.netflix}</td>
                     <td className="px-4 py-3 text-center text-gray-400">{row.prime}</td>
                     <td className="px-4 py-3 text-center text-gray-400">{row.disney}</td>
                   </tr>
@@ -659,18 +692,18 @@ export default function NetflixNepalPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16">
+      <section className="py-16 bg-gradient-to-b from-transparent to-amber-500/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">Ready to Start Streaming?</h2>
+          <h2 className="text-3xl font-bold text-white mb-6">Ready to Start Streaming Netflix in Nepal?</h2>
           <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-            Get your Netflix subscription instantly with OTTSewa. Choose your plan, make payment, and start streaming thousands of movies and shows immediately.
+            Get your Netflix subscription instantly with OTTSewa. Choose your plan (Rs. 350 to Rs. 999), make payment via eSewa/Khalti/Bank transfer, and start streaming thousands of movies, series, and Netflix originals immediately in Nepal.
           </p>
           <Link
             href="/category?search=netflix"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold px-8 py-4 rounded-lg transition-all shadow-lg shadow-red-600/20"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold px-8 py-4 rounded-lg transition-all shadow-lg shadow-amber-500/30"
           >
             <Play className="w-5 h-5" />
-            Browse Netflix Plans
+            Get Netflix Now - From Rs. 350
           </Link>
         </div>
       </section>
