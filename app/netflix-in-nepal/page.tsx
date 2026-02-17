@@ -5,15 +5,10 @@ import {
   Globe,
   Users,
   Zap,
-  HelpCircle,
-  FileText,
-  MessageSquare,
-  BookOpen,
 } from "lucide-react"
 import Link from "next/link"
 import { PageHeader } from "@/components/info-pages/page-header"
 import { SectionCard } from "@/components/info-pages/section-card"
-import { QuickLinks } from "@/components/info-pages/quick-links"
 
 export const metadata: Metadata = {
   title: "Netflix in Nepal 2026 - Price, Plans, Best Deal Starting Rs. 350 | OTTSewa",
@@ -168,13 +163,6 @@ const faqItems = [
     q: "Can I download Netflix content to watch offline?",
     a: "Yes, all Netflix plans support downloading movies and series to watch offline on mobile devices. Downloaded content is available for 30 days.",
   },
-]
-
-const quickLinks = [
-  { title: "Browse Products", description: "See all Netflix plans", href: "/category", icon: BookOpen },
-  { title: "How It Works", description: "Complete purchase guide", href: "/how-it-works", icon: FileText },
-  { title: "FAQ", description: "Common questions", href: "/faq", icon: HelpCircle },
-  { title: "Contact Support", description: "Get help anytime", href: "/contact", icon: MessageSquare },
 ]
 
 export default function NetflixNepalPage() {
@@ -422,13 +410,7 @@ export default function NetflixNepalPage() {
         </div>
       </section>
 
-      {/* Quick Links */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-white mb-8 text-center">Quick Links</h2>
-          <QuickLinks links={quickLinks} />
-        </div>
-      </section>
+
     </div>
   )
 }
