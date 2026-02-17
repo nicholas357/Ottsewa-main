@@ -100,6 +100,8 @@ export default function Footer() {
               {[
                 { label: "About Us", href: "/about" },
                 { label: "How It Works", href: "/how-it-works" },
+                { label: "Guides", href: "/guides" },
+                { label: "Netflix in Nepal", href: "/netflix-in-nepal" },
                 { label: "Contact Us", href: "/contact" },
               ].map((link) => (
                 <li key={link.label}>

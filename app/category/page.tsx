@@ -23,10 +23,54 @@ import { createServerClient } from "@/lib/supabase/server"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "All Categories - Digital Products Nepal",
+  title: "All Digital Products & Subscriptions - Netflix, Spotify, Gaming, Gift Cards Nepal | OTTSewa",
   description:
-    "Browse all categories of digital products, games, gift cards, subscriptions, and software available in Nepal.",
-  keywords: ["digital products nepal", "game categories", "gift cards nepal", "subscriptions nepal"],
+    "Browse all digital products in Nepal - Netflix, Spotify, Disney+, Amazon Prime Video, gaming subscriptions, gift cards, and software. Instant delivery with OTTSewa.",
+  keywords: [
+    "digital products nepal",
+    "Netflix Nepal",
+    "Spotify Nepal",
+    "gift cards nepal",
+    "steam gift cards",
+    "PSN gift cards",
+    "subscriptions nepal",
+    "game cards nepal",
+    "Disney+ Nepal",
+    "HBO Max Nepal",
+    "YouTube Premium Nepal",
+    "buy subscriptions online",
+  ],
+  metadataBase: new URL("https://www.ottsewa.store"),
+  alternates: {
+    canonical: "/category",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://www.ottsewa.store/category",
+    siteName: "OTTSewa",
+    title: "All Digital Products & Subscriptions Nepal",
+    description: "Browse Netflix, Spotify, gaming, and gift cards in Nepal with instant delivery.",
+    images: [
+      {
+        url: "/og-categories.png",
+        width: 1200,
+        height: 630,
+        alt: "OTTSewa All Categories",
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 }
 
 export const revalidate = 120
