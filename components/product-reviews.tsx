@@ -3,47 +3,47 @@
 import React from 'react'
 import { Star } from 'lucide-react'
 
-// Static reviews with Nepali names for SEO and trust
+// Static reviews with Nepali names (transliterated) for SEO and trust
 const STATIC_REVIEWS = [
   {
     id: 1,
-    author: 'राज कुमार वर्मा',
+    author: 'Raj Kumar Verma',
     rating: 5,
-    title: 'उत्कृष्ट गुणस्तर र तीव्र डिलिभरी',
+    title: 'Excellent Quality and Fast Delivery',
     content:
-      'यो सबै उत्पाद बढि राम्रो छ र डिलिभरी पनि धेरै छिटो भयो। मलाई कहिले नै असन्तुष्ट भएको छैन।',
+      'This product is of excellent quality and the delivery was incredibly fast. I have never been disappointed with my purchase. Great service overall!',
     verified: true,
-    date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('en-NP'),
+    date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US'),
   },
   {
     id: 2,
-    author: 'प्रिया शर्मा',
+    author: 'Priya Sharma',
     rating: 5,
-    title: 'सुरक्षित र विश्वस्त सेवा',
+    title: 'Safe and Trustworthy Service',
     content:
-      'OTTSewa बाट किनेर मलाई पछुताउने कुनै कारण छैन। भुक्तानी सुरक्षित र ग्राहक सेवा उत्कृष्ट छ।',
+      'I have no reason to regret buying from OTTSewa. The payment is secure and the customer service is outstanding. Highly recommended for anyone looking for reliable service.',
     verified: true,
-    date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-NP'),
+    date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US'),
   },
   {
     id: 3,
-    author: 'अमित पाण्डे',
+    author: 'Amit Pandey',
     rating: 4,
-    title: 'राम्रो मूल्य र तीव्र सेवा',
+    title: 'Great Value and Fast Service',
     content:
-      'मैले यहाँ अनेक पटक खरिद गरेको छु र हरेक पटक सन्तुष्ट भएको छु। मूल्य पनि अन्य ठाउँ भन्दा सस्तो छ।',
+      'I have purchased multiple times from this platform and have been satisfied each time. The prices are competitive and very reasonable compared to other sites. Excellent shopping experience.',
     verified: true,
-    date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toLocaleDateString('en-NP'),
+    date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US'),
   },
   {
     id: 4,
-    author: 'सुना देवी खातिवडा',
+    author: 'Suna Devi Khatiwada',
     rating: 5,
-    title: 'उत्तम अनुभव र सेवा',
+    title: 'Excellent Experience and Service',
     content:
-      'मै नेपालको विभिन्न ठाउँबाट किनेको छु र सबै ठाउँमा एकै राम्रो सेवा पाएको छु। यो साइट धेरै भरपर्दो छ।',
+      'I have ordered from different parts of Nepal and received consistent quality service everywhere. This is a highly trustworthy platform. Delivery is always on time and packaging is excellent.',
     verified: true,
-    date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toLocaleDateString('en-NP'),
+    date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US'),
   },
 ]
 
@@ -60,8 +60,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <div className="flex items-center gap-2 mb-2">
-              <h2 className="text-xl sm:text-2xl font-bold text-white">ग्राहकको प्रतिक्रिया</h2>
-              <span className="text-xs sm:text-sm text-zinc-500">(Customer Reviews)</span>
+              <h2 className="text-xl sm:text-2xl font-bold text-white">Customer Reviews</h2>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <div className="flex items-center gap-0.5">
@@ -126,19 +125,19 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
           <div className="mt-8 sm:mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-6 sm:pt-8 border-t border-white/[0.06]">
             <div className="text-center p-3 sm:p-4 rounded-lg bg-[#1a1a1a] border border-white/[0.06]">
               <div className="text-xl sm:text-2xl font-bold text-amber-400 mb-1">10,000+</div>
-              <p className="text-xs sm:text-sm text-zinc-500">संतुष्ट ग्राहकहरु</p>
+              <p className="text-xs sm:text-sm text-zinc-500">Happy Customers</p>
             </div>
             <div className="text-center p-3 sm:p-4 rounded-lg bg-[#1a1a1a] border border-white/[0.06]">
               <div className="text-xl sm:text-2xl font-bold text-amber-400 mb-1">24/7</div>
-              <p className="text-xs sm:text-sm text-zinc-500">ग्राहक सहायता</p>
+              <p className="text-xs sm:text-sm text-zinc-500">Customer Support</p>
             </div>
             <div className="text-center p-3 sm:p-4 rounded-lg bg-[#1a1a1a] border border-white/[0.06]">
               <div className="text-xl sm:text-2xl font-bold text-amber-400 mb-1">100%</div>
-              <p className="text-xs sm:text-sm text-zinc-500">सुरक्षित लेनदेन</p>
+              <p className="text-xs sm:text-sm text-zinc-500">Secure Transactions</p>
             </div>
             <div className="text-center p-3 sm:p-4 rounded-lg bg-[#1a1a1a] border border-white/[0.06]">
-              <div className="text-xl sm:text-2xl font-bold text-amber-400 mb-1">तात्कालीन</div>
-              <p className="text-xs sm:text-sm text-zinc-500">डिलिभरी</p>
+              <div className="text-xl sm:text-2xl font-bold text-amber-400 mb-1">Fast</div>
+              <p className="text-xs sm:text-sm text-zinc-500">Delivery</p>
             </div>
           </div>
 
