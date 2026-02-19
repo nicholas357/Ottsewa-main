@@ -5,6 +5,7 @@ import { Shield, Zap, Clock, ChevronRight, Tag, ChevronDown, Home } from "lucide
 import { getProductBySlug, getProducts, type Product } from "@/lib/products"
 import { ProductDescription } from "@/components/product-description"
 import { ProductInteractions } from "@/components/product-interactions"
+import { ProductReviews } from "@/components/product-reviews"
 
 // Platform Icons
 const PCIcon = () => (
@@ -667,6 +668,9 @@ export default async function ProductPage({ params }: { params: { slug: string }
               </div>
             </div>
           )}
+
+          {/* Customer Reviews Section */}
+          <ProductReviews productId={product.id} productTitle={product.title} />
         </div>
       </div>
     </div>
