@@ -185,6 +185,10 @@ function generateProductSchema(product: Product, baseUrl: string): ProductSchema
       author: { "@type": "Person", name: "Raj Kumar Verma" },
       reviewBody: "This product is of excellent quality and the delivery was incredibly fast. I have never been disappointed with my purchase. Great service overall!",
       datePublished: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      itemReviewed: {
+        "@type": "Product",
+        name: product.title,
+      },
     },
     {
       "@type": "Review",
@@ -198,6 +202,10 @@ function generateProductSchema(product: Product, baseUrl: string): ProductSchema
       author: { "@type": "Person", name: "Priya Sharma" },
       reviewBody: "I have no reason to regret buying from OTTSewa. The payment is secure and the customer service is outstanding. Highly recommended for anyone looking for reliable service.",
       datePublished: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      itemReviewed: {
+        "@type": "Product",
+        name: product.title,
+      },
     },
     {
       "@type": "Review",
@@ -211,6 +219,10 @@ function generateProductSchema(product: Product, baseUrl: string): ProductSchema
       author: { "@type": "Person", name: "Amit Pandey" },
       reviewBody: "I have purchased multiple times from this platform and have been satisfied each time. The prices are competitive and very reasonable compared to other sites. Excellent shopping experience.",
       datePublished: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      itemReviewed: {
+        "@type": "Product",
+        name: product.title,
+      },
     },
     {
       "@type": "Review",
@@ -224,6 +236,10 @@ function generateProductSchema(product: Product, baseUrl: string): ProductSchema
       author: { "@type": "Person", name: "Suna Devi Khatiwada" },
       reviewBody: "I have ordered from different parts of Nepal and received consistent quality service everywhere. This is a highly trustworthy platform. Delivery is always on time and packaging is excellent.",
       datePublished: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      itemReviewed: {
+        "@type": "Product",
+        name: product.title,
+      },
     },
   ]
 
