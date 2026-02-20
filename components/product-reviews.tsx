@@ -148,30 +148,11 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
                 '@context': 'https://schema.org',
-                '@type': 'Product',
-                review: STATIC_REVIEWS.map((review) => ({
-                  '@type': 'Review',
-                  reviewRating: {
-                    '@type': 'Rating',
-                    ratingValue: review.rating,
-                    bestRating: '5',
-                  },
-                  author: {
-                    '@type': 'Person',
-                    name: review.author,
-                  },
-                  reviewBody: review.content,
-                  datePublished: new Date(
-                    Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000
-                  )
-                    .toISOString()
-                    .split('T')[0],
-                })),
-                aggregateRating: {
-                  '@type': 'AggregateRating',
-                  ratingValue: '4.8',
-                  reviewCount: STATIC_REVIEWS.length,
-                },
+                '@type': 'AggregateRating',
+                ratingValue: '4.8',
+                reviewCount: STATIC_REVIEWS.length,
+                bestRating: '5',
+                worstRating: '1',
               }),
             }}
           />
