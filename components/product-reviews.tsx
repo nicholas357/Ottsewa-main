@@ -141,21 +141,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
             </div>
           </div>
 
-          {/* SEO Schema JSON-LD */}
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type': 'AggregateRating',
-                ratingValue: '4.8',
-                reviewCount: STATIC_REVIEWS.length,
-                bestRating: '5',
-                worstRating: '1',
-              }),
-            }}
-          />
+
         </div>
       </div>
     </section>
