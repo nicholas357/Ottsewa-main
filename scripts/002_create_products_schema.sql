@@ -476,8 +476,16 @@ on public.product_keys for select
 using (used_by = auth.uid());
 
 -- =====================================================
+-- =====================================================
 -- 12. REVIEWS TABLE
 -- =====================================================
+-- IMPORTANT: This table stores user reviews for products.
+-- For SEO purposes (JSON-LD schema.org):
+--   - average_rating and review_count fields in products table provide AggregateRating data
+--   - Individual reviews from this table provide Review items in product schema
+--   - Static reviews (Nepali names, English content) are hardcoded in app/product/[slug]/page.tsx
+--     for consistent SEO benefit across all products
+--   - Both database reviews and static reviews contribute to schema.org markup
 create table if not exists public.reviews (
   id uuid primary key default gen_random_uuid(),
   product_id uuid not null references public.products(id) on delete cascade,
