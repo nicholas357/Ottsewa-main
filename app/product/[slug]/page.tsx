@@ -140,11 +140,11 @@ type ProductSchema = {
   }
   review?: Array<{
     "@type": string
+    name: string
     reviewRating: { "@type": string; ratingValue: number; bestRating: number; worstRating: number }
     author: { "@type": string; name: string }
-    reviewBody?: string
-    datePublished?: string
-    name?: string
+    reviewBody: string
+    datePublished: string
   }>
   additionalProperty?: Array<{ "@type": string; name: string; value: string }>
 }
