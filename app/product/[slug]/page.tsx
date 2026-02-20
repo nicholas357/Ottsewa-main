@@ -227,7 +227,8 @@ function generateProductSchema(product: Product, baseUrl: string): ProductSchema
     },
   ]
 
-  const schema: ProductSchema = {
+  // Build schema step by step to avoid duplication
+  const schema: any = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.title,
@@ -236,27 +237,14 @@ function generateProductSchema(product: Product, baseUrl: string): ProductSchema
       ? [product.image_url, ...product.gallery_images].filter(Boolean)
       : product.image_url,
     sku: product.id,
-    ...(hasRealReviews && hasRealRating
-      ? {
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: Number(product.average_rating!.toFixed(1)),
-            reviewCount: product.review_count,
-            bestRating: 5,
-            worstRating: 1,
-          },
-          review: staticReviews,
-        }
-      : {
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: 4.8,
-            reviewCount: 4,
-            bestRating: 5,
-            worstRating: 1,
-          },
-          review: staticReviews,
-        }),
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: hasRealReviews && hasRealRating ? Number(product.average_rating!.toFixed(1)) : 4.8,
+      reviewCount: hasRealReviews && hasRealRating ? product.review_count : 4,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    review: staticReviews,
     offers: {
       "@type": "Offer",
       price: cleanPrice,
@@ -350,7 +338,7 @@ function generateProductSchema(product: Product, baseUrl: string): ProductSchema
     schema.additionalProperty = additionalProperties
   }
 
-  return schema
+  return schema as ProductSchema
 }
 
 function generateBreadcrumbSchema(product: Product, baseUrl: string) {
